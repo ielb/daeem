@@ -1,10 +1,8 @@
 import 'dart:async';
-
-import 'package:daeem/configs/config.dart';
-import 'package:daeem/screens/onBoarding.dart';
+import 'package:daeem/provider/auth_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:daeem/services/services.dart';
+import "package:provider/provider.dart";
 
 class Splash extends StatefulWidget {
   static const id = "/splash";
@@ -14,49 +12,29 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+  Timer? _timer;
   @override
   void initState() {
-    super.initState();
-    Timer(const Duration(milliseconds: 1000), () {
-      Navigator.pushReplacement(context,CupertinoPageRoute(builder: (context)=>OnBoardering()));
+    WidgetsBinding.instance!.addPostFrameCallback((_)=>_skip());
+
+
+    _timer = new Timer(const Duration(milliseconds: 2000), () {
+      Navigator.pushReplacementNamed(context,OnBoardering.id);
     });
+    super.initState();
   }
-
+    _skip() async{
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      bool isOnBoardingSkipped = await auth.getOnBoardingSkipped() ?? false;
+      if(isOnBoardingSkipped) {
+        Navigator.pushReplacementNamed(context, Login.id);
+      }
+    }
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    precacheImage(
-        AssetImage(
-          Config.logo,
-        ),
-        context);
-    precacheImage(
-        AssetImage(
-          Config.background,
-        ),
-        context);
-    precacheImage(
-        AssetImage(
-          Config.shopping_cart,
-        ),
-        context);
-    precacheImage(
-        AssetImage(
-          Config.ontheway,
-        ),
-        context);
-    precacheImage(
-        AssetImage(
-          Config.arrived,
-        ),
-        context);
-    precacheImage(
-        AssetImage(
-          Config.auth_background,
-        ),
-        context);
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,3 +71,4 @@ class _SplashState extends State<Splash> {
             )));
   }
 }
+

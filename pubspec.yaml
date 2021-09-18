@@ -28,20 +28,31 @@ dependencies:
     sdk: flutter
 
     
-  cloud_firestore: ^2.5.1 
+
   cupertino_icons: ^1.0.2
-  firebase_auth: ^3.1.0
+  http: ^0.13.3
   provider: ^6.0.0
   google_fonts: ^2.1.0
   introduction_screen: ^2.1.0
+  flutter_svg: ^0.22.0
+  intl: ^0.17.0
+  shared_preferences: ^2.0.6
+  flutter_rating_stars: ^1.0.3+4
+
+  #auth
+  flutter_facebook_auth: ^3.5.1
+  google_sign_in: ^5.1.0
+
+
 
   # Firebase packages
   firebase_core: ^1.6.0
+  firebase_auth: ^3.1.0
+  cloud_firestore: ^2.5.1
   firebase_dynamic_links: ^2.0.9
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  intl: ^0.17.0
-  shared_preferences: ^2.0.6
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +72,19 @@ flutter:
      - assets/order_arrived.png
      - assets/ontheway.png
      - assets/market.png
+     - assets/Facebook.svg
+     - assets/Google.svg
+     - assets/market_4.jpg
+     - assets/logo_v.png
+     - assets/user.svg
+     - assets/question.svg
+     - assets/rate.svg
+     - assets/share.svg
+     - assets/question.svg
+     - assets/notifications.svg
+     - assets/logout.svg
+     - assets/shopping-bag.svg
+     - assets/closed.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-animages/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
@@ -70,11 +94,11 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-
-  fonts:
-    - family: icomoon
-      fonts:
-        - asset: assets/fonts/MyIcons.ttf
-
-
+#
+#  fonts:
+#    - family: icomoon
+#      fonts:
+#        - asset: assets/fonts/MyIcons.ttf
+#
+#
 

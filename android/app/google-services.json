@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "754880333308",
+    "project_id": "daeem-10b87",
+    "storage_bucket": "daeem-10b87.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754880333308:android:24877d09b33939c6749e79",
+        "android_client_info": {
+          "package_name": "com.ielb.daeem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754880333308-ghqopvkolhgici92nh70nboudtqb755q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ielb.daeem",
+            "certificate_hash": "09cbef21a99cbd424bd8a6dafb4a0b960645bd49"
+          }
+        },
+        {
+          "client_id": "754880333308-vv2m8jg73ouuqtduej0t35fddtrc0co6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD06NHrE7Q0bvZKU4bbb_iCu_JbwuIhp7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754880333308-vv2m8jg73ouuqtduej0t35fddtrc0co6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
