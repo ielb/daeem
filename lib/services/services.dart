@@ -18,3 +18,5 @@ export 'package:daeem/configs/config.dart';
 export  'package:daeem/widgets/SearchInput.dart';
 export 'package:daeem/widgets/toast.dart';
 export 'package:daeem/screens/loading.dart';
+export 'package:daeem/models/client.dart';
+export 'package:daeem/preferences/prefs.dart';

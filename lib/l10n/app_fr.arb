@@ -22,5 +22,25 @@
   "phone": "Numéro de téléphone",
   "address": "Adresse",
   "love_join": "Nous serions ravis que vous nous rejoigniez",
-  "have_acc": "Vous avez déjà un compte?"
+  "have_acc": "Vous avez déjà un compte?",
+
+  "name": "nom",
+  "wentWrong": "Quelque chose a mal tourné s’il vous plaît essayez à nouveau!",
+  "welcome_home": "Bienvenue",
+  "delivering_to": "Emplacement actuel",
+  "current_loc": "Current Location",
+  "search": "Recherche d’un supermarché",
+  "available": "disponible",
+  "closed": "fermé",
+  "kg": "Veuillez ne pas dépasser 15 kg",
+
+  "account": "Compte",
+  "my_orders": "Mes ordres",
+  "my_information": "Mes informations",
+  "notification": "Notifications",
+  "rate": "Rate us",
+  "refer": "Référez un ami",
+  "help": "Aide",
+  "logout":  "Déconnexion"
+
 }

@@ -15,19 +15,43 @@ class _SplashState extends State<Splash> {
   Timer? _timer;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_)=>_skip());
 
+    WidgetsBinding.instance!.addPostFrameCallback((_)async {
 
     _timer = new Timer(const Duration(milliseconds: 2000), () {
-      Navigator.pushReplacementNamed(context,OnBoardering.id);
+      _getAuthClient();
+     // _skip();
+
+    });
     });
     super.initState();
   }
-    _skip() async{
+
+ void _getAuthClient()async{
+    print("test");
+   final auth = Provider.of<AuthProvider>(context, listen: false);
+    String? id = await Prefs.instance.getClient();
+    bool? isAut = await Prefs.instance.getAuth();
+
+    if(id!=null&&isAut!=null){
+      bool result = await auth.getAuthenticatedClient(id);
+
+         if(result){
+             Navigator.pushReplacementNamed(context, Home.id);
+         }else{
+           _skip();
+         }
+    }
+    _skip();
+  }
+
+   void _skip() async{
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      bool isOnBoardingSkipped = await auth.getOnBoardingSkipped() ?? false;
-      if(isOnBoardingSkipped) {
+      bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
+      if(isOnBoardingSkipped!=null&&isOnBoardingSkipped) {
         Navigator.pushReplacementNamed(context, Login.id);
+      }else{
+        Navigator.pushReplacementNamed(context, OnBoardering.id);
       }
     }
   @override

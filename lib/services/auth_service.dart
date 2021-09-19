@@ -16,22 +16,33 @@ class AuthService extends BaseApi {
       print(e);
     }
    }
-  Future<http.Response?> socialLogin(int platform,String email, String uid) async{
+  Future<http.Response?> socialLogin(int provider,String email, String uid) async{
     try {
-      if(platform==0)
-        return await api.httpPost('login_google', {'email': email.trim(), 'go_id': uid});
-      else
-        return await api.httpPost('login_facebook', {'email': email.trim(), 'fb_id': uid});
+
+        return await api.httpPost('login_client',
+            {
+              'uid': uid,
+              'email': email.trim().toLowerCase(),
+              'provider': provider == 0 ? 'google' :'facebook'
+            }
+        );
+
     } catch (e) {
       print(e);
     }
   }
-  Future<http.Response?>  socialRegister(int platform,String email, String uid,String name)async{
+  Future<http.Response?>  socialRegister(int provider,String email, String uid,String name)async{
     try {
-      if(platform==0)
-        return await api.httpPost('register_google', {'name':name.trim().toLowerCase(),'email': email.trim().toLowerCase(), 'uid': uid.trim()});
-      else
-        return await api.httpPost('register_facebook', {'name':name.trim().toLowerCase(),'email': email.trim().toLowerCase(), 'uid': uid.trim()});
+
+        return await api.httpPost('register_client',
+            {
+             'uid': uid,
+             'name':name.trim().toLowerCase(),
+             'email': email.trim().toLowerCase(),
+              'provider': provider == 0 ? 'google' :'facebook'
+            }
+        );
+
     } catch (e) {
       print(e);
     }
@@ -46,11 +57,18 @@ class AuthService extends BaseApi {
    }
   Future<http.Response?> getClient(String id)async{
     try {
-      return await api.httpGet('user/$id');
+      return await api.httpGet('client/$id');
     } catch (e) {
       print(e);
     }
    }
+  Future<http.Response?> sentVerification()async{
+    try {
+      return await api.httpGet('user/');
+    } catch (e) {
+      print(e);
+    }
+  }
 
   // Future<http.Response?> logout(){
   //

@@ -25,6 +25,7 @@ class Config {
   static Widget notification = SvgPicture.asset("assets/notifications.svg",height: 26,width: 26,);
   static Widget question = SvgPicture.asset("assets/question.svg",height: 26,width: 26,);
   static Widget closed = SvgPicture.asset("assets/closed.svg",height: 35,width: 35,);
+  static Widget emailSent = SvgPicture.asset("assets/email_sent.svg",height: 130,width: 130,);
 
   static const margane = "assets/market_4.jpg";
   static const logo_white ="assets/logo_v.png";
@@ -36,10 +37,9 @@ class Config {
     return regExp.hasMatch(email);
   }
   static bool isPassword(String password) {
-    String p = r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{7,}$';
-    RegExp regExp = new RegExp(p);
+    bool isPass = password.length >= 8 ? true :false ;
 
-    return regExp.hasMatch(password);
+    return isPass;
   }
 
 

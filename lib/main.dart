@@ -1,8 +1,10 @@
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
+import 'screens/email/verify_email.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
+import "package:daeem/screens/sous_category.dart";
 
 
 void main() async{
@@ -71,9 +73,14 @@ Route<dynamic> routes(RouteSettings settings) {
       /// Profile
     case Profile.id:
       return CupertinoPageRoute(builder: (_) => Profile(), settings: settings);
+    case VerifyEmail.id:
+      return CupertinoPageRoute(builder: (_) => VerifyEmail(), settings: settings);
       /// Settings
     case Setting.id:
       return CupertinoPageRoute(builder: (_) => Setting(), settings: settings);
+
+    case Category.id:
+      return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
 
     /// Default route in case of error
     default:

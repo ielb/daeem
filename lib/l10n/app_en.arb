@@ -24,6 +24,27 @@
   "phone": "Phone Number",
   "address": "Address",
   "love_join": "We would love you to join us",
-  "have_acc": "Already have an account?"
+  "have_acc": "Already have an account?",
+
+  "name": "Name",
+  "wentWrong": "Something went wrong please try again!",
+  "welcome_home": "Welcome",
+  "delivering_to": "Delivering to",
+  "current_loc": "Current Location",
+  "search": "Search for a supermarket",
+  "available": "Available",
+  "closed": "Closed",
+  "kg": "Please do not exceed 15Kg",
+
+  "account": "Account",
+  "my_orders": "My orders",
+  "my_information": "My information",
+  "notification": "Notifications",
+  "rate": "Rate us",
+  "refer": "Refer a friend",
+  "help": "Help",
+  "logout": "Log out"
+
+
 
 }

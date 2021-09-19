@@ -1,3 +1,4 @@
+import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
@@ -12,6 +13,8 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   TextEditingController? _emailController;
   TextEditingController? _passwordController;
+  TextEditingController? _nameController;
+  AuthProvider _authProvider = AuthProvider();
   bool _isVisible = true;
   bool _isValidate = true;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -19,9 +22,15 @@ class _SignUpState extends State<SignUp> {
   void initState() {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-
+    _nameController = TextEditingController();
     super.initState();
   }
+  @override
+  void didChangeDependencies() {
+    _authProvider = Provider.of<AuthProvider>(context);
+    super.didChangeDependencies();
+  }
+
 
   @override
   void dispose() {
@@ -36,15 +45,22 @@ class _SignUpState extends State<SignUp> {
       _isVisible = !_isVisible;
     });
   }
-  _validate(){
+  _validate()async{
+
     if(_formkey.currentState!.validate()) {
       setState((){
         _isValidate=true;
       });
-      if (Config.isEmail(_emailController!.text) &&
+      if (Config.isEmail(_emailController!.text.trim()) &&
           Config.isPassword(_passwordController!.text)) {
-        //Login logic
-        Navigator.pushReplacementNamed(context, 'home');
+        var result = await _authProvider.registerWithEmail(_nameController!.text,_emailController!.text,_passwordController!.text);
+        if(result){
+          Toast.show("Registration completed successfully,please login",context);
+          Navigator.pushReplacementNamed(context,Login.id);
+        }else{
+          Toast.show(AppLocalizations.of(context)!.wentWrong,context,duration: 4);
+        }
+
       } else {
 
       }
@@ -55,15 +71,26 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  _googleLogin(){
-
+  _googleSignUp()async{
+    var result = await _authProvider.socialSignUp("google");
+    if(result){
+      Navigator.pushReplacementNamed(context,Home.id);
+    }else{
+      Toast.show(AppLocalizations.of(context)!.wentWrong,context,duration: 4);
+    }
   }
-  _facebookLogin(){
-
+  _facebookSignUp()async{
+   var result = await _authProvider.socialSignUp("facebook");
+   if(result){
+     Navigator.pushReplacementNamed(context,Home.id);
+   }else{
+     Toast.show(AppLocalizations.of(context)!.wentWrong,context,duration: 4);
+   }
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    var locale = Provider.of<LocaleProvider>(context);
+    return _authProvider.isLoading ? Loading() : Scaffold(
       body: SingleChildScrollView(
         child: Container(
           width: screenSize(context).width,
@@ -83,22 +110,17 @@ class _SignUpState extends State<SignUp> {
                     fontWeight: FontWeight.w600),
               )
                   .paddingOnly(left: 35, bottom: 10)
-                  .align(alignment: Alignment.topLeft),
+                  .align(alignment: locale.locale?.languageCode == "ar" ? Alignment.topRight : Alignment.topLeft),
               Container(
                 padding: EdgeInsets.all(5),
                 margin: EdgeInsets.only(bottom: 30),
-                height:_isValidate ?   420 : 500 ,
+                height:_isValidate ?   440 : 480 ,
                 width: screenSize(context).width * .85,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20)),
                 child: Column(
                   children: [
-                    Image.asset(
-                      Config.logo,
-                      width: 200,
-                      filterQuality: FilterQuality.high,
-                    ).paddingOnly(top: 10,bottom:10),
                     RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
@@ -121,15 +143,17 @@ class _SignUpState extends State<SignUp> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children:[
-                        IconButton(icon:Config.google,onPressed:_googleLogin,iconSize:40),
+                        IconButton(icon:Config.google,onPressed:_googleSignUp,iconSize:40),
                         SizedBox(width: 20,),
-                        IconButton(icon :Config.facebook,onPressed:_facebookLogin,iconSize: 40,),
+                        IconButton(icon :Config.facebook,onPressed:_facebookSignUp,iconSize: 40,),
                       ]
                     ),
                     Form(
                         key: _formkey,
                         child: Column(
                           children: [
+                            Input(_nameController!, AppLocalizations.of(context)!.name,
+                                CupertinoIcons.person,isName: true,),
                             Input(_emailController!, AppLocalizations.of(context)!.email,
                                 Icons.email_outlined),
                             Input(
@@ -161,7 +185,7 @@ class _SignUpState extends State<SignUp> {
                     ).paddingOnly(top: 5, bottom: 10),
                     OutlinedButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context,'market');
+                        Navigator.pushReplacementNamed(context,Home.id);
                       },
                       child: Text(AppLocalizations.of(context)!.skip),
                       style: OutlinedButton.styleFrom(

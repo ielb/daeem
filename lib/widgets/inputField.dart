@@ -5,10 +5,11 @@ import 'package:daeem/services/services.dart';
 
 class Input extends StatelessWidget {
   Input(this._controller, this._hint, this._icon,
-      {this.isPassword = false, this.showPassword,this.isNumber=false, this.obscureText = false});
+      {this.isName=false,this.isPassword = false, this.showPassword,this.isNumber=false, this.obscureText = false});
 
   final String _hint;
   final IconData _icon;
+  final bool isName;
   final bool obscureText;
   final bool isPassword;
   final bool isNumber;
@@ -21,20 +22,22 @@ class Input extends StatelessWidget {
       width: 270,
       child: TextFormField(
         validator: (content){
+          if(!isName){
 
           if(isPassword==false&&!isNumber){
-           bool result  =  Config.isEmail(_controller.text);
+           bool result  =  Config.isEmail(_controller.text.trim());
              if(!result){
               return "Please provide a valid email";}
           }else{
             if(isPassword) {
-              bool result = _controller.text.length==8 ? true : false;
+              bool result = _controller.text.length>=8 ? true : false;
               if (!result) {
                 return "Please provide a valid password >= 8";
               }
             }else{
               return "Please provide a valid phone number";
             }
+          }
           }
         },
         controller: _controller,

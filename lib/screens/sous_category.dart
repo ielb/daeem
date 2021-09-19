@@ -1,12 +1,13 @@
 import 'dart:ui';
 
+import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/market_category.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
 
 class Category extends StatefulWidget {
-  static const id = "Category";
+  static const id = "category";
 
   @override
   _CategoryState createState() => _CategoryState();
@@ -101,8 +102,11 @@ class _CategoryState extends State<Category> {
       itemCount: 5,
       itemExtent: 190,
       itemBuilder: (context, index) {
-        return CategoryWidget("Food", Config.margane)
-            .paddingOnly(left: 20, right: 20, bottom: 20);
+        return GestureDetector(
+          onTap: ()=> Navigator.pushNamed(context,ProductsPage.id),
+          child: CategoryWidget("Food", Config.margane)
+              .paddingOnly(left: 20, right: 20, bottom: 20),
+        );
       },
     ),
   );

@@ -47,7 +47,7 @@ class _LoginState extends State<Login> {
       setState((){
         _isValidate=true;
       });
-      if (Config.isEmail(_emailController!.text)) {
+      if (Config.isEmail(_emailController!.text.trim())&&Config.isPassword(_passwordController!.text)) {
         _login(_emailController!.text,_passwordController!.text);
        //
       } else {
@@ -63,28 +63,29 @@ class _LoginState extends State<Login> {
  void _login(String email,String password)async{
     var result = await _authProvider.loginWithEmail(email,password);
     if(result) Navigator.pushReplacementNamed(context, Home.id);
-    else Toast.show('Please try again',context);
+    else Toast.show(AppLocalizations.of(context)!.wentWrong,context);
   }
   ///google button
  void signInWithGoogle()async{
-   bool result = await _authProvider.registerWithGoogle(true);
+   bool result = await _authProvider.socialLogin("google");
    if(result){
      Navigator.pushReplacementNamed(context, Home.id);
    }else
-     Toast.show("Please try again", context,duration: 2);
+     Toast.show(AppLocalizations.of(context)!.wentWrong, context,duration: 2);
   }
   ///facebook button
   void signInWithFacebook()async{
-    bool result = await _authProvider.registerWithFacebook(true);
+    bool result = await _authProvider.socialLogin("facebook");
     if(result){
       Navigator.pushReplacementNamed(context, Home.id);
     }else
-      Toast.show("Please try again", context,duration: 2);
+      Toast.show(AppLocalizations.of(context)!.wentWrong, context,duration: 2);
 
   }
 
   @override
   Widget build(BuildContext context) {
+    var locale = Provider.of<LocaleProvider>(context, listen: false);
     return WillPopScope(
       onWillPop: () async => false,
       child: _authProvider.isLoading ?  Loading() : Scaffold(
@@ -100,19 +101,22 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.signIn,
-                  style: GoogleFonts.ubuntu(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.w600),
-                )
-                    .paddingOnly(left: 35, bottom: 10)
-                    .align(alignment: Alignment.topLeft),
+                Align(
+            alignment:locale.locale == Locale('ar')  ? Alignment.topRight : Alignment.topLeft,
+                  child: Text(
+                    AppLocalizations.of(context)!.signIn,
+                    style: GoogleFonts.ubuntu(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600),
+                  )
+                      .paddingOnly(left:locale.locale == Locale('ar')  ? 0 : 35,right: locale.locale == Locale('ar')  ? 35 : 0, bottom: 10)
+                      ,
+                ),
                 Container(
                   padding: EdgeInsets.all(10),
                   margin: EdgeInsets.only(bottom: 30),
-                  height:_isValidate? 429 : 477,
+                  height:_isValidate? locale.locale == Locale('ar')  ?  460 : 440 : 477,
                   width: screenSize(context).width * .85,
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -125,6 +129,7 @@ class _LoginState extends State<Login> {
                         filterQuality: FilterQuality.high,
                       ).paddingOnly(top: 10),
                       RichText(
+                        locale: locale.locale,
                           textAlign: TextAlign.center,
                           text: TextSpan(
                             children: [
@@ -142,7 +147,7 @@ class _LoginState extends State<Login> {
                                       fontSize: 14,
                                       color: Config.color_1))
                             ],
-                          )).paddingOnly(top: 20),
+                          )).paddingOnly(top: 5),
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children:[
@@ -187,6 +192,7 @@ class _LoginState extends State<Login> {
                       ).paddingOnly(top: 5, bottom: 10),
                       OutlinedButton(
                         onPressed: () {
+                          Prefs.instance.setAuth(false);
                          Navigator.pushReplacementNamed(context,Home.id);
                         },
                         child: Text(AppLocalizations.of(context)!.skip),

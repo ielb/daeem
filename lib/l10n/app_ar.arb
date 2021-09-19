@@ -23,5 +23,25 @@
   "phone": "رقم الهاتف",
   "address": "عنوان",
   "love_join": " نحب أن تنضم إلينا",
-  "have_acc": "هل لديك حساب؟"
+  "have_acc": "هل لديك حساب؟",
+
+  "name": "الاسم",
+  "wentWrong": "حدث خطأ ما. أعد المحاولة من فضلك!",
+  "welcome_home": "أهلا بك",
+  "delivering_to": "توصيل إلى",
+  "current_loc": "الموقع الحالي",
+  "search": "ابحث عن سوبر ماركت",
+  "available": "متوفر",
+  "closed": "مغلق",
+  "kg": "من فضلك لا تتجاوز 15 كجم",
+
+  "account": "حساب",
+  "my_orders": "My orders",
+  "my_information": "طلباتي",
+  "notification": "إشعارات",
+  "rate": "قيم تطبيقنا",
+  "refer": "قم بإحالة صديق",
+  "help": "مساعدة",
+  "logout": "تسجيل خروج"
+
 }

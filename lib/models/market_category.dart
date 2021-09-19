@@ -1,5 +1,5 @@
 
 
-class Category {
+class MarketCategory {
 
 }

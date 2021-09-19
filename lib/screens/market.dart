@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:daeem/screens/sous_category.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/market_category.dart';
 import 'package:daeem/widgets/rating.dart';
@@ -101,8 +102,11 @@ class _MarketState extends State<Market> {
           itemCount: 5,
           itemExtent: 190,
           itemBuilder: (context, index) {
-            return CategoryWidget("Food", Config.margane)
-                .paddingOnly(left: 20, right: 20, bottom: 20);
+            return GestureDetector(
+              onTap: ()=> Navigator.pushNamed(context, Category.id),
+              child: CategoryWidget("Food", Config.margane)
+                  .paddingOnly(left: 20, right: 20, bottom: 20),
+            );
           },
         ),
       );

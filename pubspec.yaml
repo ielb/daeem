@@ -34,6 +34,7 @@ dependencies:
   provider: ^6.0.0
   google_fonts: ^2.1.0
   introduction_screen: ^2.1.0
+  flutter_verification_code: ^1.1.0
   flutter_svg: ^0.22.0
   intl: ^0.17.0
   shared_preferences: ^2.0.6
@@ -85,6 +86,7 @@ flutter:
      - assets/logout.svg
      - assets/shopping-bag.svg
      - assets/closed.svg
+     - assets/email_sent.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-animages/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

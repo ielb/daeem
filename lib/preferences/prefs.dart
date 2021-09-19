@@ -42,8 +42,18 @@ class Prefs {
     prefs.setBool('isAuthenticated', value);
   }
 
+
   Future<bool?> getAuth() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isAuthenticated');
+  }
+  ///client
+  setClient(String id,)async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('client_id', id);
+  }
+  Future<String?> getClient()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('client_id');
   }
 }
