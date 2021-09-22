@@ -1,4 +1,6 @@
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/products_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'screens/email/verify_email.dart';
@@ -14,6 +16,7 @@ void main() async{
       MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => AuthProvider()),
+            ChangeNotifierProvider(create: (context) => MarketProvider()),
           ],
           child:MyApp()
       )
@@ -81,6 +84,8 @@ Route<dynamic> routes(RouteSettings settings) {
 
     case Category.id:
       return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
+    case ProductsPage.id:
+      return CupertinoPageRoute(builder: (_) => ProductsPage(), settings: settings);
 
     /// Default route in case of error
     default:

@@ -9,6 +9,7 @@ class Api {
   Api._internal();
   String url = "https://app.daeem.ma/api/";
 
+  // ignore: todo
   //TODO:HERE YOU CHANGE THE BEARER TOKEN
   var headers = {
     'Accept': 'application/json',

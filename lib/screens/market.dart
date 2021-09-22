@@ -125,8 +125,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     final top = expandedHeight - shrinkOffset - size / 2;
 
     return Stack(
-      fit: StackFit.expand,
-      overflow: Overflow.visible,
+      clipBehavior: Clip.none, fit: StackFit.expand,
       children: [
         buildBackground(shrinkOffset, context),
         buildAppBar(shrinkOffset, context),

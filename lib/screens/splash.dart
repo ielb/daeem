@@ -20,12 +20,17 @@ class _SplashState extends State<Splash> {
 
     _timer = new Timer(const Duration(milliseconds: 2000), () {
       _getAuthClient();
-     // _skip();
-
+    //  _getMarkets();
     });
     });
     super.initState();
   }
+  
+  // _getMarkets() {
+  //   MarketProvider marketProvider =
+  //       Provider.of<MarketProvider>(context, listen: false);
+  //   marketProvider.getMarkets();
+  // }
 
  void _getAuthClient()async{
     print("test");
@@ -41,8 +46,10 @@ class _SplashState extends State<Splash> {
          }else{
            _skip();
          }
+    }else{
+       _skip();
     }
-    _skip();
+    
   }
 
    void _skip() async{

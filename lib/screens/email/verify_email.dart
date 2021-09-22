@@ -13,15 +13,15 @@ class VerifyEmail extends StatefulWidget {
 
 class _VerifyEmailState extends State<VerifyEmail> {
 
-  bool _onEditing = true;
+  bool onEditing = true;
   bool _isResendAgain = false;
-  bool _isVerified = false;
-  bool _isLoading = false;
+  bool isVerified = false;
+  bool isLoading = false;
 
-  String _code = '';
+  String code = '';
 
 
-  late Timer _timer;
+  late Timer timer;
   int _start = 60;
 
   void startTimer() {
@@ -30,7 +30,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
     });
 
     const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
+    timer = new Timer.periodic(
       oneSec,
           (Timer timer) {
         setState(() {
@@ -48,7 +48,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   verify() {
     setState(() {
-      _isLoading = true;
+     isLoading = true;
     });
   }
 
@@ -103,12 +103,12 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 length: 4,
                 onCompleted: (String value) {
                   setState(() {
-                    _code = value;
+                    code = value;
                   });
                 },
                 onEditing: (bool value) {
                   setState(() {
-                    _onEditing = value;
+                    onEditing = value;
                   });
                 },
               ).paddingOnly(top:20),

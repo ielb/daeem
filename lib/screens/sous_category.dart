@@ -104,6 +104,7 @@ class _CategoryState extends State<Category> {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: ()=> Navigator.pushNamed(context,ProductsPage.id),
+          
           child: CategoryWidget("Food", Config.margane)
               .paddingOnly(left: 20, right: 20, bottom: 20),
         );
@@ -125,8 +126,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     final top = expandedHeight - shrinkOffset - size / 2;
 
     return Stack(
-      fit: StackFit.expand,
-      overflow: Overflow.visible,
+      clipBehavior: Clip.none, fit: StackFit.expand,
       children: [
         buildBackground(shrinkOffset, context),
         buildAppBar(shrinkOffset, context),
