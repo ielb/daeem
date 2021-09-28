@@ -7,7 +7,9 @@
 
     <application
         android:label="Daeem"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/fb_login_protocol_scheme"/>
 

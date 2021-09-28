@@ -53,4 +53,49 @@ class MarketService extends BaseApi {
       print(e);
     }
   }
+
+
+    Future<http.Response?> getMarketsCategory(int id) async {
+    try {
+      return await api.httpGet('supermarket/$id/categories');
+    } catch (e) {
+      throw e;
+    }
+  }
+   Future<http.Response?> searchForCategory(String name) async {
+    try {
+      return await api.httpGet('categories/$name');
+    } catch (e) {
+      print(e);
+    }
+  }
+ Future<http.Response?> searchForSubCategory(String name) async {
+    try {
+      return await api.httpGet('subcategories/$name');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+   Future<http.Response?> getMarketsSubCategory(int id) async {
+    try {
+      return await api.httpGet('category/$id/subcategories');
+    } catch (e) {
+      throw e;
+    }
+  }
+  Future<http.Response?> getProducts(int id) async {
+    try {
+      return await api.httpGet('subcategory/$id/products');
+    } catch (e) {
+      throw e;
+    }
+    }
+  Future<http.Response?> searchProducts(String name) async {
+    try {
+      return await api.httpGet('products/search/$name');
+    } catch (e) {
+      throw e;
+    }
+  }
 }

@@ -49,40 +49,57 @@ class MarketWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                _marketTitle,
-                style: GoogleFonts.ubuntu(
+              Expanded(
+                child: new Container(
+                  margin: EdgeInsets.only(left: 10),
+                  child:  Text(
+                    _marketTitle,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: true,
+                    style: GoogleFonts.ubuntu(
                     fontSize: 22,
                     fontWeight: FontWeight.w500,
                     color: Color(0xff4A4B4D)),
-              ).paddingOnly(left: 10),
-              Spacer(),
+                  ),
+                ),
+              ),
               Rating((s) {}, _marketRating).paddingOnly(right: 10),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              
               Column(
-                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                   mainAxisAlignment: MainAxisAlignment.start,
-                   children: [
-                     Icon(CupertinoIcons.location,size: 18,color: Color(0xff4A4B4D)),
-                     Text(_marketAddress,style: GoogleFonts.ubuntu(fontSize: 12,fontWeight: FontWeight.w300,color: Color(0xff4A4B4D))),
-
-                   ],
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(CupertinoIcons.location,
+                          size: 18, color: Color(0xff4A4B4D)),
+                      Text(_marketAddress,
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: Color(0xff4A4B4D))),
+                    ],
                   ),
-                 Row(
-                  children: [
-                    Icon(CupertinoIcons.clock,size: 18,color: Color(0xff4A4B4D)).paddingOnly(right: 3),
-                    Text(_marketTime,style: GoogleFonts.ubuntu(fontSize: 12,fontWeight: FontWeight.w300,color: Color(0xff4A4B4D))),
-                    SizedBox(width: 55,),
-
-                  ],
+                  Row(
+                    children: [
+                      Icon(CupertinoIcons.clock,
+                              size: 18, color: Color(0xff4A4B4D))
+                          .paddingOnly(right: 3),
+                      Text(_marketTime,
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              color: Color(0xff4A4B4D))),
+                      SizedBox(
+                        width: 55,
+                      ),
+                    ],
                   )
                 ],
               ),

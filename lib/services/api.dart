@@ -20,10 +20,6 @@ class Api {
   Future<http.Response?> httpGet(String endPath,{Map<String,dynamic>? query}) async {
     try{
       Uri uri = Uri.parse('$url$endPath');
-      if(query!=null){
-        // ignore: unused_local_variable
-        Uri uri = Uri.parse('$url$endPath');
-      }
       return http.get(uri,headers:headers);
     }catch(e){
       print(e);

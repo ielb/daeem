@@ -239,7 +239,7 @@ class _HomeState extends State<Home> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, Market.id);
+                    Navigator.pushNamed(context, MarketPage.id,arguments: marketProvider.markets[index]);
                   },
                   child: MarketWidget(
                     marketProvider.markets[index].name!,

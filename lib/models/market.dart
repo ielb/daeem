@@ -65,7 +65,6 @@ class Market {
           case "Monday":
             return "${data['0_from']} - ${data['0_to']}";
           case "Tuesday":
-        
             return "${data["1_from"]} - ${data["1_to"]}";
           case "Wednesday":
             return "${data['2_from']} - ${data['2_to']}";

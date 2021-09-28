@@ -1,4 +1,6 @@
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,17 +8,20 @@ import 'package:flutter/cupertino.dart';
 import 'screens/email/verify_email.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
-import "package:daeem/screens/sous_category.dart";
+import 'package:daeem/screens/sub_category.dart';
 
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(
       MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (context) => AuthProvider()),
             ChangeNotifierProvider(create: (context) => MarketProvider()),
+            ChangeNotifierProvider(create: (context)=> CategoryProvider()),
+            ChangeNotifierProvider(create: (context)=> CartProvider())
           ],
           child:MyApp()
       )
@@ -71,8 +76,8 @@ Route<dynamic> routes(RouteSettings settings) {
     case SignUp.id:
       return CupertinoPageRoute(builder: (_) => SignUp(), settings: settings);
       /// Market
-    case Market.id:
-      return CupertinoPageRoute(builder: (_) => Market(), settings: settings);
+    case MarketPage.id:
+      return CupertinoPageRoute(builder: (_) => MarketPage(), settings: settings);
       /// Profile
     case Profile.id:
       return CupertinoPageRoute(builder: (_) => Profile(), settings: settings);

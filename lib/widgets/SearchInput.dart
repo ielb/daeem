@@ -2,7 +2,7 @@ import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
 class SearchInput extends StatelessWidget {
-  const SearchInput(this._controller,this._hint,this._width,this._icon,{this.onChanged,this.onTap,this.searching=false,this.onClose});
+  const SearchInput(this._controller,this._hint,this._width,this._icon,{this.onChanged,this.onSubmit,this.onTap,this.searching=false,this.onClose});
   final TextEditingController _controller;
   final String  _hint;
   final IconData _icon ;
@@ -10,6 +10,7 @@ class SearchInput extends StatelessWidget {
   final Function(String)? onChanged;
   final Function()? onClose;
   final Function()? onTap;
+  final Function(String)? onSubmit;
   final searching;
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,7 @@ class SearchInput extends StatelessWidget {
         controller: _controller,
         onChanged: onChanged,
         onTap: onTap,
+        onFieldSubmitted: onSubmit,
         decoration: InputDecoration(
             errorStyle:     GoogleFonts.ubuntu(color: Colors.red, fontSize: 12),
             contentPadding: EdgeInsets.all(1),

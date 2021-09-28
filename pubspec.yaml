@@ -21,43 +21,37 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  
-  flutter:
-    sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-
-    
+  cached_network_image: ^3.1.0
+  cloud_firestore: ^2.5.1
 
   cupertino_icons: ^1.0.2
-  http: ^0.13.3
-  provider: ^6.0.0
-  google_fonts: ^2.1.0
-  introduction_screen: ^2.1.0
-  flutter_verification_code: ^1.1.0
-  flutter_svg: ^0.22.0
-  intl: ^0.17.0
-  shared_preferences: ^2.0.6
-  flutter_rating_stars: ^1.0.3+4
-
-  #auth
-  flutter_facebook_auth: ^3.5.1
-  google_sign_in: ^5.1.0
-
-
+  firebase_auth: ^3.1.0
 
   # Firebase packages
   firebase_core: ^1.6.0
-  firebase_auth: ^3.1.0
-  cloud_firestore: ^2.5.1
   firebase_dynamic_links: ^2.0.9
+  flutter:
+    sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  #auth
+  flutter_facebook_auth: ^3.5.1
+  flutter_localizations:
+    sdk: flutter
+  flutter_rating_stars: ^1.0.3+4
+  flutter_svg: ^0.22.0
+  flutter_verification_code: ^1.1.0
+  google_fonts: ^2.1.0
+  google_sign_in: ^5.1.0
+  http: ^0.13.3
+  intl: ^0.17.0
+  introduction_screen: ^2.1.0
+  provider: ^6.0.0
+  shared_preferences: ^2.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  internet_connection_checker: ^0.0.1+2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,26 +61,26 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/background.png
-     - assets/logo.png
-     - assets/shopping_cart.png
-     - assets/order_arrived.png
-     - assets/ontheway.png
-     - assets/market.png
-     - assets/Facebook.svg
-     - assets/Google.svg
-     - assets/market_4.jpg
-     - assets/logo_v.png
-     - assets/user.svg
-     - assets/question.svg
-     - assets/rate.svg
-     - assets/share.svg
-     - assets/question.svg
-     - assets/notifications.svg
-     - assets/logout.svg
-     - assets/shopping-bag.svg
-     - assets/closed.svg
-     - assets/email_sent.svg
+    - assets/background.png
+    - assets/logo.png
+    - assets/shopping_cart.png
+    - assets/order_arrived.png
+    - assets/ontheway.png
+    - assets/market.png
+    - assets/Facebook.svg
+    - assets/Google.svg
+    - assets/market_4.jpg
+    - assets/logo_v.png
+    - assets/user.svg
+    - assets/question.svg
+    - assets/rate.svg
+    - assets/share.svg
+    - assets/question.svg
+    - assets/notifications.svg
+    - assets/logout.svg
+    - assets/shopping-bag.svg
+    - assets/closed.svg
+    - assets/email_sent.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-animages/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
@@ -96,6 +90,7 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+
 #
 #  fonts:
 #    - family: icomoon
@@ -103,4 +98,3 @@ flutter:
 #        - asset: assets/fonts/MyIcons.ttf
 #
 #
-

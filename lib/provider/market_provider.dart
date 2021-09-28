@@ -1,9 +1,4 @@
-
-
-
-
 import 'dart:convert';
-
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/market_service.dart';
@@ -13,21 +8,27 @@ class MarketProvider extends BaseProvider {
 
   List<Market> _markets = List.empty(growable: true) ;
   MarketService _marketService = MarketService();
-   List<Market> _searchedMarkets = List.empty(growable: true) ;
+  List<Market> _searchedMarkets = List.empty(growable: true) ;
+  List<Market> get markets => _markets;
   int _offset=0;
+
+  
+  //Todo:Remove market data from route arguments and use provider
+ // Market? _currentMarket ;
+
 
   _addMarket(Market market){
     _markets.add(market);
   }
-  setMarkets(List<Market>  markets){
-    _markets.addAll(markets);
-  }
 
+ 
+  
   setMarketFromJson(List data){
     data.forEach((element) {
       print(element);
       _addMarket(Market.fromJson(element));
     });
+    notifyListeners();
   }
   setSearchedMarkets(List data){
     data.forEach((element) {
@@ -35,7 +36,7 @@ class MarketProvider extends BaseProvider {
     });
   }
    
-  List<Market> get markets => _markets;
+ 
 
   Future<bool> getMarkets()async{
     Response? response = await _marketService.getMarkets(_offset);
@@ -54,10 +55,12 @@ class MarketProvider extends BaseProvider {
 
   }
 Future<List<Market>> getSearchedMarkets(String name)async {
+  if(name.isEmpty||name==''){
+    return _markets;
+  }else{
      Response? response = await _marketService.search(name);
      if(response!=null &&response.statusCode==200){
        var data = jsonDecode(response.body);
-       print("saerching"+data['status']);
        if(data['status']!="error"){
          data = data['data'];
          _searchedMarkets.clear();
@@ -67,7 +70,7 @@ Future<List<Market>> getSearchedMarkets(String name)async {
          return List.empty();
      }else
        return List.empty();
-     
+  }
 
 }
 
