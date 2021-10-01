@@ -23,6 +23,10 @@ class AuthProvider extends BaseProvider {
     notifyListeners();
   }
 
+  bool isAuth(){
+   return _client==null ? false :true;
+  }
+
   Future<bool?> getSkipped() async {
     return await Prefs.instance.getSkipped();
   }
@@ -52,7 +56,6 @@ class AuthProvider extends BaseProvider {
         var response = await _authService.socialLogin(
             1, clientCredential.user!.email!,
             clientCredential.user!.uid);
-        print(response?.body);
         if (response != null) {
           var data = jsonDecode(response.body);
           if (data['status'] == "success") {

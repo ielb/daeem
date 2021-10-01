@@ -66,7 +66,7 @@ class MarketWidget extends StatelessWidget {
               ),
               Rating((s) {}, _marketRating).paddingOnly(right: 10),
             ],
-          ),
+          ).paddingOnly(bottom: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [

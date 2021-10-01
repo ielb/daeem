@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -11,8 +10,10 @@ class Setup extends StatefulWidget {
 }
 
 class _SetupState extends State<Setup> {
+
   @override
   void initState() {
+   
     Timer(
         Duration(milliseconds: 20),
         () => Navigator.pushReplacement(

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:daeem/configs/config.dart';
 import 'package:flutter/material.dart';
 import 'package:daeem/services/services.dart';
+import 'package:flutter/services.dart';
 
 class Input extends StatelessWidget {
   Input(this._controller, this._hint, this._icon,
@@ -42,6 +43,7 @@ class Input extends StatelessWidget {
         },
         controller: _controller,
         obscureText: obscureText,
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           errorStyle:     GoogleFonts.ubuntu(color: Colors.red, fontSize: 12),
             contentPadding: EdgeInsets.all(1),

@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:daeem/configs/notification_manager.dart';
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/services/notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import "package:provider/provider.dart";
@@ -13,24 +16,32 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   Timer? _timer;
+    late PushNotificationService _notificationService;
   @override
   void initState() {
-
     WidgetsBinding.instance!.addPostFrameCallback((_)async {
 
     _timer = new Timer(const Duration(milliseconds: 2000), () {
       _getAuthClient();
-    //  _getMarkets();
+    
     });
     });
+  
+    notifyManager.setOnNotificationClick(onNotificationClick);
+    notifyManager.setOnNotificationReceive(onNotificationReceive);
+     _notificationService = PushNotificationService(FirebaseMessaging.instance);
+    _notificationService.initialize();
     super.initState();
   }
+
+  onNotificationClick(RecieveNotification notification) {
+    print("Notification Received : ${notification.id}");
+  }
+
+  onNotificationReceive(String payload) {
+    print('Payload $payload');
+  }
   
-  // _getMarkets() {
-  //   MarketProvider marketProvider =
-  //       Provider.of<MarketProvider>(context, listen: false);
-  //   marketProvider.getMarkets();
-  // }
 
  void _getAuthClient()async{
     print("test");

@@ -1,4 +1,5 @@
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
@@ -16,6 +17,7 @@ class _LoginState extends State<Login> {
   AuthProvider _authProvider = AuthProvider();
   bool _isVisible = true;
   bool _isValidate = true;
+  var isCheckout ;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   @override
   void initState() {
@@ -26,6 +28,7 @@ class _LoginState extends State<Login> {
   @override
   void didChangeDependencies() {
     _authProvider = Provider.of<AuthProvider>(context);
+      isCheckout =  ModalRoute.of(context)!.settings.arguments ;
         super.didChangeDependencies();
   }
 
@@ -62,7 +65,12 @@ class _LoginState extends State<Login> {
   ///Login
  void _login(String email,String password)async{
     var result = await _authProvider.loginWithEmail(email,password);
-    if(result) Navigator.pushReplacementNamed(context, Home.id);
+    if(result){ 
+      if(isCheckout!=null&&isCheckout){
+         Navigator.pushReplacementNamed(context, CheckoutPage.id);
+      }else
+      Navigator.pushReplacementNamed(context, Home.id);
+      }
     else Toast.show(AppLocalizations.of(context)!.wentWrong,context);
   }
   ///google button
@@ -186,7 +194,7 @@ class _LoginState extends State<Login> {
                             shadowColor: Config.color_1,
                             primary: Config.color_1,
                             shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(5),
+                              borderRadius: new BorderRadius.circular(15),
                             ),
                             fixedSize: Size(270, 50)),
                       ).paddingOnly(top: 5, bottom: 10),
@@ -200,7 +208,7 @@ class _LoginState extends State<Login> {
                             primary: Config.color_1,
                             side: BorderSide(color: Config.color_1, width: 1.5),
                             shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(6),
+                              borderRadius: new BorderRadius.circular(15),
                             ),
                             textStyle: GoogleFonts.ubuntu(fontSize: 22),
                             fixedSize: Size(270, 50)),

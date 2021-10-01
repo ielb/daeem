@@ -1,17 +1,19 @@
-
 import 'package:daeem/models/market.dart';
+import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
-import 'package:daeem/services/services.dart';
+import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:daeem/services/services.dart';
+import '/extensions/extensions.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
   final Market market;
-  const CustomSliverAppBarDelegate(
-    this.market,
-    this.expandedHeight,
-  );
+  final bool isMarket;
+  final bool isSub;
+  const CustomSliverAppBarDelegate(this.market, this.expandedHeight,
+      {this.isMarket = false,this.isSub=false});
 
   @override
   Widget build(
@@ -41,6 +43,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   Widget buildAppBar(double shrinkOffset, context) {
     var _categoryProvider =
         Provider.of<CategoryProvider>(context, listen: false);
+    var cart = Provider.of<CartProvider>(context, listen: false);
     return Opacity(
       opacity: appear(shrinkOffset),
       child: AppBar(
@@ -81,8 +84,87 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         ),
         leading: IconButton(
             onPressed: () {
-              _categoryProvider.closeProducts();
-              Navigator.pop(context);
+              if (!isMarket) {
+                _categoryProvider.closeProducts();
+                if(!isSub)
+                _categoryProvider.closeSub();
+                Navigator.pop(context);
+              } else {
+                if (cart.isCartEmpty()) {
+                  _categoryProvider.closeProducts();
+                  Navigator.pop(context);
+                } else
+                  showDialog(
+                    context: context, // <<----
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          child: Container(
+                            height: 400,
+                            width: 400,
+                            child: Column(
+                              children: [
+                                Image.asset("assets/cart.png").paddingAll(25),
+                                Text("Your cart will be deleted",
+                                    style: GoogleFonts.ubuntu(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black)),
+                                Text("Please complete your order",
+                                        style: GoogleFonts.ubuntu(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.grey))
+                                    .paddingAll(20),
+                                Spacer(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    OutlinedButton(
+                                        onPressed: () {
+                                          cart.clearCart();
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel anyway"),
+                                        style: OutlinedButton.styleFrom(
+                                          primary: Colors.red.shade400,
+                                          side: BorderSide(
+                                              color: Colors.red.shade400,
+                                              width: 1.5),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                new BorderRadius.circular(6),
+                                          ),
+                                          textStyle:
+                                              GoogleFonts.ubuntu(fontSize: 14),
+                                        )),
+                                    Spacer(),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context, CheckoutPage.id);
+                                      },
+                                      child: Text("Go to checkout"),
+                                      style: ElevatedButton.styleFrom(
+                                          shadowColor: Config.color_1,
+                                          primary: Config.color_1,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                new BorderRadius.circular(5),
+                                          ),
+                                          textStyle: GoogleFonts.ubuntu(fontSize: 14,color: Colors.white)
+                                          )
+                                    ),
+                                  ],
+                                ).paddingOnly(left: 20, right: 20, bottom: 20)
+                              ],
+                            ),
+                          ));
+                    },
+                  );
+              }
             },
             iconSize: 30,
             color: Config.darkBlue,
@@ -154,6 +236,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               leading: IconButton(
                   onPressed: () {
                     _categoryProvider.closeProducts();
+                    if(!isSub)
+                    _categoryProvider.closeSub();
                     Navigator.pop(context);
                   },
                   iconSize: 30,

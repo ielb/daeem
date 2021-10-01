@@ -1,9 +1,12 @@
+import 'package:daeem/models/product.dart';
+
 class SubCategory {
   int? id;
   String? categoryId;
   String? name;
   String? image;
   String? status;
+  List<Product> products =List.empty(growable: true );
   SubCategory({
     this.id,
     this.categoryId,

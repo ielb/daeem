@@ -98,4 +98,18 @@ class MarketService extends BaseApi {
       throw e;
     }
   }
+   Future<http.Response?> checkCoupon(String name) async {
+    try {
+      return await api.httpGet('coupon/$name');
+    } catch (e) {
+      throw e;
+    }
+  }
+    Future<http.Response?> getDeliveryPrice() async {
+    try {
+      return await api.httpGet('delivery_setting');
+    } catch (e) {
+      throw e;
+    }
+  }
 }

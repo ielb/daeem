@@ -53,7 +53,9 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   _getProducts(int id) {
-    return _categoryProvider.getProducts(id);
+    if (_categoryProvider.products.isEmpty)
+      return _categoryProvider.getProducts(id);
+    return Future(() => false);
   }
 
   onChange(String value) {
@@ -78,111 +80,110 @@ class _ProductsPageState extends State<ProductsPage> {
 
   addToCart(Product product, BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
-    Item item = Item(product: product);
+    Item item = Item(product: product, quantity: 1);
     cart.addToBasket(item);
+    setState(() {});
   }
 
   removeFromCart(Product product, BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
     Item item = Item(product: product);
     cart.removeFromBasket(item);
+    setState(() {});
   }
 
   int? getItemCount(int id, BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
-       Item data = cart.basket.singleWhere((element) => id==element.product.id,orElse: () => Item(product: Product()));
+    Item data = cart.basket.singleWhere((element) => id == element.product.id,
+        orElse: () => Item(product: Product()));
     return data.quantity;
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      builder: (BuildContext context, Widget? child) {
-        return Scaffold(
-            backgroundColor: Colors.white,
-            body: StickyOrder(
-              child: CustomScrollView(
-                physics: BouncingScrollPhysics(),
-                slivers: [
-                  //?App bar
-                  SliverPersistentHeader(
-                    delegate: CustomSliverAppBarDelegate(market, 200),
-                    pinned: true,
-                  ),
-                  //*Closed sign
-                  if (_isClosed)
-                    SliverToBoxAdapter(
-                        child: Container(
-                      height: 55,
-                      width: 300,
-                      margin: EdgeInsets.only(left: 20, right: 20, top: 80),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Config.closed,
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                RichText(
-                                    text: TextSpan(
-                                        text:
-                                            "This store is closed at the moment.",
+    return Scaffold(
+        backgroundColor: Colors.white,
+        body: StickyOrder(
+            child: CustomScrollView(
+              physics: BouncingScrollPhysics(),
+              slivers: [
+                //?App bar
+                SliverPersistentHeader(
+                  delegate:
+                      CustomSliverAppBarDelegate(market, 200, isSub: true),
+                  pinned: true,
+                ),
+                //*Closed sign
+                if (_isClosed)
+                  SliverToBoxAdapter(
+                      child: Container(
+                    height: 55,
+                    width: 300,
+                    margin: EdgeInsets.only(left: 20, right: 20, top: 80),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Config.closed,
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                  text: TextSpan(
+                                      text:
+                                          "This store is closed at the moment.",
+                                      style: GoogleFonts.ubuntu(
+                                          color: Colors.black,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w400),
+                                      children: [
+                                    TextSpan(
+                                        text: "Looking for something similar?",
                                         style: GoogleFonts.ubuntu(
                                             color: Colors.black,
                                             fontSize: 8,
-                                            fontWeight: FontWeight.w400),
-                                        children: [
-                                      TextSpan(
-                                          text:
-                                              "Looking for something similar?",
-                                          style: GoogleFonts.ubuntu(
-                                              color: Colors.black,
-                                              fontSize: 8,
-                                              fontWeight: FontWeight.w600))
-                                    ])),
-                                Text("Explore stores near you",
-                                        style: GoogleFonts.ubuntu(
-                                            color: Config.color_1))
-                                    .align(alignment: Alignment.bottomLeft)
-                                    .paddingOnly(right: 105)
-                              ])
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                          color: Color(0xffFFF3DA),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade200,
-                              spreadRadius: 2,
-                              blurRadius: 16,
-                              offset: Offset(0, 4),
-                            )
-                          ]),
-                    )),
-                  //?SearchField
-                  SliverToBoxAdapter(
-                      child: SearchInput(
-                    _searchController,
-                    "Search for supermarket",
-                    screenSize(context).width * .81,
-                    CupertinoIcons.search,
-                    onChanged: onChange,
-                    onClose: onClose,
-                    onTap: onTap,
-                    searching: isSearching,
-                  ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
-                  //*content
-                  isSearching ? _searchedContent(context) : _content(context)
-                ],
-              ),
-            ));
-      },
-      create: (BuildContext context) => CartProvider(),
-    );
+                                            fontWeight: FontWeight.w600))
+                                  ])),
+                              Text("Explore stores near you",
+                                      style: GoogleFonts.ubuntu(
+                                          color: Config.color_1))
+                                  .align(alignment: Alignment.bottomLeft)
+                                  .paddingOnly(right: 105)
+                            ])
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        color: Color(0xffFFF3DA),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade200,
+                            spreadRadius: 2,
+                            blurRadius: 16,
+                            offset: Offset(0, 4),
+                          )
+                        ]),
+                  )),
+                //?SearchField
+                SliverToBoxAdapter(
+                    child: SearchInput(
+                  _searchController,
+                  "Search for supermarket",
+                  screenSize(context).width * .81,
+                  CupertinoIcons.search,
+                  onChanged: onChange,
+                  onClose: onClose,
+                  onTap: onTap,
+                  searching: isSearching,
+                  isHavingShadow: true,
+                ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
+                //*content
+                isSearching ? _searchedContent(context) : _content(context)
+              ],
+            ),
+            mcontext: context));
   }
 
   Widget _searchedContent(BuildContext context) {
@@ -236,39 +237,82 @@ class _ProductsPageState extends State<ProductsPage> {
             }),
       );
 
-  Widget content({required Product product, required BuildContext context}) {
+  Widget content(
+      {required Product product,
+      required BuildContext context,
+      Function()? onTap}) {
     var cart = Provider.of<CartProvider>(context, listen: false);
-    return ListTile(
-        minVerticalPadding: 5,
-        leading: Container(
-          height: 60,
-          width: 60,
-          padding: EdgeInsets.all(5),
-          child: Image.network(
-            product.image ??
-                "https://static.thenounproject.com/png/741653-200.png",
-            width: 55,
-            height: 55,
+    return GestureDetector(
+      onTap: onTap,
+      child: ListTile(
+          minVerticalPadding: 5,
+          leading: Container(
+            height: 60,
+            width: 60,
+            padding: EdgeInsets.all(5),
+            child: Image.network(
+              product.image ??
+                  "https://static.thenounproject.com/png/741653-200.png",
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.high,
+            ),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    spreadRadius: 2,
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  )
+                ]),
           ),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  spreadRadius: 2,
-                  blurRadius: 12,
-                  offset: Offset(0, 4),
-                )
-              ]),
-        ),
-        title: Text(product.name!),
-        subtitle: Text(product.price! + " MAD"),
-        trailing: Container(
-          width: 120,
-          child: Row(
-            children: [
-              if (cart.basket.length != 0)
+          title: Text(product.name!),
+          subtitle: Text(product.price! + " MAD"),
+          trailing: Container(
+            width: 120,
+            child: Row(
+              children: [
+                if (cart.basket.length != 0)
+                  Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(35),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade300,
+                              spreadRadius: 2,
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
+                            )
+                          ]),
+                      child: IconButton(
+                        iconSize: 18,
+                        onPressed: () => removeFromCart(product, context),
+                        icon: Icon(CupertinoIcons.minus),
+                        color: Colors.redAccent,
+                      ).center())
+                else
+                  SizedBox(
+                    width: 35,
+                  ),
+                SizedBox(
+                  width: 10,
+                ),
+                if (cart.basket.length != 0)
+                  getItemCount(product.id!, context) != null
+                      ? Text("${getItemCount(product.id!, context)}x")
+                      : Text("0")
+                else
+                  SizedBox(
+                    width: 10,
+                  ),
+                SizedBox(
+                  width: 10,
+                ),
                 Container(
                     height: 35,
                     width: 35,
@@ -279,56 +323,19 @@ class _ProductsPageState extends State<ProductsPage> {
                           BoxShadow(
                             color: Colors.grey.shade300,
                             spreadRadius: 2,
-                            blurRadius: 12,
+                            blurRadius: 16,
                             offset: Offset(0, 4),
                           )
                         ]),
                     child: IconButton(
+                      onPressed: () => addToCart(product, context),
+                      icon: Icon(CupertinoIcons.add),
+                      color: Config.color_2,
                       iconSize: 18,
-                      onPressed: () => removeFromCart(product, context),
-                      icon: Icon(CupertinoIcons.minus),
-                      color: Colors.redAccent,
                     ).center())
-              else
-                SizedBox(
-                  width: 35,
-                ),
-              SizedBox(
-                width: 10,
-              ),
-              if (cart.basket.length != 0)
-                getItemCount(product.id!, context) != null
-                    ? Text("${getItemCount(product.id!, context)}x")
-                    : Text("0")
-              else
-                SizedBox(
-                  width: 10,
-                ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(35),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade300,
-                          spreadRadius: 2,
-                          blurRadius: 16,
-                          offset: Offset(0, 4),
-                        )
-                      ]),
-                  child: IconButton(
-                    onPressed: () => addToCart(product, context),
-                    icon: Icon(CupertinoIcons.add),
-                    color: Config.color_2,
-                    iconSize: 18,
-                  ).center())
-            ],
-          ),
-        ));
+              ],
+            ),
+          )),
+    );
   }
 }

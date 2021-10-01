@@ -2,7 +2,7 @@ import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
 class SearchInput extends StatelessWidget {
-  const SearchInput(this._controller,this._hint,this._width,this._icon,{this.onChanged,this.onSubmit,this.onTap,this.searching=false,this.onClose});
+  const SearchInput(this._controller,this._hint,this._width,this._icon,{this.onChanged,this.onSubmit,this.onTap,this.searching=false,this.onClose,this.isHavingShadow=false});
   final TextEditingController _controller;
   final String  _hint;
   final IconData _icon ;
@@ -12,6 +12,7 @@ class SearchInput extends StatelessWidget {
   final Function()? onTap;
   final Function(String)? onSubmit;
   final searching;
+  final bool isHavingShadow;
   @override
   Widget build(BuildContext context) {
     
@@ -74,7 +75,7 @@ class SearchInput extends StatelessWidget {
         ),
             
       ),
-      decoration: BoxDecoration(
+      decoration: isHavingShadow ?  BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade200,
@@ -83,7 +84,7 @@ class SearchInput extends StatelessWidget {
             offset: Offset(0, 4),
           )
         ]
-      ),
-    ).paddingOnly(bottom: 10);
+      ):null,
+    );
   }
 }

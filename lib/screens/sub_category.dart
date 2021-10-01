@@ -147,6 +147,7 @@ class _CategoryState extends State<Category> {
             onClose: onClose,
             onTap: onTap,
             searching: isSearching,
+            isHavingShadow: true,
           ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
           isSearching ? _searchedContent() : _content()
         ],

@@ -1,5 +1,6 @@
 import 'package:daeem/models/market.dart' as model;
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/drawer.dart';
 import 'package:daeem/widgets/market_widget.dart';
@@ -51,8 +52,7 @@ class _HomeState extends State<Home> {
   }
 
   _scrollListener() {
-    if(!isSearching)
-    if (_scrollController.offset >=
+    if (!isSearching) if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
       setState(() {
@@ -100,21 +100,21 @@ class _HomeState extends State<Home> {
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Delivering to",
-                  style: GoogleFonts.ubuntu(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.grey.shade500),
-                ).align(alignment: Alignment.topLeft),
-                GestureDetector(
-                  onTap: () {
-                    ///Todo:Open Map
-                  },
-                  child: Row(
+            title: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context,MapScreen.id);
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Delivering to",
+                    style: GoogleFonts.ubuntu(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.grey.shade500),
+                  ).align(alignment: Alignment.topLeft),
+                  Row(
                     children: [
                       Text(
                         "Current Location",
@@ -130,8 +130,8 @@ class _HomeState extends State<Home> {
                       ).paddingOnly(left: 5, top: 5)
                     ],
                   ),
-                )
-              ],
+                ],
+              ),
             ),
             leading: IconButton(
                 onPressed: () {
@@ -180,6 +180,7 @@ class _HomeState extends State<Home> {
                         onClose: onClose,
                         onTap: onTap,
                         searching: isSearching,
+                        isHavingShadow: true,
                       ).paddingOnly(bottom: 10),
                     ]),
                   ),
@@ -193,7 +194,7 @@ class _HomeState extends State<Home> {
     );
   }
 
- Widget _searchedContent() {
+  Widget _searchedContent() {
     return SliverToBoxAdapter(
       child: FutureBuilder<List<model.Market>>(
           future: marketProvider.getSearchedMarkets(query),
@@ -205,7 +206,7 @@ class _HomeState extends State<Home> {
             }
             return ListView.builder(
                 shrinkWrap: true,
-                 primary: false,
+                primary: false,
                 itemExtent: 250,
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
@@ -239,7 +240,8 @@ class _HomeState extends State<Home> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, MarketPage.id,arguments: marketProvider.markets[index]);
+                    Navigator.pushNamed(context, MarketPage.id,
+                        arguments: marketProvider.markets[index]);
                   },
                   child: MarketWidget(
                     marketProvider.markets[index].name!,

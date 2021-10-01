@@ -83,6 +83,7 @@ class CategoryProvider extends BaseProvider {
     Response? response = await _service.getProducts(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
+      print(data);
       if (data['status'] != "error") {
         _setProductsFormJson(data['data']);
         notifyListeners();
@@ -214,5 +215,6 @@ class CategoryProvider extends BaseProvider {
 
   closeSub() {
     _subCategories.clear();
+    notifyListeners();
   }
 }
