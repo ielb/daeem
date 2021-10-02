@@ -12,8 +12,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Daeem"
         android:usesCleartextTraffic="true">
-        <activity       android:name=".Application"
-            />
+        <activity     
+          android:name=".Application" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/fb_login_protocol_scheme" />
@@ -77,7 +77,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
              <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyB6kbuOgcg8zwx5DXw0oopJcJnCBqcCsm4"/>
+               android:value="AIzaSyCCjWpGuffIn_vBwswTImB1eRBBbqdXW2A"/>
     </application>
 
 </manifest>

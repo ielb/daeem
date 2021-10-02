@@ -1,11 +1,16 @@
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/locator.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/screens/client/change_address.dart';
+import 'package:daeem/screens/client/change_password.dart';
+import 'package:daeem/screens/client/change_phone.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/map_screen.dart';
+import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -30,7 +35,8 @@ void main() async {
     ChangeNotifierProvider(create: (context) => AuthProvider()),
     ChangeNotifierProvider(create: (context) => MarketProvider()),
     ChangeNotifierProvider(create: (context) => CategoryProvider()),
-    ChangeNotifierProvider(create: (context) => CartProvider())
+    ChangeNotifierProvider(create: (context) => CartProvider()),
+    ChangeNotifierProvider(create: (context) => ClientProvider())
   ], child: MyApp()));
 }
 
@@ -78,6 +84,9 @@ Route<dynamic> routes(RouteSettings settings) {
     case Home.id:
       return CupertinoPageRoute(builder: (_) => Home(), settings: settings);
 
+    case OrdersPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => OrdersPage(), settings: settings);
     /// On boarding
     case OnBoardering.id:
       return CupertinoPageRoute(
@@ -121,6 +130,15 @@ Route<dynamic> routes(RouteSettings settings) {
     case ProductsPage.id:
       return CupertinoPageRoute(
           builder: (_) => ProductsPage(), settings: settings);
+            case ChangePassword.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangePassword(), settings: settings);
+            case ChangePhone.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangePhone(), settings: settings);
+            case ChangeAddress.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangeAddress(), settings: settings);
 
     /// Default route in case of error
     default:

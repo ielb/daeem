@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -18,25 +20,27 @@ class _MapScreenState extends State<MapScreen> {
     target: LatLng(35.7651929,-5.7999158),
   );
 
+ late MarketProvider marketProvider ;
 
 
+ 
+ @override
+ void didChangeDependencies() {
+   super.didChangeDependencies();
+   marketProvider = Provider.of<MarketProvider>(context,listen: false);
+       generateMarkers();
+ }
+  List<Marker> markers = List.empty(growable: true);
 
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-  }
-
-  _getCurrentLocation() {
-    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-     
-
-   
-    }).catchError((e) {
-      print(e);
+  generateMarkers(){
+    Marker marker ;
+    marketProvider.markets.forEach((element) {
+      marker = Marker(markerId: MarkerId( element.id!.toString()),position: LatLng(double.parse(element.lat!), double.parse(element.lng!)));
+      markers.add(marker);
     });
   }
+
+  
 
   
 
@@ -50,10 +54,10 @@ class _MapScreenState extends State<MapScreen> {
               initialCameraPosition: _kGooglePlex,
               ///Todo:When published set to false
               zoomControlsEnabled: true,
+              markers: markers.toSet(),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
-              myLocationEnabled: true,
             ),
             Row(
               children: [
@@ -72,7 +76,6 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 child: Center(
                   child: IconButton(onPressed: (){
-                       _getCurrentLocation();
                       }, icon: Icon(CupertinoIcons.location),iconSize: 30,color: Config.color_1,),
                 ),
             ).align(alignment: Alignment.bottomRight).paddingOnly(bottom:120,right: 10),

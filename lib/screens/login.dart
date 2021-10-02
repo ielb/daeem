@@ -1,4 +1,5 @@
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,7 +66,9 @@ class _LoginState extends State<Login> {
   ///Login
  void _login(String email,String password)async{
     var result = await _authProvider.loginWithEmail(email,password);
+   
     if(result){ 
+       Provider.of<ClientProvider>(context,listen: false).setClient(_authProvider.client!);
       if(isCheckout!=null&&isCheckout){
          Navigator.pushReplacementNamed(context, CheckoutPage.id);
       }else
@@ -77,6 +80,8 @@ class _LoginState extends State<Login> {
  void signInWithGoogle()async{
    bool result = await _authProvider.socialLogin("google");
    if(result){
+     
+       Provider.of<ClientProvider>(context,listen: false).setClient(_authProvider.client!);
      Navigator.pushReplacementNamed(context, Home.id);
    }else
      Toast.show(AppLocalizations.of(context)!.wentWrong, context,duration: 2);
@@ -85,6 +90,8 @@ class _LoginState extends State<Login> {
   void signInWithFacebook()async{
     bool result = await _authProvider.socialLogin("facebook");
     if(result){
+      
+       Provider.of<ClientProvider>(context,listen: false).setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
     }else
       Toast.show(AppLocalizations.of(context)!.wentWrong, context,duration: 2);

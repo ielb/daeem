@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,7 +52,6 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   @override
   Widget build(BuildContext context) {
-    var _authProvider = Provider.of<AuthProvider>(context,listen:false);
     return Scaffold(
       backgroundColor: Config.white,
       appBar: AppBar(
@@ -89,7 +86,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                       style: GoogleFonts.ubuntu(color:Config.color_1,fontWeight: FontWeight.w400,fontSize: 18,),
                     ),
                     TextSpan(
-                      text:" sent to ${_authProvider.client?.email ?? "issamelbouhati@gmail.com"}"
+                      text:" sent to "
                     )
 
                   ]

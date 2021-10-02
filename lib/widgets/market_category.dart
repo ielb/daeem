@@ -29,11 +29,10 @@ class CategoryWidget extends StatelessWidget {
             ]),
         child: Text(
           _categoryTitle,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
           softWrap: true,
           style: GoogleFonts.ubuntu(
-              fontSize: 30, fontWeight: FontWeight.w500, color: Config.white),
-        ).center());
+              fontSize: 24, fontWeight: FontWeight.w500, color: Config.white),
+        ).paddingAll(15)
+    );
   }
 }

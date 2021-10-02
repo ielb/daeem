@@ -14,6 +14,6 @@ void setupLocator() {
   locator.registerFactory<CartProvider>(() => CartProvider());
   locator.registerFactory<AuthProvider>(() => AuthProvider());
   locator.registerFactory<CategoryProvider>(() => CategoryProvider());
-  locator.registerFactory<ClientProvider>(() => ClientProvider());
+  locator.registerSingleton<ClientProvider>(ClientProvider());
 
 }

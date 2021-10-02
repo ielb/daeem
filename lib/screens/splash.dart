@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:daeem/configs/notification_manager.dart';
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,23 +17,39 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   Timer? _timer;
-    late PushNotificationService _notificationService;
+  late PushNotificationService _notificationService;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_)async {
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+        // var  result  = await connection();
+        // if(!result){
+        //   Navigator.of(context).pushReplacementNamed('connection');
+        // }
 
-    _timer = new Timer(const Duration(milliseconds: 2000), () {
-      _getAuthClient();
-    
+      _timer = new Timer(const Duration(milliseconds: 2000), () {
+        _getAuthClient();
+      });
     });
-    });
-  
+
     notifyManager.setOnNotificationClick(onNotificationClick);
     notifyManager.setOnNotificationReceive(onNotificationReceive);
-     _notificationService = PushNotificationService(FirebaseMessaging.instance);
+    _notificationService = PushNotificationService(FirebaseMessaging.instance);
     _notificationService.initialize();
     super.initState();
   }
+//     connection()async{
+//     try {
+//   final result = await InternetAddress.lookup('app.daeem.ma');
+//   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+//     return true;
+//   }else{
+//      return false;
+//   }
+// } on SocketException catch (_) {
+//   print('not connected');
+// }
+//  return false;
+//   }
 
   onNotificationClick(RecieveNotification notification) {
     print("Notification Received : ${notification.id}");
@@ -41,37 +58,41 @@ class _SplashState extends State<Splash> {
   onNotificationReceive(String payload) {
     print('Payload $payload');
   }
-  
 
- void _getAuthClient()async{
+  void _getAuthClient() async {
     print("test");
-   final auth = Provider.of<AuthProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final client = Provider.of<ClientProvider>(context, listen: false);
     String? id = await Prefs.instance.getClient();
     bool? isAut = await Prefs.instance.getAuth();
 
-    if(id!=null&&isAut!=null){
-      bool result = await auth.getAuthenticatedClient(id);
+    if (id != null && isAut != null) {
+      bool result = await auth.getAuthenticatedClient(
+        id,
+      );
 
-         if(result){
-             Navigator.pushReplacementNamed(context, Home.id);
-         }else{
-           _skip();
-         }
-    }else{
-       _skip();
+      if (result) {
+        client.setClient(auth.client!);
+        Navigator.pushReplacementNamed(context, Home.id);
+      } else {
+        _skip();
+      }
+    } else {
+      _skip();
     }
-    
+     
   }
 
-   void _skip() async{
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
-      if(isOnBoardingSkipped!=null&&isOnBoardingSkipped) {
-        Navigator.pushReplacementNamed(context, Login.id);
-      }else{
-        Navigator.pushReplacementNamed(context, OnBoardering.id);
-      }
+  void _skip() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
+    if (isOnBoardingSkipped != null && isOnBoardingSkipped) {
+      Navigator.pushReplacementNamed(context, Login.id);
+    } else {
+      Navigator.pushReplacementNamed(context, OnBoardering.id);
     }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -113,4 +134,3 @@ class _SplashState extends State<Splash> {
             )));
   }
 }
-

@@ -1,4 +1,5 @@
 import 'package:daeem/models/market.dart' as model;
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/services/services.dart';
@@ -6,6 +7,7 @@ import 'package:daeem/widgets/drawer.dart';
 import 'package:daeem/widgets/market_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class Home extends StatefulWidget {
   static const id = "home";
@@ -18,27 +20,28 @@ class _HomeState extends State<Home> {
   String userName = "John";
   late TextEditingController _controller;
   double value = 3.5;
-  final ScrollController _scrollController = ScrollController();
+  late  ScrollController _scrollController;
   int itemCount = 5;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   late Future dataResult;
-  MarketProvider marketProvider = MarketProvider();
+  late MarketProvider marketProvider ;
+  late ClientProvider _clientProvider ;
   bool isSearching = false;
   String query = '';
   @override
   void initState() {
+     _scrollController = ScrollController();
     _controller = TextEditingController();
 
     super.initState();
   }
-
   @override
   void didChangeDependencies() {
-    marketProvider = Provider.of<MarketProvider>(context, listen: false);
-
-    dataResult = _getMarkets();
-    _scrollController.addListener(_scrollListener);
     super.didChangeDependencies();
+      marketProvider = Provider.of<MarketProvider>(context, listen: false);
+      _clientProvider = Provider.of<ClientProvider>(context, listen: false);
+      dataResult = _getMarkets();
+      _scrollController.addListener(_scrollListener);
   }
 
   _getMarkets() async {
@@ -91,7 +94,6 @@ class _HomeState extends State<Home> {
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: () async {
           marketProvider.getMarkets();
-          setState(() {});
         },
         child: Scaffold(
           key: _key,
@@ -102,7 +104,7 @@ class _HomeState extends State<Home> {
             elevation: 0,
             title: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context,MapScreen.id);
+                Navigator.pushNamed(context, MapScreen.id);
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -165,7 +167,7 @@ class _HomeState extends State<Home> {
                     child: Column(children: [
                       ///Todo:Update the user
                       Text(
-                        "Welcome, $userName!",
+                        "Welcome, ${_clientProvider.client!.name}",
                         style: GoogleFonts.ubuntu(
                             fontSize: 26,
                             fontWeight: FontWeight.w300,
