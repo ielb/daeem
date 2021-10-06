@@ -12,7 +12,7 @@ class PushNotificationService {
     if (Platform.isIOS) {
       _fcm.requestPermission();
     }
-    //String? token = await _fcm.getToken();
+    
     FirebaseMessaging.instance.getInitialMessage().then((value) {
       if(value!=null){
          notifyManager.showNotification(int.tryParse(value.messageId!) ?? 0,value.notification!.title!, value.notification!.body!);

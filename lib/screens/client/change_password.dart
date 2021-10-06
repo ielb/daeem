@@ -50,7 +50,7 @@ class _ChangePasswordState extends State<ChangePassword> {
           },
           color: Config.black,
         ),
-        title: Text(AppLocalizations.of(context)!.my_information,
+        title: Text("Update password",
             style: GoogleFonts.ubuntu(
                 color: Config.black,
                 fontSize: 22,

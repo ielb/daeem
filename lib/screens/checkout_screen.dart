@@ -1,6 +1,7 @@
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/map_screen.dart';
@@ -36,7 +37,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
         orElse: () => Item(product: Product()));
     return data.quantity;
   }
-  checkout(CartProvider cart){
+
+  checkout(CartProvider cart) {
     cart.clearCart();
     Navigator.pushReplacementNamed(context, ConfirmedPage.id);
   }
@@ -50,6 +52,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
     var market = Provider.of<MarketProvider>(context, listen: false);
+    var client = Provider.of<ClientProvider>(context, listen: false);
     market.getDeliveryPrice(double.parse(cart.getFinalPrice()));
     return Scaffold(
       appBar: AppBar(
@@ -100,71 +103,136 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       height: 20,
                     ),
                     Text(
-                      "Delivery location",
+                      "Delivery details",
                       style: GoogleFonts.ubuntu(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
                           color: Colors.black),
                     ).paddingOnly(top: 10, bottom: 20, left: 20),
-                    GestureDetector(
-                      onTap: () {
-                        if (!address) {
-                          Navigator.pushNamed(context, MapScreen.id);
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
+                    Container(
+                            height: 60,
+                            width: screenSize(context).width * .9,
+                            decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                    color: Config.color_1.withOpacity(0.5),
+                                    width: 2),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: client.client?.address == null
+                                ? ListTile(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, MapScreen.id);
+                                    },
+                                    
+                                    leading: Icon(
+                                      CupertinoIcons.location,
+                                      color: Colors.black,
+                                      size: 26,
+                                    ),
+                                    horizontalTitleGap: 0,
+                                    title: Text(
+                                      "Address",
+                                      style: GoogleFonts.ubuntu(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                   
+                                    trailing: Icon(
+                                      CupertinoIcons.chevron_down,
+                                      size: 20,
+                                    ),
+                                  )
+                                : ListTile(
+                                    onTap: () {},
+                                    leading: Icon(
+                                      CupertinoIcons.location,
+                                      color: Colors.black,
+                                      size: 26,
+                                    ),
+                                    horizontalTitleGap: 0,
+                                    title: Text(
+                                      client.client!.address.toString(),
+                                      style: GoogleFonts.ubuntu(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                   
+                                    trailing: Icon(
+                                      CupertinoIcons.chevron_right,
+                                      size: 20,
+                                    ),
+                                  ))
+                        .center()
+                        .paddingOnly(top: 10),
+                    Container(
                         height: 60,
                         width: screenSize(context).width * .9,
                         decoration: BoxDecoration(
                             color: Colors.transparent,
-                            border: Border.all(color: Config.color_1, width: 2),
+                            border: Border.all(
+                                color: Config.color_1.withOpacity(0.5),
+                                width: 2),
                             borderRadius: BorderRadius.circular(15)),
-                        child: !address
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    CupertinoIcons.location,
-                                    color: Colors.black,
-                                    size: 26,
-                                  ).paddingOnly(right: 10),
-                                  Text(
-                                    "Add address",
-                                    softWrap: true,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.ubuntu(fontSize: 18),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    CupertinoIcons.right_chevron,
-                                    size: 26,
-                                  )
-                                ],
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    CupertinoIcons.location,
-                                    color: Colors.black,
-                                    size: 26,
-                                  ).paddingOnly(right: 10),
-                                  Text(
-                                    "Branes, Ibn sirine, n24",
-                                    softWrap: true,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.ubuntu(fontSize: 18),
-                                  ),
-                                  Spacer(),
-                                  Icon(
-                                    CupertinoIcons.right_chevron,
-                                    size: 26,
-                                  )
-                                ],
-                              ),
-                      ).center(),
-                    ),
+                        child: ListTile(
+                          onTap: () {},
+                          isThreeLine: true,
+                          leading: Icon(
+                            CupertinoIcons.clock,
+                            color: Colors.black,
+                            size: 26,
+                          ),
+                          horizontalTitleGap: 0,
+                          title: Text(
+                            "ASAP",
+                            style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "30-45 min",
+                            style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          trailing: Icon(
+                            CupertinoIcons.chevron_down,
+                            size: 20,
+                          ),
+                        )).center().paddingOnly(top: 10),
+                    Container(
+                        height: 60,
+                        width: screenSize(context).width * .9,
+                        decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            border: Border.all(
+                                color: Config.color_1.withOpacity(0.5),
+                                width: 2),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: ListTile(
+                          onTap: () {},
+                          leading: Icon(
+                            CupertinoIcons.phone,
+                            color: Colors.black,
+                            size: 26,
+                          ),
+                          horizontalTitleGap: 0,
+                          title: Text(
+                            "Add your phone number",
+                            style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          trailing: Icon(
+                            CupertinoIcons.chevron_right,
+                            size: 20,
+                          ),
+                        )).center().paddingOnly(top: 10),
                     SizedBox(
                       height: 20,
                     ),

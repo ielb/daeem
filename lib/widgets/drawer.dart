@@ -1,4 +1,6 @@
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/login.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/services/services.dart';
@@ -10,6 +12,8 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var _clientProvider = Provider.of<AuthProvider>(context, listen: false);
+    var _client = Provider.of<ClientProvider>(context, listen: false);
+    var _store= Provider.of<MarketProvider>(context, listen: false);
     return Container(
       height: screenSize(context).height,
       width: screenSize(context).width * .8,
@@ -52,13 +56,15 @@ class CustomDrawer extends StatelessWidget {
                 container(
                     label: "My orders",
                     icon: Config.shoppingBag,
-                    onPressed: () =>  Navigator.of(context).pushNamed(OrdersPage.id)
-                    ),
+                    onPressed: () =>
+                        Navigator.of(context).pushNamed(OrdersPage.id)),
                 container(
                     label: "My information",
                     icon: Config.user,
                     onPressed: () {
-                      print('TEST');Navigator.of(context).pushNamed(Profile.id);}),
+                      print('TEST');
+                      Navigator.of(context).pushNamed(Profile.id);
+                    }),
                 Divider(),
                 container(
                     label: "Notifications",
@@ -78,7 +84,8 @@ class CustomDrawer extends StatelessWidget {
                     icon: Config.logout,
                     onPressed: () {
                       _clientProvider.logOut().then((result) {
-                        print(result);
+                        _client.clear();
+                        _store.clear();
                         if (result) {
                           Navigator.of(context).pushReplacementNamed(Login.id);
                         }
@@ -121,7 +128,12 @@ class CustomDrawer extends StatelessWidget {
                   height: screenSize(context).height * .05,
                 ),
                 container(
-                    label: "Sign in", icon: Config.user, onPressed: () {}),
+                    label: "Sign in",
+                    icon: Config.user,
+                    onPressed: () {
+                       _store.clear();
+                      Navigator.of(context).pushReplacementNamed(Login.id);
+                    }),
               ],
             ),
     );
@@ -142,8 +154,13 @@ class CustomDrawer extends StatelessWidget {
                     color: Config.black,
                     fontWeight: FontWeight.w400,
                     fontSize: 18)),
-                    Spacer(),
-           if(label!="Log out") Icon(CupertinoIcons.right_chevron,color: Colors.black54,size: 16,).paddingOnly(right: 10)
+            Spacer(),
+            if (label != "Log out")
+              Icon(
+                CupertinoIcons.right_chevron,
+                color: Colors.black54,
+                size: 16,
+              ).paddingOnly(right: 10)
           ],
         ),
       ).center(),

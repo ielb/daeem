@@ -8,7 +8,9 @@ import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/screens/client/change_address.dart';
 import 'package:daeem/screens/client/change_password.dart';
 import 'package:daeem/screens/client/change_phone.dart';
+import 'package:daeem/screens/client/phone_screen.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
+import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/screens/products_screen.dart';
@@ -76,9 +78,15 @@ Route<dynamic> routes(RouteSettings settings) {
     case MapScreen.id:
       return CupertinoPageRoute(
           builder: (_) => MapScreen(), settings: settings);
+     case LostConnection.id:
+      return CupertinoPageRoute(
+          builder: (_) => LostConnection(), settings: settings);
     case ConfirmedPage.id:
       return CupertinoPageRoute(
           builder: (_) => ConfirmedPage(), settings: settings);
+              case PhoneScreen.id:
+      return CupertinoPageRoute(
+          builder: (_) => PhoneScreen(), settings: settings);
 
     /// Home screen
     case Home.id:

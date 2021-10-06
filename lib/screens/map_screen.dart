@@ -4,7 +4,6 @@ import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapScreen extends StatefulWidget {
@@ -18,6 +17,7 @@ class _MapScreenState extends State<MapScreen> {
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(35.7651929,-5.7999158),
+    zoom: 11
   );
 
  late MarketProvider marketProvider ;

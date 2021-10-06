@@ -49,38 +49,12 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       child: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Delivering to",
-              style: GoogleFonts.ubuntu(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.grey.shade500),
-            ).align(alignment: Alignment.topLeft),
-            GestureDetector(
-              onTap: () {
-                ///Todo:Open Map
-              },
-              child: Row(
-                children: [
-                  Text(
-                    "Current Location",
-                    style: GoogleFonts.ubuntu(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w300,
-                        color: Config.darkBlue),
-                  ),
-                  Icon(
-                    CupertinoIcons.chevron_down,
-                    color: Config.color_2,
-                    size: 20,
-                  ).paddingOnly(left: 5, top: 5)
-                ],
-              ),
-            )
-          ],
+        title: Text(
+          "Supermarket",
+          style: GoogleFonts.ubuntu(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+              color: Config.black),
         ),
         leading: IconButton(
             onPressed: () {
@@ -168,8 +142,9 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               }
             },
             iconSize: 30,
-            color: Config.darkBlue,
+            color: Config.black,
             icon: Icon(CupertinoIcons.back)),
+            centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -202,39 +177,14 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             child: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Delivering to",
-                    style: GoogleFonts.ubuntu(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white),
-                  ).align(alignment: Alignment.topLeft),
-                  GestureDetector(
-                    onTap: () {
-                      ///Todo:Open Map
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          "Current Location",
-                          style: GoogleFonts.ubuntu(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w300,
-                              color: Config.white),
-                        ),
-                        Icon(
-                          CupertinoIcons.chevron_down,
-                          color: Config.color_2,
-                          size: 20,
-                        ).paddingOnly(left: 5, top: 5)
-                      ],
-                    ),
-                  )
-                ],
+              title: Text(
+                "Supermarket",
+                style: GoogleFonts.ubuntu(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    color: Config.white),
               ),
+               centerTitle: true,
               leading: IconButton(
                   onPressed: () {
                     if (!isMarket) {

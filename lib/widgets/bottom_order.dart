@@ -20,7 +20,7 @@ class StickyOrder extends StatelessWidget {
           TweenAnimationBuilder(
               tween: Tween(
                   begin: screenSize(context).height - 50,
-                  end: screenSize(context).height - 150),
+                  end: screenSize(context).height - 120),
               duration: Duration(milliseconds: 300),
               builder: (_, double d, __) {
                 return Positioned(

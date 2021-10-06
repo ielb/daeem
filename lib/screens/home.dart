@@ -1,7 +1,9 @@
 import 'package:daeem/models/market.dart' as model;
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/loading/market_shimmer.dart';
 import 'package:daeem/screens/map_screen.dart';
+import 'package:daeem/screens/test.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/drawer.dart';
 import 'package:daeem/widgets/market_widget.dart';
@@ -20,28 +22,29 @@ class _HomeState extends State<Home> {
   String userName = "John";
   late TextEditingController _controller;
   double value = 3.5;
-  late  ScrollController _scrollController;
+  late ScrollController _scrollController;
   int itemCount = 5;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   late Future dataResult;
-  late MarketProvider marketProvider ;
-  late ClientProvider _clientProvider ;
+  late MarketProvider marketProvider;
+  late ClientProvider _clientProvider;
   bool isSearching = false;
   String query = '';
   @override
   void initState() {
-     _scrollController = ScrollController();
+    _scrollController = ScrollController();
     _controller = TextEditingController();
 
     super.initState();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-      marketProvider = Provider.of<MarketProvider>(context, listen: false);
-      _clientProvider = Provider.of<ClientProvider>(context, listen: false);
-      dataResult = _getMarkets();
-      _scrollController.addListener(_scrollListener);
+    marketProvider = Provider.of<MarketProvider>(context, listen: false);
+    _clientProvider = Provider.of<ClientProvider>(context, listen: false);
+    dataResult = _getMarkets();
+    _scrollController.addListener(_scrollListener);
   }
 
   _getMarkets() async {
@@ -145,7 +148,10 @@ class _HomeState extends State<Home> {
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) => Test()));
+                  },
                   iconSize: 26,
                   color: Config.darkBlue,
                   icon: Icon(CupertinoIcons.bell_fill)),
@@ -165,9 +171,10 @@ class _HomeState extends State<Home> {
                   background: Container(
                     height: 300,
                     child: Column(children: [
-                      ///Todo:Update the user
+                      //Todo:Update the user
+                      //?sss
                       Text(
-                        "Welcome, ${_clientProvider.client!.name}",
+                        "Welcome, ${_clientProvider.client?.name??''}",
                         style: GoogleFonts.ubuntu(
                             fontSize: 26,
                             fontWeight: FontWeight.w300,
@@ -202,24 +209,35 @@ class _HomeState extends State<Home> {
           future: marketProvider.getSearchedMarkets(query),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(
-                color: Config.color_1,
-              ).paddingOnly(top: 20).center();
-            }
-            return ListView.builder(
+              return ListView.builder(
                 shrinkWrap: true,
                 primary: false,
+                itemCount: 5,
                 itemExtent: 250,
-                itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
-                  return MarketWidget(
-                          snapshot.data![index].name!,
-                          snapshot.data![index].cover,
-                          snapshot.data![index].address!,
-                          snapshot.data![index].hours,
-                          5)
+                  return MarketLoading()
                       .paddingOnly(left: 20, right: 20, bottom: 20);
-                });
+                },
+              );
+            }
+            return snapshot.data?.length != 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemExtent: 250,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return MarketWidget(
+                              snapshot.data![index].name!,
+                              snapshot.data![index].cover,
+                              snapshot.data![index].address!,
+                              snapshot.data![index].hours,
+                              5)
+                          .paddingOnly(left: 20, right: 20, bottom: 20);
+                    })
+                : Text("We didn't find what are you searching about")
+                    .paddingAll(50)
+                    .center();
           }),
     );
   }
@@ -230,9 +248,16 @@ class _HomeState extends State<Home> {
           future: dataResult,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(
-                color: Config.color_1,
-              ).paddingOnly(top: 20).center();
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: 5,
+                itemExtent: 250,
+                itemBuilder: (context, index) {
+                  return MarketLoading()
+                      .paddingOnly(left: 20, right: 20, bottom: 20);
+                },
+              );
             }
             return ListView.builder(
               shrinkWrap: true,

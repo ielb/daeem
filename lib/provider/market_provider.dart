@@ -22,7 +22,6 @@ class MarketProvider extends BaseProvider {
 
   setMarketFromJson(List data) {
     data.forEach((element) {
-      print(element);
       _addMarket(Market.fromJson(element));
     });
     notifyListeners();
@@ -38,13 +37,12 @@ class MarketProvider extends BaseProvider {
     notifyListeners();
   }
 
-  void getDeliveryPrice(double price) async {
+  Future<void> getDeliveryPrice(double price) async {
    
     Response? response = await _marketService.getDeliveryPrice();
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       if (data['status'] == 'success') {
-        print(data);
         data = data['data'];
         data.forEach((element) {
           if (price >= double.parse(element['price_from']) &&
@@ -59,12 +57,12 @@ class MarketProvider extends BaseProvider {
   }
 
   getPrice(List data) {}
+
   Future<bool> getMarkets() async {
     Response? response = await _marketService.getMarkets(_offset);
     _offset = _offset + 5;
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      print(data);
       if (data['status'] != "error") {
         setMarketFromJson(data['data']);
         return true;
@@ -96,5 +94,11 @@ class MarketProvider extends BaseProvider {
 
   checkout(Client client,List<Item> cart,) async {
    
+  }
+
+    clear(){
+  _markets = [];
+  _offset = 0 ;
+  _searchedMarkets = [];
   }
 }

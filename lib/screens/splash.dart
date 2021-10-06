@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:daeem/configs/notification_manager.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/screens/connection.dart';
 import 'package:daeem/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import "package:provider/provider.dart";
+import "package:simple_connection_checker/simple_connection_checker.dart";
 
 class Splash extends StatefulWidget {
   static const id = "/splash";
@@ -18,38 +20,39 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   Timer? _timer;
   late PushNotificationService _notificationService;
+  StreamSubscription? subscription;
+  late AuthProvider auth ;
+  late ClientProvider client;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
-        // var  result  = await connection();
-        // if(!result){
-        //   Navigator.of(context).pushReplacementNamed('connection');
-        // }
+    WidgetsBinding.instance!.addPostFrameCallback((_) async { 
+      auth =  Provider.of<AuthProvider>(context, listen: false);
+      client = Provider.of<ClientProvider>(context, listen: false);
+        notifyManager.setOnNotificationClick(onNotificationClick);
+        notifyManager.setOnNotificationReceive(onNotificationReceive);
+        _notificationService =
+            PushNotificationService(FirebaseMessaging.instance);
+        _notificationService.initialize();
 
       _timer = new Timer(const Duration(milliseconds: 2000), () {
-        _getAuthClient();
+     
+        SimpleConnectionChecker _simpleConnectionChecker =
+            SimpleConnectionChecker()
+              ..setLookUpAddress(
+                  'pub.dev'); //Optional method to pass the lookup string
+        subscription =
+            _simpleConnectionChecker.onConnectionChange.listen((connected) {
+          if (connected) {
+            _getAuthClient();
+          } else {
+            Navigator.pushReplacementNamed(context, LostConnection.id);
+          }
+        });
       });
     });
 
-    notifyManager.setOnNotificationClick(onNotificationClick);
-    notifyManager.setOnNotificationReceive(onNotificationReceive);
-    _notificationService = PushNotificationService(FirebaseMessaging.instance);
-    _notificationService.initialize();
     super.initState();
   }
-//     connection()async{
-//     try {
-//   final result = await InternetAddress.lookup('app.daeem.ma');
-//   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-//     return true;
-//   }else{
-//      return false;
-//   }
-// } on SocketException catch (_) {
-//   print('not connected');
-// }
-//  return false;
-//   }
 
   onNotificationClick(RecieveNotification notification) {
     print("Notification Received : ${notification.id}");
@@ -61,8 +64,6 @@ class _SplashState extends State<Splash> {
 
   void _getAuthClient() async {
     print("test");
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-    final client = Provider.of<ClientProvider>(context, listen: false);
     String? id = await Prefs.instance.getClient();
     bool? isAut = await Prefs.instance.getAuth();
 
@@ -80,11 +81,9 @@ class _SplashState extends State<Splash> {
     } else {
       _skip();
     }
-     
   }
 
   void _skip() async {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
     bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
     if (isOnBoardingSkipped != null && isOnBoardingSkipped) {
       Navigator.pushReplacementNamed(context, Login.id);
@@ -96,6 +95,7 @@ class _SplashState extends State<Splash> {
   @override
   void dispose() {
     _timer?.cancel();
+    subscription?.cancel();
     super.dispose();
   }
 

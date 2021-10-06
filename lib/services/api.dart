@@ -13,7 +13,7 @@ class Api {
   //TODO:HERE YOU CHANGE THE BEARER TOKEN
   var headers = {
     'Accept': 'application/json',
-    'Authorization': 'Bearer N1u2Zlj9SpALm9wiZamY5Xfz5DuNLO5oVc1Z6Zih',
+    'Authorization': 'Bearer 7aMhMdMcmLvLDxfVl4HhlRvKzM4mXfh35Ob7ISuc',
     'Content-Type': 'application/x-www-form-urlencoded'
   };
 

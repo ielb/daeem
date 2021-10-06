@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class MarketService extends BaseApi {
   Future<http.Response?> getMarkets(int offset, {int limit = 5}) async {
     try {
-      return await api.httpGet('supermarkets/$offset/$limit');
+      return await api.httpGet('stores/$offset/$limit');
     } catch (e) {
       print(e);
     }
@@ -12,7 +12,7 @@ class MarketService extends BaseApi {
 
   Future<http.Response?> getMarketById(int id) async {
     try {
-      return await api.httpGet('supermarket/$id');
+      return await api.httpGet('store/$id');
     } catch (e) {
       print(e);
     }
@@ -20,7 +20,7 @@ class MarketService extends BaseApi {
 
   Future<http.Response?> search(String name) async {
     try {
-      return await api.httpGet('supermarkets/$name');
+      return await api.httpGet('stores/$name');
     } catch (e) {
       print(e);
     }
@@ -28,7 +28,7 @@ class MarketService extends BaseApi {
 
   Future<http.Response?> getMarketsHours(int id) async {
     try {
-      return await api.httpGet('supermarket/$id/hours');
+      return await api.httpGet('store/$id/hours');
     } catch (e) {
       print(e);
     }
@@ -36,7 +36,7 @@ class MarketService extends BaseApi {
 
   Future<http.Response?> getMarketsRating(int id) async {
     try {
-      return await api.httpGet('supermarket/$id/rating');
+      return await api.httpGet('store/$id/rating');
     } catch (e) {
       print(e);
     }
@@ -44,8 +44,8 @@ class MarketService extends BaseApi {
 
   Future<http.Response?> updateMarketsRating(int marketId,int clientId,int rating) async {
     try {
-      return await api.httpPost('supermarket/rating',
-          {'supermarket_id': marketId,
+      return await api.httpPost('store/rating',
+          {'store_id': marketId,
            'rating_value': rating,
            'client_id': clientId
           });
@@ -57,7 +57,7 @@ class MarketService extends BaseApi {
 
     Future<http.Response?> getMarketsCategory(int id) async {
     try {
-      return await api.httpGet('supermarket/$id/categories');
+      return await api.httpGet('store/$id/categories');
     } catch (e) {
       throw e;
     }
@@ -112,4 +112,5 @@ class MarketService extends BaseApi {
       throw e;
     }
   }
+
 }

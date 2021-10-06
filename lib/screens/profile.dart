@@ -1,5 +1,6 @@
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/client/change_password.dart';
+import 'package:daeem/screens/client/phone_screen.dart';
 import 'package:daeem/screens/home.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -199,7 +200,9 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                 ).center(),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(PhoneScreen.id);
+                },
               ).paddingOnly(left: 7, top: 20),
             ],
           ),

@@ -40,9 +40,9 @@ class Market {
     this.id = json['id'];
     this.name = json['name'];
     this.logo =
-        "https://app.daeem.ma/images/supermarkets/logos/" + json['logo'];
+        "https://app.daeem.ma/images/stores/logos/" + json['logo'];
     this.cover =
-        "https://app.daeem.ma/images/supermarkets/covers/" + json['cover'];
+        "https://app.daeem.ma/images/stores/covers/" + json['cover'];
     this.phone = json['phone'];
     this.address = json['address'];
     this.cityId = json['city_id'];

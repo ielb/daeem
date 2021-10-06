@@ -4,6 +4,7 @@ import 'package:daeem/models/market_category.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/screens/loading/category_shimmer.dart';
 import 'package:daeem/screens/sub_category.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/market_category.dart';
@@ -244,11 +245,18 @@ class _MarketPageState extends State<MarketPage> {
           future: _categoryProvider.searchForCategories(query),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(
-                color: Config.color_1,
-              ).paddingOnly(top: 20).center();
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: 5,
+                itemExtent: 250,
+                itemBuilder: (context, index) {
+                  return CategoryLoading()
+                      .paddingOnly(left: 20, right: 20, bottom: 20);
+                },
+              );
             }
-            return ListView.builder(
+            return  snapshot.data?.length !=0 ?  ListView.builder(
                 shrinkWrap: true,
                 primary: false,
                 itemExtent: 200,
@@ -257,7 +265,9 @@ class _MarketPageState extends State<MarketPage> {
                   return CategoryWidget(snapshot.data![index].name!,
                           snapshot.data![index].image!)
                       .paddingOnly(left: 20, right: 20, bottom: 20);
-                });
+                }) : Text("We didn't find what are you searching about")
+                              .paddingAll(50)
+                              .center();
           }),
     );
   }
@@ -267,15 +277,29 @@ class _MarketPageState extends State<MarketPage> {
             future: dataResult,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(
-                  color: Config.color_1,
-                ).paddingOnly(top: 20).center();
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return CategoryLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
+                  },
+                );
               }
               if (_categoryProvider.categories.length == 0) {
                 _categoryProvider.getCategories(market.id!);
-                return CircularProgressIndicator(
-                  color: Config.color_1,
-                ).paddingOnly(top: 20).center();
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return CategoryLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
+                  },
+                );
               }
 
               return ListView.builder(

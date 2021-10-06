@@ -234,7 +234,8 @@ class AuthProvider extends BaseProvider {
   }
 
   Future<bool> logOut() async {
-    _client = Client();
+    _client = null;
+    notifyListeners();
     print("test");
     var google = await GoogleSignIn().isSignedIn();
     var facebook = await FacebookAuth.instance.accessToken;
@@ -244,6 +245,7 @@ class AuthProvider extends BaseProvider {
     }
     var prefs = await SharedPreferences.getInstance();
     prefs.clear();
+    notifyListeners();
     return true;
   }
 }

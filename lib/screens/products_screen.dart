@@ -3,6 +3,7 @@ import 'package:daeem/models/market.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/screens/loading/product_shimmer.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -99,8 +100,9 @@ class _ProductsPageState extends State<ProductsPage> {
     return data.quantity;
   }
 
-  Future<bool> _backPressed()async{
-      var _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+  Future<bool> _backPressed() async {
+    var _categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
     _categoryProvider.closeProducts();
     Navigator.of(context).pop(context);
     return true;
@@ -149,7 +151,8 @@ class _ProductsPageState extends State<ProductsPage> {
                                             fontWeight: FontWeight.w400),
                                         children: [
                                       TextSpan(
-                                          text: "Looking for something similar?",
+                                          text:
+                                              "Looking for something similar?",
                                           style: GoogleFonts.ubuntu(
                                               color: Colors.black,
                                               fontSize: 8,
@@ -202,9 +205,16 @@ class _ProductsPageState extends State<ProductsPage> {
           future: _categoryProvider.searchForProduct(query),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(
-                color: Config.color_1,
-              ).paddingOnly(top: 20).center();
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: 5,
+                itemExtent: 80,
+                itemBuilder: (context, index) {
+                  return ProductLoading()
+                      .paddingOnly(left: 20, right: 20, bottom: 20);
+                },
+              );
             }
             return snapshot.data?.length == 0
                 ? Text("This product out of stock").paddingAll(50).center()
@@ -230,9 +240,16 @@ class _ProductsPageState extends State<ProductsPage> {
             future: dataResult,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(
-                  color: Config.color_1,
-                ).paddingOnly(top: 20).center();
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 80,
+                  itemBuilder: (context, index) {
+                    return ProductLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
+                  },
+                );
               }
               return ListView.builder(
                   shrinkWrap: true,
@@ -243,7 +260,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     return content(
                         product: _categoryProvider.products[index],
                         context: context);
-                  });
+                  }).paddingOnly(bottom: 50);
             }),
       );
 
