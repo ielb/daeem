@@ -10,12 +10,17 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePasswordState extends State<ChangePassword> {
-  late TextEditingController _currentPasswordController, _newPasswordController;
+  late TextEditingController _currentPasswordController,
+      _newPasswordController,
+      _confirmPasswordController;
   late ClientProvider _clientProvider;
+
+  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   @override
   void initState() {
     _currentPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
     WidgetsBinding.instance!.scheduleFrameCallback((timeStamp) {
       _clientProvider = Provider.of<ClientProvider>(context, listen: false);
     });
@@ -33,8 +38,26 @@ class _ChangePasswordState extends State<ChangePassword> {
     _newPasswordController.dispose();
     super.dispose();
   }
-  _changePassword()async{
-   await _clientProvider.changePassword(_currentPasswordController.text,_newPasswordController.text);
+
+  _changePassword() async {
+    var result = _formkey.currentState?.validate();
+    print(result);
+    if (result!=null) {
+      if (_newPasswordController.text == _confirmPasswordController.text){
+      String? test =  await _clientProvider.changePassword(
+            _currentPasswordController.text, _newPasswordController.text);
+            if(test!=null)
+            Toast.show(test, context,duration: 5);
+            else
+            Toast.show("Something went wrong", context,duration: 5);
+      }
+    }
+  }
+
+  String? validate(String? text) {
+    if (text != null && text.isEmpty) return 'this field is required';
+    if (text != null && text.length < 8)
+      return 'the password should be 8 chars long';
   }
 
   @override
@@ -64,67 +87,91 @@ class _ChangePasswordState extends State<ChangePassword> {
         child: Stack(
           children: [
             SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "CURRENT PASSWORD",
-                    style: GoogleFonts.ubuntu(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400),
-                  )
-                      .align(alignment: Alignment.topLeft)
-                      .paddingOnly(left: 20, top: 20),
-                  TextField(
-                      controller: _currentPasswordController,
+              child: Form(
+                key: _formkey,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "CURRENT PASSWORD",
                       style: GoogleFonts.ubuntu(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: Colors.black,
                           fontWeight: FontWeight.w400),
-                      decoration: InputDecoration(
-                        hintText: "Current password",
-                      )).paddingOnly(
-                    left: 20,
-                    right: 20,
-                  ),
-                  Text(
-                    "NEW PASSWORD",
-                    style: GoogleFonts.ubuntu(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400),
-                  )
-                      .align(alignment: Alignment.topLeft)
-                      .paddingOnly(left: 20, top: 20),
-                  TextField(
-                      controller: _newPasswordController,
+                    )
+                        .align(alignment: Alignment.topLeft)
+                        .paddingOnly(left: 20, top: 20),
+                    TextFormField(
+                        controller: _currentPasswordController,
+                        validator: validate,
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400),
+                        decoration: InputDecoration(
+                          hintText: "Current password",
+                        )).paddingOnly(
+                      left: 20,
+                      right: 20,
+                    ),
+                    Text(
+                      "NEW PASSWORD",
                       style: GoogleFonts.ubuntu(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: Colors.black,
                           fontWeight: FontWeight.w400),
-                      decoration: InputDecoration(
-                        hintText: "New password",
-                      )).paddingOnly(left: 20, right: 20),
-                ],
+                    )
+                        .align(alignment: Alignment.topLeft)
+                        .paddingOnly(left: 20, top: 20),
+                    TextFormField(
+                        controller: _newPasswordController,
+                        validator: validate,
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400),
+                        decoration: InputDecoration(
+                          hintText: "New password",
+                        )).paddingOnly(left: 20, right: 20),
+                    Text(
+                      "CONFIRM PASSWORD",
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400),
+                    )
+                        .align(alignment: Alignment.topLeft)
+                        .paddingOnly(left: 20, top: 20),
+                    TextFormField(
+                        controller: _confirmPasswordController,
+                        validator: validate,
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400),
+                        decoration: InputDecoration(
+                          hintText: "Confirm password",
+                        )).paddingOnly(left: 20, right: 20),
+                  ],
+                ),
               ),
             ),
             TextButton(
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Colors.white), 
-          elevation: MaterialStateProperty.all(35), 
-          shadowColor: MaterialStateProperty.all(Colors.black),
-          fixedSize: MaterialStateProperty.all(Size(screenSize(context).width, 50)),
-        ),
-              child: Text("Done",style: GoogleFonts.ubuntu(
-                  fontSize: 24,
-                  color: Config.color_1,
-                  fontWeight: FontWeight.w600
-                )),
-              onPressed: () => _changePassword,
-              
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                elevation: MaterialStateProperty.all(35),
+                shadowColor: MaterialStateProperty.all(Colors.black),
+                fixedSize: MaterialStateProperty.all(
+                    Size(screenSize(context).width, 50)),
+              ),
+              child: Text("Update",
+                  style: GoogleFonts.ubuntu(
+                      fontSize: 24,
+                      color: Config.color_1,
+                      fontWeight: FontWeight.w600)),
+              onPressed: () { _changePassword();},
             ).align(alignment: Alignment.bottomCenter),
           ],
         ),

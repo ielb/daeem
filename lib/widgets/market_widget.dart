@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,36 +32,40 @@ class MarketWidget extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            height: 135,
-            width: screenSize(context).width * .91,
-            decoration: BoxDecoration(
+              height: 135,
+              width: screenSize(context).width * .91,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                image: DecorationImage(
-                  image: _marketImageUrl != null
-                      ? NetworkImage(_marketImageUrl!)
-                      : AssetImage(Config.margane) as ImageProvider,
-                  fit: BoxFit.cover,
-                  colorFilter: !_isAvailable
-                      ? ColorFilter.mode(
-                          Colors.black.withOpacity(0.6), BlendMode.darken)
-                      : null,
-                )),
-          ).paddingOnly(bottom: 5),
+                child: CachedNetworkImage(
+                    imageUrl: _marketImageUrl!,
+                    filterQuality: FilterQuality.high,
+                    fit: BoxFit.cover,
+                    
+                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                        CircularProgressIndicator(
+                                value: downloadProgress.progress)
+                            .center(),
+                    errorWidget: (context, url, error) => Image.asset(
+                          "assets/placeholder.png",
+                          filterQuality: FilterQuality.high,
+                          fit: BoxFit.cover,
+                        )),
+              )).paddingOnly(bottom: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
                 child: new Container(
                   margin: EdgeInsets.only(left: 10),
-                  child:  Text(
+                  child: Text(
                     _marketTitle,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     softWrap: true,
                     style: GoogleFonts.ubuntu(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff4A4B4D)),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff4A4B4D)),
                   ),
                 ),
               ),
@@ -79,11 +84,16 @@ class MarketWidget extends StatelessWidget {
                     children: [
                       Icon(CupertinoIcons.location,
                           size: 18, color: Color(0xff4A4B4D)),
-                      Text(_marketAddress,
-                          style: GoogleFonts.ubuntu(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0xff4A4B4D))),
+                      Container(
+                        width: 150,
+                        child: Text(_marketAddress,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.ubuntu(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
+                                color: Color(0xff4A4B4D))),
+                      ),
                     ],
                   ),
                   Row(

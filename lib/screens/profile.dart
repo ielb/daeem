@@ -1,6 +1,7 @@
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/screens/client/change_address.dart';
 import 'package:daeem/screens/client/change_password.dart';
-import 'package:daeem/screens/client/phone_screen.dart';
+import 'package:daeem/screens/client/change_phone.dart';
 import 'package:daeem/screens/home.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -142,7 +143,9 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                 ).center(),
-                onPressed: () {},
+                onPressed: () {
+                   Navigator.of(context).pushNamed(ChangeAddress.id);
+                },
               ).paddingOnly(left: 7, top: 20),
               TextButton(
                 child: Container(
@@ -201,7 +204,7 @@ class _ProfileState extends State<Profile> {
                   ),
                 ).center(),
                 onPressed: () {
-                  Navigator.of(context).pushNamed(PhoneScreen.id);
+                  Navigator.of(context).pushNamed(ChangePhone.id);
                 },
               ).paddingOnly(left: 7, top: 20),
             ],

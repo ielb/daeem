@@ -5,6 +5,8 @@
     "cSpell.words": [
         "appbar",
         "Autovalidate",
+        "avlc",
+        "Avocat",
         "Boardering",
         "Branes",
         "cntlr",
@@ -12,12 +14,16 @@
         "daeem",
         "firestore",
         "formkey",
+        "geocoder",
         "geolocator",
+        "ionicons",
         "Issam",
         "margane",
         "mcontext",
         "mipmap",
+        "nullsafety",
         "ontheway",
+        "Placemark",
         "Plex",
         "precache",
         "prefs",
@@ -26,6 +32,9 @@
         "rxdart",
         "signup",
         "sirine",
-        "unfocus"
+        "Supermarche",
+        "Supermarches",
+        "unfocus",
+        "webp"
     ]
 }

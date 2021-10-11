@@ -1,3 +1,4 @@
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
@@ -5,15 +6,16 @@ import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/locator.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/screens/client/change_address.dart';
 import 'package:daeem/screens/client/change_password.dart';
 import 'package:daeem/screens/client/change_phone.dart';
-import 'package:daeem/screens/client/phone_screen.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/screens/products_screen.dart';
+import 'package:daeem/screens/store_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,7 +40,8 @@ void main() async {
     ChangeNotifierProvider(create: (context) => MarketProvider()),
     ChangeNotifierProvider(create: (context) => CategoryProvider()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
-    ChangeNotifierProvider(create: (context) => ClientProvider())
+    ChangeNotifierProvider(create: (context) => ClientProvider()),
+    ChangeNotifierProvider(create: (context) => AddressProvider())
   ], child: MyApp()));
 }
 
@@ -78,15 +81,12 @@ Route<dynamic> routes(RouteSettings settings) {
     case MapScreen.id:
       return CupertinoPageRoute(
           builder: (_) => MapScreen(), settings: settings);
-     case LostConnection.id:
+    case LostConnection.id:
       return CupertinoPageRoute(
           builder: (_) => LostConnection(), settings: settings);
     case ConfirmedPage.id:
       return CupertinoPageRoute(
           builder: (_) => ConfirmedPage(), settings: settings);
-              case PhoneScreen.id:
-      return CupertinoPageRoute(
-          builder: (_) => PhoneScreen(), settings: settings);
 
     /// Home screen
     case Home.id:
@@ -95,10 +95,14 @@ Route<dynamic> routes(RouteSettings settings) {
     case OrdersPage.id:
       return CupertinoPageRoute(
           builder: (_) => OrdersPage(), settings: settings);
+
     /// On boarding
     case OnBoardering.id:
       return CupertinoPageRoute(
           builder: (_) => OnBoardering(), settings: settings);
+
+    case Store.id:
+      return CupertinoPageRoute(builder: (_) => Store(), settings: settings);
 
     ///Login
     case Login.id:
@@ -112,6 +116,9 @@ Route<dynamic> routes(RouteSettings settings) {
     case MarketPage.id:
       return CupertinoPageRoute(
           builder: (_) => MarketPage(), settings: settings);
+    case AddressPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => AddressPage(), settings: settings);
 
     /// Profile
     case Profile.id:
@@ -138,13 +145,13 @@ Route<dynamic> routes(RouteSettings settings) {
     case ProductsPage.id:
       return CupertinoPageRoute(
           builder: (_) => ProductsPage(), settings: settings);
-            case ChangePassword.id:
+    case ChangePassword.id:
       return CupertinoPageRoute(
           builder: (_) => ChangePassword(), settings: settings);
-            case ChangePhone.id:
+    case ChangePhone.id:
       return CupertinoPageRoute(
           builder: (_) => ChangePhone(), settings: settings);
-            case ChangeAddress.id:
+    case ChangeAddress.id:
       return CupertinoPageRoute(
           builder: (_) => ChangeAddress(), settings: settings);
 

@@ -1,9 +1,11 @@
 
+import 'package:daeem/models/address.dart';
+
 class Client {
   String? id ;
   String? name;
   String? email;
-  String? address;
+  Address? address;
   String? phone;
   String? token;
   Client({this.id,this.name,this.email,this.address,this.phone});
@@ -12,7 +14,6 @@ class Client {
     this.id=json['id'].toString();
     this.name=json['name'];
     this.email=json['email'];
-    this.address=json['address'];
     this.phone=json['phone'];
     this.token = json['client_token'];
   }
@@ -22,7 +23,6 @@ class Client {
    return  <dynamic,dynamic>{
       'id':this.id,
       'name':this.name,
-      'address':this.address,
       'phone':this.phone
     };
   }

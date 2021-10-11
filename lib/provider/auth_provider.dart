@@ -224,7 +224,7 @@ class AuthProvider extends BaseProvider {
     if (response != null) {
       var json = jsonDecode(response.body);
       print(json);
-      if (response.statusCode == 200 || json['status'] == "success") {
+      if (response.statusCode == 200 && json['status'] == "success") {
         setClient(Client.fromJson(json['data']));
         return true;
       }

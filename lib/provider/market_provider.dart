@@ -12,10 +12,15 @@ class MarketProvider extends BaseProvider {
   List<Market> get markets => _markets;
   double deliveryCost = 0;
   int _offset = 0;
+  String? _storeType;
+  String? get storeType => _storeType;
 
   //Todo:Remove market data from route arguments and use provider
   // Market? _currentMarket ;
-
+  void setStoreType(String type){
+    _storeType =type;
+    notifyListeners();
+  }
   _addMarket(Market market) {
     _markets.add(market);
   }

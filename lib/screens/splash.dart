@@ -74,6 +74,7 @@ class _SplashState extends State<Splash> {
 
       if (result) {
         client.setClient(auth.client!);
+        client.getClientAddress(auth.client!);
         Navigator.pushReplacementNamed(context, Home.id);
       } else {
         _skip();

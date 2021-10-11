@@ -12,6 +12,7 @@ class Product {
     String? subCategoryId;
     bool?  available;
     bool? status    ;  
+    bool hasVariant=false;
     int quantity = 0; 
     Product({this.id,this.supermarketId,this.sku,this.name,this.description,this.image,this.price,this.weight,this.subCategoryId,this.available,this.status}); 
     Product.fromJson(Map<String,dynamic> json){
@@ -26,5 +27,6 @@ class Product {
       this.subCategoryId = json[''];
       this.available = json['available'] == 0 ? false: true;
       this.status = json['status'] == 0 ? false :true;
+       this.hasVariant = json['has_variants'] == 0 ? false: true;
     }
 }

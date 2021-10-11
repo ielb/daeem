@@ -5,6 +5,7 @@ import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
+import 'package:ionicons/ionicons.dart';
 import '/extensions/extensions.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
@@ -148,10 +149,12 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context,CheckoutPage.id);
+              },
               iconSize: 26,
-              color: Config.darkBlue,
-              icon: Icon(CupertinoIcons.bell_fill)),
+              color: Config.black,
+              icon: Icon(Ionicons.bag_handle)),
         ],
       ),
     );
@@ -282,10 +285,12 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               automaticallyImplyLeading: false,
               actions: [
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context,CheckoutPage.id);
+                    },
                     iconSize: 26,
                     color: Config.white,
-                    icon: Icon(CupertinoIcons.bell_fill)),
+                    icon: Icon(Ionicons.bag_handle)),
               ],
             )));
   }

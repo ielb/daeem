@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/screens/loading/product_shimmer.dart';
+import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -108,6 +110,11 @@ class _ProductsPageState extends State<ProductsPage> {
     return true;
   }
 
+  _productPressed(Product product){
+    if(product.hasVariant){
+      Navigator.of(context).push(CupertinoPageRoute(builder: (context)=>ProductDetails(product:product)));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -259,7 +266,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   itemBuilder: (context, index) {
                     return content(
                         product: _categoryProvider.products[index],
-                        context: context);
+                        context: context,onTap: (){_productPressed(_categoryProvider.products[index]);});
                   }).paddingOnly(bottom: 50);
             }),
       );
@@ -277,11 +284,14 @@ class _ProductsPageState extends State<ProductsPage> {
             height: 60,
             width: 60,
             padding: EdgeInsets.all(5),
-            child: Image.network(
-              product.image ??
+            child:CachedNetworkImage(
+             imageUrl: product.image ??
                   "https://static.thenounproject.com/png/741653-200.png",
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
+              progressIndicatorBuilder: (context,url,downloadProgress)=>CircularProgressIndicator(value: downloadProgress.progress)
+                        .center(),
+              errorWidget: (context,url,error)=> Image.asset("assets/placeholder.png"),
             ),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -308,7 +318,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(35),
-                          boxShadow: [
+                          boxShadow: [ 
                             BoxShadow(
                               color: Colors.grey.shade300,
                               spreadRadius: 2,

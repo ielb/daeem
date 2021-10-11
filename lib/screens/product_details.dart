@@ -1,16 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:daeem/models/product.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
-class Test extends StatefulWidget {
-  const Test({Key? key}) : super(key: key);
-
+class ProductDetails extends StatefulWidget {
+  static const  id ="product_details";
+  ProductDetails({required this.product});
+  final Product product ;
   @override
-  _TestState createState() => _TestState();
+  _ProductDetailsState createState() => _ProductDetailsState();
 }
 
-class _TestState extends State<Test> {
+class _ProductDetailsState extends State<ProductDetails> {
   List<String> size = [
     "S",
     "M",
@@ -30,6 +31,8 @@ class _TestState extends State<Test> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(CupertinoIcons.back),
+            color: Colors.black,
+            iconSize: 26,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -43,12 +46,12 @@ class _TestState extends State<Test> {
               StretchMode.zoomBackground,
             ],
             background: CachedNetworkImage(
-                imageUrl:
-                    "https://images.unsplash.com/photo-1601275868399-45bec4f4cd9d?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=735&q=80",
+                imageUrl:widget.product.image!,
                 filterQuality: FilterQuality.high,
-                fit: BoxFit.cover,
+              fit: BoxFit.scaleDown, 
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    CircularProgressIndicator(value: downloadProgress.progress).center(),
+                    CircularProgressIndicator(value: downloadProgress.progress)
+                        .center(),
                 errorWidget: (context, url, error) => Image.asset(
                       "assets/placeholder.png",
                       filterQuality: FilterQuality.high,
@@ -98,7 +101,9 @@ class _TestState extends State<Test> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Appel",
+                             widget.product.name!.replaceRange(18,  widget.product.name!.length, ''),
+                             overflow: TextOverflow.ellipsis,
+                             softWrap: true,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 22,
@@ -109,7 +114,7 @@ class _TestState extends State<Test> {
                               height: 5,
                             ),
                             Text(
-                              "Fruit",
+                               "${ widget.product.sku}",
                               style: TextStyle(
                                 color: Config.color_2,
                                 fontSize: 14,
@@ -118,7 +123,7 @@ class _TestState extends State<Test> {
                           ],
                         ),
                         Text(
-                          "8.00 MAD",
+                          "${ widget.product.price} MAD",
                           style: TextStyle(color: Colors.black, fontSize: 16),
                         ),
                       ],
@@ -127,7 +132,7 @@ class _TestState extends State<Test> {
                       height: 20,
                     ),
                     Text(
-                      "Take a break from jeans with the parker long straight pant. These lightweight, pleat front pants feature a flattering high waist and loose, straight legs.",
+                      "${widget.product.description}",
                       style: TextStyle(
                         height: 1.5,
                         color: Colors.grey.shade800,
@@ -135,11 +140,9 @@ class _TestState extends State<Test> {
                       ),
                     ),
                     SizedBox(
-                      height: 30,
-                    ),
-                    SizedBox(
                       height: 20,
                     ),
+                   
                     Text(
                       'Size',
                       style:
@@ -194,7 +197,7 @@ class _TestState extends State<Test> {
                       },
                       height: 50,
                       elevation: 0,
-                      splashColor: Colors.yellow[700],
+                      splashColor: Config.color_1,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
                       color: Config.color_2,

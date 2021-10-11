@@ -134,6 +134,16 @@ class CustomDrawer extends StatelessWidget {
                        _store.clear();
                       Navigator.of(context).pushReplacementNamed(Login.id);
                     }),
+                     Divider(),
+                container(
+                    label: "Rate us", icon: Config.rate, onPressed: () {}),
+                container(
+                    label: "Refer a friend",
+                    icon: Config.share,
+                    onPressed: () {}),
+                container(
+                    label: "Help", icon: Config.question, onPressed: () {}),
+                Spacer(),
               ],
             ),
     );
