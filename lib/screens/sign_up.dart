@@ -1,3 +1,4 @@
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/widgets/inputField.dart';
@@ -16,6 +17,9 @@ class _SignUpState extends State<SignUp> {
   TextEditingController? _passwordController;
   TextEditingController? _nameController;
   AuthProvider _authProvider = AuthProvider();
+
+  ClientProvider _clientProvider = ClientProvider();
+  AddressProvider _addressProvider = AddressProvider();
   bool _isVisible = true;
   bool _isValidate = true;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -30,6 +34,8 @@ class _SignUpState extends State<SignUp> {
   @override
   void didChangeDependencies() {
     _authProvider = Provider.of<AuthProvider>(context);
+    _clientProvider =  Provider.of<ClientProvider>(context);
+    _addressProvider = Provider.of<AddressProvider>(context);
     super.didChangeDependencies();
   }
 
@@ -77,7 +83,8 @@ class _SignUpState extends State<SignUp> {
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
     if (result) {
-      Provider.of<ClientProvider>(context,listen: false).setClient(_authProvider.client!);
+      Provider.of<ClientProvider>(context, listen: false)
+          .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
     } else {
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
@@ -87,7 +94,8 @@ class _SignUpState extends State<SignUp> {
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
     if (result) {
-      Provider.of<ClientProvider>(context,listen: false).setClient(_authProvider.client!);
+      Provider.of<ClientProvider>(context, listen: false)
+          .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
     } else {
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
@@ -211,7 +219,15 @@ class _SignUpState extends State<SignUp> {
                           ).paddingOnly(top: 5, bottom: 10),
                           OutlinedButton(
                             onPressed: () {
-                              Navigator.pushReplacementNamed(context, Home.id);
+                              if (_clientProvider.client == null ||
+                                  _addressProvider.address == null) {
+                                Config.bottomSheet(context);
+                              } else {
+                                Prefs.instance.setAuth(false);
+                                Navigator.pushReplacementNamed(
+                                    context, Home.id);
+                              }
+                              
                             },
                             child: Text(AppLocalizations.of(context)!.skip),
                             style: OutlinedButton.styleFrom(

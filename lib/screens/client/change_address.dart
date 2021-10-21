@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field
 
+import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,11 +34,11 @@ class _ChangeAddressState extends State<ChangeAddress> {
   void didChangeDependencies() {
     if (!_called) {
       _clientProvider = Provider.of<ClientProvider>(context, listen: false);
-      _street.text = _clientProvider.client!.address?.streetName??'';
-      _number.text = _clientProvider.client!.address?.houseNumber??'';
-      _business.text = _clientProvider.client!.address?.buildingName??'';
-      _floor.text = _clientProvider.client!.address?.floorDoorNumber??'';
-      _post.text = _clientProvider.client!.address?.codePostal??'';
+      _street.text = _clientProvider.client!.address?.streetName ?? '';
+      _number.text = _clientProvider.client!.address?.houseNumber ?? '';
+      _business.text = _clientProvider.client!.address?.buildingName ?? '';
+      _floor.text = _clientProvider.client!.address?.floorDoorNumber ?? '';
+      _post.text = _clientProvider.client!.address?.codePostal ?? '';
       setState(() {
         _called = true;
       });
@@ -48,8 +49,15 @@ class _ChangeAddressState extends State<ChangeAddress> {
   _updateAddress() async {
     var result = _formkey.currentState!.validate();
     if (result) {
-      await _clientProvider.updateAddress(
-          _street.text, _number.text, _business.text, _floor.text, _post.text);
+      Address _address = Address(
+        streetName: _street.text,
+        codePostal: _post.text,
+        address: _street.text + _number.text,
+        buildingName: _business.text,
+        floorDoorNumber: _floor.text,
+      );
+
+      await _clientProvider.updateAddress(_address);
     }
   }
 

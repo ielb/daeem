@@ -21,6 +21,8 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+  flutter:
+    sdk: flutter
   cached_network_image: ^3.1.0
   cloud_firestore: ^2.5.1
   cupertino_icons: ^1.0.2
@@ -29,8 +31,7 @@ dependencies:
   firebase_core: ^1.6.0
   firebase_dynamic_links: ^2.0.9
   firebase_messaging: ^10.0.7
-  flutter:
-    sdk: flutter
+  
   #auth
   flutter_facebook_auth: ^3.5.1
   flutter_local_notifications: ^8.2.0
@@ -56,6 +57,7 @@ dependencies:
   ionicons: ^0.1.2
   geolocator: 7.6.2
   geocoding: ^2.0.1
+  top_snackbar_flutter: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +98,7 @@ flutter:
     - assets/pharmacy_1.png
     - assets/grocery.png
     - assets/placeholder.png
+    - assets/empty_cart.png
     - assets/delivery_address.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see

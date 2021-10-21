@@ -5,6 +5,7 @@ import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/locator.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/screens/client/change_address.dart';
@@ -13,6 +14,7 @@ import 'package:daeem/screens/client/change_phone.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/map_screen.dart';
+import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
@@ -154,6 +156,13 @@ Route<dynamic> routes(RouteSettings settings) {
     case ChangeAddress.id:
       return CupertinoPageRoute(
           builder: (_) => ChangeAddress(), settings: settings);
+          case CartPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => CartPage(), settings: settings);
+
+case NotificationScreen.id:
+      return CupertinoPageRoute(
+          builder: (_) => NotificationScreen(), settings: settings);
 
     /// Default route in case of error
     default:

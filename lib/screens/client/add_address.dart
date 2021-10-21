@@ -1,4 +1,5 @@
-import 'dart:async';
+
+import 'dart:ui';
 
 import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/address_provider.dart';
@@ -19,16 +20,18 @@ class AddressPage extends StatefulWidget {
 
 class _AddressPageState extends State<AddressPage> {
   late TextEditingController _street, _number, _business, _floor, _post;
-  bool _called = false;
+
   Position? _currentPosition;
   Marker? marker;
-  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController? _controller ;
 
   CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(35.7651929, -5.7999158), zoom: 11);
 
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   List<Placemark> address = [];
+  late ClientProvider _clientProvider ;
+  late AddressProvider _addressProvider;
   @override
   void initState() {
     _street = TextEditingController();
@@ -36,23 +39,18 @@ class _AddressPageState extends State<AddressPage> {
     _business = TextEditingController();
     _floor = TextEditingController();
     _post = TextEditingController();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _clientProvider =  Provider.of<ClientProvider>(context,listen:false);
+      _addressProvider    =   Provider.of<AddressProvider>(context,listen: false);
+    });
 
     super.initState();
   }
+ 
 
-  @override
-  void didChangeDependencies() {
-    if (!_called) {
-      getLocation();
-      setState(() {
-        _called = true;
-      });
-    }
-    super.didChangeDependencies();
-  }
+  
 
   void getLocation() async {
-    final GoogleMapController controller = await _controller.future;
     _currentPosition = await LocationService().getLoc();
     
     if (_currentPosition != null) {
@@ -61,7 +59,7 @@ class _AddressPageState extends State<AddressPage> {
         zoom: 20,
           target:
               LatLng(_currentPosition!.latitude, _currentPosition!.longitude));
-      controller.animateCamera(CameraUpdate.newLatLng( LatLng(_currentPosition!.latitude, _currentPosition!.longitude)));
+       _controller?.animateCamera(CameraUpdate.newLatLng( LatLng(_currentPosition!.latitude, _currentPosition!.longitude)));
        address = await LocationService()
           .getAddress(_currentPosition!.latitude, _currentPosition!.longitude);
       _street.text = "${address.first.street??''}";
@@ -78,13 +76,20 @@ class _AddressPageState extends State<AddressPage> {
     _business.dispose();
     _floor.dispose();
     _post.dispose();
+    _controller?.dispose();
     super.dispose();
   }
-   _submit(){
+   _submit()async{
      var result = _formkey.currentState?.validate();
      if(result!=null&&result){
        Address _address = Address(streetName: _street.text,codePostal: _post.text,lat: "${_currentPosition?.latitude??''}",lng:"${_currentPosition?.longitude??''}", city: address.first.locality);
-       Provider.of<AddressProvider>(context).setAddress(_address);
+      _addressProvider.setAddress(_address);
+       if(_clientProvider.client!=null)
+       await _clientProvider.updateAddress(_address);
+       Toast.show("Address was added with  success", context,duration: 4);
+       Navigator.pushReplacementNamed(context,Home.id);
+       
+  
 
      }
    }
@@ -130,7 +135,7 @@ class _AddressPageState extends State<AddressPage> {
               myLocationButtonEnabled: false,
               mapToolbarEnabled: false,
               onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
+                _controller=controller;
               },
             ),
           ),
@@ -364,7 +369,7 @@ class _AddressPageState extends State<AddressPage> {
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                         ),
-                      ).paddingOnly(bottom: 50),
+                      ),
                     ],
                   ),
                 )),

@@ -1,5 +1,5 @@
+import 'package:daeem/models/coupon.dart';
 import 'package:daeem/models/item.dart';
-import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
@@ -7,6 +7,7 @@ import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 
 class CheckoutPage extends StatefulWidget {
   static const id = "checkout";
@@ -17,43 +18,55 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   ScrollController controller = ScrollController();
-  TextEditingController _controller = TextEditingController();
+  late TextEditingController _controller ;
+  bool called = false;
+  late MarketProvider market;
+  late CartProvider cart;
+  String discout = '';
+  @override
+  void didChangeDependencies() {
+    if (!called) {
+      cart = Provider.of<CartProvider>(context, listen: false);
+      market = Provider.of<MarketProvider>(context, listen: false);
+      _controller = TextEditingController();
+    }
+    super.didChangeDependencies();
+  }
 
   addToCart(Item item, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
     cart.addToBasket(item);
-    setState(() {});
   }
 
   removeFromCart(Item item, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
     cart.removeFromBasket(item);
-    setState(() {});
   }
 
-  int? getItemCount(int id, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
-    Item data = cart.basket.singleWhere((element) => id == element.product.id,
-        orElse: () => Item(product: Product()));
-    return data.quantity;
-  }
-
-  checkout(CartProvider cart) {
+  checkout() {
     cart.clearCart();
     Navigator.pushReplacementNamed(context, ConfirmedPage.id);
   }
 
-  checkCoupon() {}
+  checkCoupon()async {
+    showDialog(context: context,builder : (context) =>  CircularProgressIndicator(color: Config.color_2,).center());
+    Coupon? coupon =  await market.checkCoupon(_controller.text);
+    if(coupon == null) {
+
+    }else{
+       setState(() {
+         couponChecked = true;
+         discout = coupon.discount_price??'';
+         Navigator.pop(context);
+       });
+    }
+  }
 
   var address = true;
   var couponChecked = false;
 
   @override
   Widget build(BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
-    var market = Provider.of<MarketProvider>(context, listen: false);
     var client = Provider.of<ClientProvider>(context, listen: false);
-    market.getDeliveryPrice(double.parse(cart.getFinalPrice()));
+    
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -85,24 +98,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "My cart",
-                      style: GoogleFonts.ubuntu(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
-                    ).paddingAll(20),
-                    ListView.builder(
-                      primary: false,
-                      shrinkWrap: true,
-                      itemCount: cart.basket.length,
-                      itemBuilder: (context, index) {
-                        return content(item: cart.basket[index]);
-                      },
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
                       "Delivery details",
                       style: GoogleFonts.ubuntu(
                           fontSize: 22,
@@ -124,7 +119,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       Navigator.pushNamed(
                                           context, MapScreen.id);
                                     },
-                                    
                                     leading: Icon(
                                       CupertinoIcons.location,
                                       color: Colors.black,
@@ -138,7 +132,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         color: Colors.black,
                                       ),
                                     ),
-                                   
                                     trailing: Icon(
                                       CupertinoIcons.chevron_down,
                                       size: 20,
@@ -153,13 +146,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                     horizontalTitleGap: 0,
                                     title: Text(
-                                      client.client!.address.toString(),
+                                      "${client.client!.address?.streetName}",
                                       style: GoogleFonts.ubuntu(
                                         fontSize: 20,
                                         color: Colors.black,
                                       ),
                                     ),
-                                   
                                     trailing: Icon(
                                       CupertinoIcons.chevron_right,
                                       size: 20,
@@ -222,7 +214,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           horizontalTitleGap: 0,
                           title: Text(
-                            "Add your phone number",
+                            client.client?.phone ?? '',
                             style: GoogleFonts.ubuntu(
                               fontSize: 20,
                               color: Colors.grey,
@@ -246,7 +238,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     Row(
                       children: [
                         Container(
-                            width: screenSize(context).width * .85,
+                            width: screenSize(context).width * .91,
                             decoration: BoxDecoration(boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.shade100,
@@ -323,7 +315,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                             )),
                       ],
-                    ).paddingOnly(left: 20, right: 20),
+                    ).paddingOnly(left: 20),
                     SizedBox(
                       height: 20,
                     ),
@@ -363,7 +355,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               style: GoogleFonts.ubuntu(
                                   fontSize: 16, fontWeight: FontWeight.w400)),
                           Spacer(),
-                          Text("10 MAD",
+                          Text("$discout MAD",
                               style: GoogleFonts.ubuntu(
                                   fontSize: 16, fontWeight: FontWeight.w400))
                         ],
@@ -382,7 +374,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ).paddingOnly(left: 20, bottom: 10, right: 20),
                     ElevatedButton(
                       onPressed: () {
-                        checkout(cart);
+                        checkout();
                       },
                       child: Text(
                         "Checkout ( ${double.parse(cart.getFinalPrice()) + market.deliveryCost} MAD )",

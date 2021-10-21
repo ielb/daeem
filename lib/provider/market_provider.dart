@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:daeem/models/coupon.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/base_provider.dart';
@@ -14,6 +15,7 @@ class MarketProvider extends BaseProvider {
   int _offset = 0;
   String? _storeType;
   String? get storeType => _storeType;
+  Coupon? coupon ; 
 
   //Todo:Remove market data from route arguments and use provider
   // Market? _currentMarket ;
@@ -49,6 +51,7 @@ class MarketProvider extends BaseProvider {
       var data = jsonDecode(response.body);
       if (data['status'] == 'success') {
         data = data['data'];
+        print(data);
         data.forEach((element) {
           if (price >= double.parse(element['price_from']) &&
               price <= double.parse(element['price_to'])) {
@@ -56,6 +59,7 @@ class MarketProvider extends BaseProvider {
            
           }
          });   
+         notifyListeners();
       }
     }
     setBusy(false);
@@ -96,6 +100,21 @@ class MarketProvider extends BaseProvider {
         return List.empty();
     }
   }
+
+  Future<Coupon?> checkCoupon(String data)async{
+     Response? response = await _marketService.checkCoupon(data);
+     if(response!=null){
+        var data  = jsonDecode(response.body);
+        if(data["status"]=="success"){
+           coupon = Coupon.fromJson(jsonEncode(data["data"]));
+           return coupon;
+        }else{
+          return null;
+        }
+     }else{
+       return null;
+     }
+   }
 
   checkout(Client client,List<Item> cart,) async {
    

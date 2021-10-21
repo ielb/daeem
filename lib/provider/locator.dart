@@ -1,7 +1,4 @@
-
-
-
-
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
@@ -14,6 +11,7 @@ void setupLocator() {
   locator.registerFactory<CartProvider>(() => CartProvider());
   locator.registerFactory<AuthProvider>(() => AuthProvider());
   locator.registerFactory<CategoryProvider>(() => CategoryProvider());
-  locator.registerSingleton<ClientProvider>(ClientProvider());
+  locator.registerFactory<ClientProvider>(()=>ClientProvider());
+  locator.registerFactory<AddressProvider>(()=>AddressProvider());
 
 }

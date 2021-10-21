@@ -5,13 +5,14 @@ import 'package:flutter/cupertino.dart';
 
 class MarketWidget extends StatelessWidget {
   const MarketWidget(this._marketTitle, this._marketImageUrl,
-      this._marketAddress, this._marketTime, this._marketRating);
+      this._marketAddress, this._marketTime, this._marketRating,this._rate);
   final String _marketTitle;
   final String? _marketImageUrl;
   final int _marketRating;
   final String _marketAddress;
   final String _marketTime;
   final bool _isAvailable = true;
+  final Function(int) _rate;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,7 @@ class MarketWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Rating((s) {}, _marketRating).paddingOnly(right: 10),
+              Rating(_rate, _marketRating).paddingOnly(right: 10),
             ],
           ).paddingOnly(bottom: 10),
           Row(
@@ -135,3 +136,4 @@ class MarketWidget extends StatelessWidget {
     );
   }
 }
+

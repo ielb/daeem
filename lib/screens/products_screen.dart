@@ -8,6 +8,7 @@ import 'package:daeem/screens/loading/product_shimmer.dart';
 import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:ionicons/ionicons.dart';
 
 class ProductsPage extends StatefulWidget {
   static const id = "products";
@@ -24,7 +25,8 @@ class _ProductsPageState extends State<ProductsPage> {
   String query = '';
   Market market = Market();
   Future<bool> dataResult = Future(() => false);
-  CategoryProvider _categoryProvider = CategoryProvider();
+  late CategoryProvider _categoryProvider ;
+  late CartProvider cart ;
   int itemCount = 1;
   @override
   void initState() {
@@ -34,8 +36,12 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   void didChangeDependencies() {
+    setState(() {
+      
+    });
     if (!_called) {
       _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+        cart = Provider.of<CartProvider>(context, listen: false);
       var list = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
       market = list[0] as Market;
       int id = list[1] as int;
@@ -63,7 +69,6 @@ class _ProductsPageState extends State<ProductsPage> {
 
   onChange(String value) {
     query = value;
-    print(value);
   }
 
   onClose() {
@@ -82,39 +87,32 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   addToCart(Product product, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
+   
     Item item = Item(product: product, quantity: 1);
     cart.addToBasket(item);
     setState(() {});
   }
 
   removeFromCart(Product product, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
+   
     Item item = Item(product: product);
     cart.removeFromBasket(item);
     setState(() {});
   }
 
-  int? getItemCount(int id, BuildContext context) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
-    Item data = cart.basket.singleWhere((element) => id == element.product.id,
-        orElse: () => Item(product: Product()));
-    return data.quantity;
-  }
 
   Future<bool> _backPressed() async {
-    var _categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
+  
     _categoryProvider.closeProducts();
     Navigator.of(context).pop(context);
     return true;
   }
 
-  _productPressed(Product product){
-    if(product.hasVariant){
-      Navigator.of(context).push(CupertinoPageRoute(builder: (context)=>ProductDetails(product:product)));
-    }
+  _productPressed(Product product) {
+    Navigator.of(context).push(CupertinoPageRoute(
+        builder: (context) => ProductDetails(product: product))); 
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -199,7 +197,9 @@ class _ProductsPageState extends State<ProductsPage> {
                     isHavingShadow: true,
                   ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
                   //*content
-                  isSearching ? _searchedContent(context) : _content(context)
+                  isSearching ? _searchedContent(context) : _content(context),
+                   SliverToBoxAdapter(
+                      child: SizedBox(height: 50,)),
                 ],
               ),
               mcontext: context)),
@@ -266,7 +266,10 @@ class _ProductsPageState extends State<ProductsPage> {
                   itemBuilder: (context, index) {
                     return content(
                         product: _categoryProvider.products[index],
-                        context: context,onTap: (){_productPressed(_categoryProvider.products[index]);});
+                        context: context,
+                        onTap: () {
+                          _productPressed(_categoryProvider.products[index]);
+                        });
                   }).paddingOnly(bottom: 50);
             }),
       );
@@ -275,7 +278,6 @@ class _ProductsPageState extends State<ProductsPage> {
       {required Product product,
       required BuildContext context,
       Function()? onTap}) {
-    var cart = Provider.of<CartProvider>(context, listen: false);
     return GestureDetector(
       onTap: onTap,
       child: ListTile(
@@ -284,14 +286,15 @@ class _ProductsPageState extends State<ProductsPage> {
             height: 60,
             width: 60,
             padding: EdgeInsets.all(5),
-            child:CachedNetworkImage(
-             imageUrl: product.image ??
-                  "https://static.thenounproject.com/png/741653-200.png",
+            child: CachedNetworkImage(
+              imageUrl: product.image ?? '',
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
-              progressIndicatorBuilder: (context,url,downloadProgress)=>CircularProgressIndicator(value: downloadProgress.progress)
-                        .center(),
-              errorWidget: (context,url,error)=> Image.asset("assets/placeholder.png"),
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress)
+                      .center(),
+              errorWidget: (context, url, error) =>
+                  Image.asset("assets/placeholder.png"),
             ),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -307,72 +310,7 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
           title: Text(product.name!),
           subtitle: Text(product.price! + " MAD"),
-          trailing: Container(
-            width: 120,
-            child: Row(
-              children: [
-                if (cart.basket.length != 0)
-                  Container(
-                      height: 35,
-                      width: 35,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(35),
-                          boxShadow: [ 
-                            BoxShadow(
-                              color: Colors.grey.shade300,
-                              spreadRadius: 2,
-                              blurRadius: 12,
-                              offset: Offset(0, 4),
-                            )
-                          ]),
-                      child: IconButton(
-                        iconSize: 18,
-                        onPressed: () => removeFromCart(product, context),
-                        icon: Icon(CupertinoIcons.minus),
-                        color: Colors.redAccent,
-                      ).center())
-                else
-                  SizedBox(
-                    width: 35,
-                  ),
-                SizedBox(
-                  width: 10,
-                ),
-                if (cart.basket.length != 0)
-                  getItemCount(product.id!, context) != null
-                      ? Text("${getItemCount(product.id!, context)}x")
-                      : Text("0")
-                else
-                  SizedBox(
-                    width: 10,
-                  ),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(35),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.shade300,
-                            spreadRadius: 2,
-                            blurRadius: 16,
-                            offset: Offset(0, 4),
-                          )
-                        ]),
-                    child: IconButton(
-                      onPressed: () => addToCart(product, context),
-                      icon: Icon(CupertinoIcons.add),
-                      color: Config.color_2,
-                      iconSize: 18,
-                    ).center())
-              ],
-            ),
-          )),
+          trailing: Icon(Ionicons.chevron_forward)),
     );
   }
 }

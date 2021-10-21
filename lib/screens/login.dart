@@ -2,7 +2,6 @@ import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
-import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
@@ -243,66 +242,7 @@ class _LoginState extends State<Login> {
                               onPressed: () {
                                 if (_clientProvider.client == null ||
                                     _addressProvider.address == null) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(
-                                                      15)),
-                                          child: Container(
-                                            padding: EdgeInsets.all(20),
-                                            height:
-                                                screenSize(context).height * .75,
-                                            width:
-                                                screenSize(context).width * .8,
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Column(
-                                              children: [
-                                                FadeInImage(
-                                                    height: 250,
-                                                    width: 250,
-                                                    placeholder: AssetImage(
-                                                        "assets/placeholder.png"),
-                                                    image: AssetImage(
-                                                      Config.delivery_address,
-                                                    )),
-                                                    SizedBox(height: 30,),
-                                                Text(
-                                                    "Please add an address to see all stores near you",
-                                                    textAlign: TextAlign.center,
-                                                    softWrap: true,style: GoogleFonts.ubuntu(fontSize: 20,color:Colors.black),),
-                                                Spacer(),
-                                                MaterialButton(
-                                                  onPressed: () {
-                                                    Navigator.pushNamed(context,AddressPage.id);
-                                                  },
-                                                  height: 50,
-                                                  elevation: 0,
-                                                  splashColor: Config.color_1,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  color: Config.color_2,
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Add address",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 18),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      });
+                                   Config.bottomSheet(context);
                                 } else {
                                   Prefs.instance.setAuth(false);
                                   Navigator.pushReplacementNamed(

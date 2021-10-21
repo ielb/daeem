@@ -1,3 +1,5 @@
+import 'package:daeem/screens/client/add_address.dart';
+import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -94,5 +96,62 @@ class Config {
     } else {
       return true;
     }
+  }
+
+  static bottomSheet(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(15)),
+            child: Container(
+              padding: EdgeInsets.all(20),
+              height: MediaQuery.of(context).size.height * .75,
+              width: MediaQuery.of(context).size.width * .8,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(15)),
+              child: Column(
+                children: [
+                  FadeInImage(
+                      height: 250,
+                      width: 250,
+                      placeholder: AssetImage("assets/placeholder.png"),
+                      image: AssetImage(
+                        Config.delivery_address,
+                      )),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    "Please add an address to see all stores near you",
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style:
+                        GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
+                  ),
+                  Spacer(),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AddressPage.id);
+                    },
+                    height: 50,
+                    elevation: 0,
+                    splashColor: Config.color_1,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    color: Config.color_2,
+                    child: Center(
+                      child: Text(
+                        "Add address",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

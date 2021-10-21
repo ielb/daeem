@@ -203,8 +203,10 @@ class AuthProvider extends BaseProvider {
         await _authService.login(email.toLowerCase().trim(), password.trim());
     if (response != null) {
       var data = jsonDecode(response.body);
+       print(data);
       if (data['status'] == "success") {
         var json = data['data'][0];
+        print(data);
         setClient(Client.fromJson(json));
         await Prefs.instance.setClient(json['id'].toString());
         print(client);

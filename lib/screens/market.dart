@@ -25,13 +25,23 @@ class _MarketPageState extends State<MarketPage> {
   bool _called = false;
   Market market = Market();
   String query = '';
-  CategoryProvider _categoryProvider = CategoryProvider();
+  late CategoryProvider _categoryProvider;
   Future dataResult = Future(() => false);
   @override
   void initState() {
     super.initState();
     SchedulerBinding.instance!.addPostFrameCallback((_) {});
     _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _called = false;
+     _isClosed = false;
+     isSearching = false;
+
+    super.dispose();
   }
 
   @override
@@ -256,18 +266,20 @@ class _MarketPageState extends State<MarketPage> {
                 },
               );
             }
-            return  snapshot.data?.length !=0 ?  ListView.builder(
-                shrinkWrap: true,
-                primary: false,
-                itemExtent: 200,
-                itemCount: snapshot.data?.length,
-                itemBuilder: (context, index) {
-                  return CategoryWidget(snapshot.data![index].name!,
-                          snapshot.data![index].image!)
-                      .paddingOnly(left: 20, right: 20, bottom: 20);
-                }) : Text("We didn't find what are you searching about")
-                              .paddingAll(50)
-                              .center();
+            return snapshot.data?.length != 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemExtent: 200,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return CategoryWidget(snapshot.data![index].name!,
+                              snapshot.data![index].image!)
+                          .paddingOnly(left: 20, right: 20, bottom: 20);
+                    })
+                : Text("We didn't find what are you searching about")
+                    .paddingAll(50)
+                    .center();
           }),
     );
   }

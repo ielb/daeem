@@ -29,7 +29,7 @@ class _StoreState extends State<Store> {
   late ClientProvider _clientProvider;
   bool isSearching = false;
   String query = '';
-  
+
   @override
   void initState() {
     _scrollController = ScrollController();
@@ -89,7 +89,7 @@ class _StoreState extends State<Store> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => true,
       child: RefreshIndicator(
         displacement: 50,
         color: Config.color_1,
@@ -124,29 +124,22 @@ class _StoreState extends State<Store> {
             controller: _scrollController,
             physics: BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                expandedHeight: 140,
-                elevation: 0,
-                backgroundColor: Colors.white,
-                automaticallyImplyLeading: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.pin,
-                  background: Container(
-                    height: 300,
-                    child: Column(children: [
-                      SearchInput(
-                        _controller,
-                        "Search for supermarket",
-                        screenSize(context).width * .91,
-                        CupertinoIcons.search,
-                        onChanged: onChange,
-                        onClose: onClose,
-                        onTap: onTap,
-                        searching: isSearching,
-                        isHavingShadow: true,
-                      ).paddingOnly(bottom: 10, top: 40),
-                    ]),
-                  ),
+              SliverToBoxAdapter(
+                child: Container(
+                  height:80,
+                  child: Column(children: [
+                    SearchInput(
+                      _controller,
+                      "Search for supermarket",
+                      screenSize(context).width * .91,
+                      CupertinoIcons.search,
+                      onChanged: onChange,
+                      onClose: onClose,
+                      onTap: onTap,
+                      searching: isSearching,
+                      isHavingShadow: true,
+                    ).paddingOnly(bottom: 10, top: 5),
+                  ]),
                 ),
               ),
               isSearching ? _searchedContent() : _content()
@@ -186,7 +179,8 @@ class _StoreState extends State<Store> {
                               snapshot.data![index].cover,
                               snapshot.data![index].address!,
                               snapshot.data![index].hours,
-                              5)
+                              5,
+                              (rate) {})
                           .paddingOnly(left: 20, right: 20, bottom: 20);
                     })
                 : Text("We didn't find what are you searching about")
@@ -225,12 +219,13 @@ class _StoreState extends State<Store> {
                         arguments: marketProvider.markets[index]);
                   },
                   child: MarketWidget(
-                    marketProvider.markets[index].name!,
-                    marketProvider.markets[index].cover,
-                    marketProvider.markets[index].address!,
-                    marketProvider.markets[index].hours,
-                    5,
-                  ).paddingOnly(left: 20, right: 20, bottom: 20),
+                          marketProvider.markets[index].name!,
+                          marketProvider.markets[index].cover,
+                          marketProvider.markets[index].address!,
+                          marketProvider.markets[index].hours,
+                          5,
+                          (rate) {})
+                      .paddingOnly(left: 20, right: 20, bottom: 20),
                 );
               },
             );

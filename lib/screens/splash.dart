@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:daeem/configs/notification_manager.dart';
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/connection.dart';
@@ -23,11 +24,13 @@ class _SplashState extends State<Splash> {
   StreamSubscription? subscription;
   late AuthProvider auth ;
   late ClientProvider client;
+  late AddressProvider addressProvider;
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((_) async { 
       auth =  Provider.of<AuthProvider>(context, listen: false);
       client = Provider.of<ClientProvider>(context, listen: false);
+      addressProvider =Provider.of<AddressProvider>(context,listen: false);
         notifyManager.setOnNotificationClick(onNotificationClick);
         notifyManager.setOnNotificationReceive(onNotificationReceive);
         _notificationService =
@@ -63,7 +66,6 @@ class _SplashState extends State<Splash> {
   }
 
   void _getAuthClient() async {
-    print("test");
     String? id = await Prefs.instance.getClient();
     bool? isAut = await Prefs.instance.getAuth();
 
@@ -74,7 +76,9 @@ class _SplashState extends State<Splash> {
 
       if (result) {
         client.setClient(auth.client!);
-        client.getClientAddress(auth.client!);
+        await client.getClientAddress(auth.client!);
+       
+        addressProvider.setAddress(client.client?.address);
         Navigator.pushReplacementNamed(context, Home.id);
       } else {
         _skip();

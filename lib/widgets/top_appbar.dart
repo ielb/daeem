@@ -1,6 +1,7 @@
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +13,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
   final Market market;
   final bool isMarket;
+  
   final bool isSub;
   const CustomSliverAppBarDelegate(this.market, this.expandedHeight,
       {this.isMarket = false, this.isSub = false});
@@ -43,15 +45,15 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   Widget buildAppBar(double shrinkOffset, context) {
     var _categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
-    var cart = Provider.of<CartProvider>(context, listen: false);
+        Provider.of<CategoryProvider>(context, );
+    var cart = Provider.of<CartProvider>(context, );
     return Opacity(
       opacity: appear(shrinkOffset),
       child: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          "Supermarket",
+          "${market.name}",
           style: GoogleFonts.ubuntu(
               fontSize: 24,
               fontWeight: FontWeight.w500,
@@ -62,13 +64,13 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               if (!isMarket) {
                 _categoryProvider.closeProducts();
                 if (!isSub) _categoryProvider.closeSub();
-                Navigator.of(context).pop(context);
+                Navigator.pop(context);
               } else {
                 _categoryProvider.close();
                 _categoryProvider.closeSub();
                 if (cart.isCartEmpty()) {
                   _categoryProvider.closeProducts();
-                  Navigator.of(context).pop(context);
+                  Navigator.pop(context);
                 } else
                   showDialog(
                     context: context, // <<----
@@ -101,7 +103,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                     OutlinedButton(
                                         onPressed: () {
                                           cart.clearCart();
-                                          Navigator.of(context).pop(context);
+                                          Navigator.pushReplacementNamed(context,Home.id);
                                         },
                                         child: Text("Cancel anyway"),
                                         style: OutlinedButton.styleFrom(
@@ -148,13 +150,43 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context,CheckoutPage.id);
-              },
-              iconSize: 26,
+          Stack(children: <Widget>[
+                IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, CartPage.id);
+                    },
+                    iconSize: 26,
               color: Config.black,
-              icon: Icon(Ionicons.bag_handle)),
+              icon: Icon(Ionicons.bag_handle)).paddingOnly(top:5),
+                cart.basket.length != 0
+                    ? Positioned(
+                        right: 3,
+                        top: 10,
+                        child: Container(
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${cart.basket.length}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ]),
+          
         ],
       ),
     );
@@ -162,8 +194,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   Widget buildBackground(double shrinkOffset, context) {
     var _categoryProvider =
-        Provider.of<CategoryProvider>(context, listen: false);
-    var cart = Provider.of<CartProvider>(context, listen: false);
+        Provider.of<CategoryProvider>(context, );
+    var cart = Provider.of<CartProvider>(context, );
     return Opacity(
         opacity: disappear(shrinkOffset),
         child: Container(
@@ -234,8 +266,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                           OutlinedButton(
                                               onPressed: () {
                                                 cart.clearCart();
-                                                Navigator.of(context)
-                                                    .pop(context);
+                                                Navigator.pushReplacementNamed(context,Home.id);
                                               },
                                               child: Text("Cancel anyway"),
                                               style: OutlinedButton.styleFrom(
@@ -284,13 +315,44 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                   icon: Icon(CupertinoIcons.back)),
               automaticallyImplyLeading: false,
               actions: [
+               
+          Stack(children: <Widget>[
                 IconButton(
                     onPressed: () {
-                      Navigator.pushNamed(context,CheckoutPage.id);
+                      Navigator.pushNamed(context, CartPage.id);
                     },
                     iconSize: 26,
-                    color: Config.white,
-                    icon: Icon(Ionicons.bag_handle)),
+              color: Config.white,
+              icon: Icon(Ionicons.bag_handle)).paddingOnly(top:5),
+                cart.basket.length != 0
+                    ? Positioned(
+                        right: 3,
+                        top: 10,
+                        child: Container(
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${cart.basket.length}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ]),
+          
               ],
             )));
   }
