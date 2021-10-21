@@ -1,79 +1,223 @@
 import 'dart:ui';
-
-import 'package:daeem/screens/sous_category.dart';
+import 'package:daeem/models/market.dart';
+import 'package:daeem/models/market_category.dart';
+import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/screens/loading/category_shimmer.dart';
+import 'package:daeem/screens/sub_category.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/market_category.dart';
-import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 
-class Market extends StatefulWidget {
+class MarketPage extends StatefulWidget {
   static const id = "market";
 
   @override
-  _MarketState createState() => _MarketState();
+  _MarketPageState createState() => _MarketPageState();
 }
 
-class _MarketState extends State<Market> {
+class _MarketPageState extends State<MarketPage> {
   late TextEditingController _searchController;
   bool _isClosed = false;
+  bool isSearching = false;
+  bool _called = false;
+  Market market = Market();
+  String query = '';
+  late CategoryProvider _categoryProvider;
+  Future dataResult = Future(() => false);
   @override
   void initState() {
     super.initState();
+    SchedulerBinding.instance!.addPostFrameCallback((_) {});
     _searchController = TextEditingController();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: CustomScrollView(
-        physics: BouncingScrollPhysics(),
-        slivers: [
-          ///App bar
-          SliverPersistentHeader(
-            delegate: CustomSliverAppBarDelegate(200),
-            pinned: true,
-          ),
-           ///Closed sign
-          if(_isClosed)
-          SliverToBoxAdapter(
+  void dispose() {
+    _searchController.dispose();
+    _called = false;
+     _isClosed = false;
+     isSearching = false;
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!_called) {
+      market = ModalRoute.of(context)!.settings.arguments as Market;
+      _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+      dataResult = _getSubCategories(market.id!);
+      setState(() {
+        _called = true;
+      });
+    }
+    super.didChangeDependencies();
+  }
+
+  _getSubCategories(int id) {
+    return _categoryProvider.getCategories(id);
+  }
+
+  onChange(String value) {
+    query = value;
+    print(value);
+  }
+
+  onClose() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+      isSearching = false;
+    });
+    _categoryProvider.clearSearched();
+    _searchController.clear();
+  }
+
+  onTap() {
+    setState(() {
+      isSearching = true;
+    });
+  }
+
+  Future<bool> _backPress() async {
+    print("test");
+    var cart = Provider.of<CartProvider>(context, listen: false);
+    var _categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    _categoryProvider.closeSub();
+    _categoryProvider.close();
+    if (cart.isCartEmpty()) {
+      _categoryProvider.closeProducts();
+      Navigator.of(context).pop(context);
+    } else
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
               child: Container(
-            height: 55,
-            width: 300,
-            
-            margin: EdgeInsets.only(left: 20, right: 20, top: 80),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Config.closed,
-                SizedBox(width: 5,),
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  RichText(
-                      text: TextSpan(
-                          text: "This store is closed at the moment.",
-                          style: GoogleFonts.ubuntu(
-                              color: Colors.black,
-                              fontSize: 8,
-                              fontWeight: FontWeight.w400),
-                          children: [
-                        TextSpan(
-                            text: "Looking for something similar?",
+                height: 400,
+                width: 400,
+                child: Column(
+                  children: [
+                    Image.asset("assets/cart.png").paddingAll(25),
+                    Text("Your cart will be deleted",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black)),
+                    Text("Please complete your order",
                             style: GoogleFonts.ubuntu(
-                                color: Colors.black,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w600))
-                      ])
-                  ),
-                  Text("Explore stores near you",style:GoogleFonts.ubuntu(
-                      color: Config.color_1)).align(alignment: Alignment.bottomLeft).paddingOnly(right:105)
-                ])
-              ],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.grey))
+                        .paddingAll(20),
+                    Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        OutlinedButton(
+                            onPressed: () {
+                              cart.clearCart();
+                              Navigator.of(context).pop(context);
+                            },
+                            child: Text("Cancel anyway"),
+                            style: OutlinedButton.styleFrom(
+                              primary: Colors.red.shade400,
+                              side: BorderSide(
+                                  color: Colors.red.shade400, width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(6),
+                              ),
+                              textStyle: GoogleFonts.ubuntu(fontSize: 14),
+                            )),
+                        Spacer(),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, CheckoutPage.id);
+                            },
+                            child: Text("Go to checkout"),
+                            style: ElevatedButton.styleFrom(
+                                shadowColor: Config.color_1,
+                                primary: Config.color_1,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(5),
+                                ),
+                                textStyle: GoogleFonts.ubuntu(
+                                    fontSize: 14, color: Colors.white))),
+                      ],
+                    ).paddingOnly(left: 20, right: 20, bottom: 20)
+                  ],
+                ),
+              ));
+        },
+      );
+
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: _backPress,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: CustomScrollView(
+          physics: BouncingScrollPhysics(),
+          slivers: [
+            ///App bar
+            SliverPersistentHeader(
+              delegate: CustomSliverAppBarDelegate(market, 200, isMarket: true),
+              pinned: true,
             ),
+
+            ///Closed sign
+            if (!market.status!)
+              SliverToBoxAdapter(
+                  child: Container(
+                height: 55,
+                width: 300,
+                margin: EdgeInsets.only(left: 20, right: 20, top: 80),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Config.closed,
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RichText(
+                              text: TextSpan(
+                                  text: "This store is closed at the moment.",
+                                  style: GoogleFonts.ubuntu(
+                                      color: Colors.black,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w400),
+                                  children: [
+                                TextSpan(
+                                    text: "Looking for something similar?",
+                                    style: GoogleFonts.ubuntu(
+                                        color: Colors.black,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w600))
+                              ])),
+                          Text("Explore stores near you",
+                                  style:
+                                      GoogleFonts.ubuntu(color: Config.color_1))
+                              .align(alignment: Alignment.bottomLeft)
+                              .paddingOnly(right: 105)
+                        ])
+                  ],
+                ),
                 decoration: BoxDecoration(
-                  color: Color(0xffFFF3DA),
-                  borderRadius: BorderRadius.circular(15),
+                    color: Color(0xffFFF3DA),
+                    borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.shade200,
@@ -81,249 +225,114 @@ class _MarketState extends State<Market> {
                         blurRadius: 16,
                         offset: Offset(0, 4),
                       )
-                    ]
-                ),
-          )),
-          ///SearchField
-          SliverToBoxAdapter(
-              child: SearchInput(_searchController, "Search for supermarket",
-                      screenSize(context).width * .81, CupertinoIcons.search)
-                  .paddingOnly(left: 20, right: 20, top: _isClosed ? 10 :80)),
-          _content()
-        ],
+                    ]),
+              )),
+
+            ///SearchField
+            SliverToBoxAdapter(
+                child: SearchInput(
+              _searchController,
+              "Search for category",
+              screenSize(context).width * .81,
+              CupertinoIcons.search,
+              onChanged: onChange,
+              onClose: onClose,
+              onTap: onTap,
+              searching: isSearching,
+              isHavingShadow: true,
+            ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
+            isSearching ? _searchedContent() : _content()
+          ],
+        ),
       ),
     );
   }
+
   ///Content list
-  Widget _content() => SliverToBoxAdapter(
-        child: ListView.builder(
-          shrinkWrap: true,
-          primary: false,
-          itemCount: 5,
-          itemExtent: 190,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: ()=> Navigator.pushNamed(context, Category.id),
-              child: CategoryWidget("Food", Config.margane)
-                  .paddingOnly(left: 20, right: 20, bottom: 20),
-            );
-          },
-        ),
-      );
-}
-
-class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final double expandedHeight;
-
-  const CustomSliverAppBarDelegate(
-    this.expandedHeight,
-  );
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final size = 120;
-    final top = expandedHeight - shrinkOffset - size / 2;
-
-    return Stack(
-      fit: StackFit.expand,
-      overflow: Overflow.visible,
-      children: [
-        buildBackground(shrinkOffset, context),
-        buildAppBar(shrinkOffset, context),
-        Positioned(
-          top: top,
-          left: 20,
-          right: 20,
-          child: buildFloating(shrinkOffset),
-        ),
-      ],
+  Widget _searchedContent() {
+    return SliverToBoxAdapter(
+      child: FutureBuilder<List<MarketCategory>>(
+          future: _categoryProvider.searchForCategories(query),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: 5,
+                itemExtent: 250,
+                itemBuilder: (context, index) {
+                  return CategoryLoading()
+                      .paddingOnly(left: 20, right: 20, bottom: 20);
+                },
+              );
+            }
+            return snapshot.data?.length != 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemExtent: 200,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return CategoryWidget(snapshot.data![index].name!,
+                              snapshot.data![index].image!)
+                          .paddingOnly(left: 20, right: 20, bottom: 20);
+                    })
+                : Text("We didn't find what are you searching about")
+                    .paddingAll(50)
+                    .center();
+          }),
     );
   }
 
-  double appear(double shrinkOffset) => shrinkOffset / expandedHeight;
-
-  double disappear(double shrinkOffset) => 1 - shrinkOffset / expandedHeight;
-
-  Widget buildAppBar(double shrinkOffset, context) => Opacity(
-        opacity: appear(shrinkOffset),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Delivering to",
-                style: GoogleFonts.ubuntu(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey.shade500),
-              ).align(alignment: Alignment.topLeft),
-              GestureDetector(
-                onTap: () {
-                  ///Todo:Open Map
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      "Current Location",
-                      style: GoogleFonts.ubuntu(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w300,
-                          color: Config.darkBlue),
-                    ),
-                    Icon(
-                      CupertinoIcons.chevron_down,
-                      color: Config.color_2,
-                      size: 20,
-                    ).paddingOnly(left: 5, top: 5)
-                  ],
-                ),
-              )
-            ],
-          ),
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              iconSize: 30,
-              color: Config.darkBlue,
-              icon: Icon(CupertinoIcons.back)),
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-                onPressed: () {},
-                iconSize: 26,
-                color: Config.darkBlue,
-                icon: Icon(CupertinoIcons.bell_fill)),
-          ],
-        ),
-      );
-
-  Widget buildBackground(double shrinkOffset, context) => Opacity(
-      opacity: disappear(shrinkOffset),
-      child: Container(
-          decoration: new BoxDecoration(
-              image: new DecorationImage(
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.8), BlendMode.darken),
-                image: new ExactAssetImage(Config.margane),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.only(
-                  bottomRight: Radius.circular(15),
-                  bottomLeft: Radius.circular(15))),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Delivering to",
-                  style: GoogleFonts.ubuntu(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white),
-                ).align(alignment: Alignment.topLeft),
-                GestureDetector(
-                  onTap: () {
-                    ///Todo:Open Map
+  Widget _content() => SliverToBoxAdapter(
+        child: FutureBuilder(
+            future: dataResult,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return CategoryLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
                   },
-                  child: Row(
-                    children: [
-                      Text(
-                        "Current Location",
-                        style: GoogleFonts.ubuntu(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w300,
-                            color: Config.white),
-                      ),
-                      Icon(
-                        CupertinoIcons.chevron_down,
-                        color: Config.color_2,
-                        size: 20,
-                      ).paddingOnly(left: 5, top: 5)
-                    ],
-                  ),
-                )
-              ],
-            ),
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
+                );
+              }
+              if (_categoryProvider.categories.length == 0) {
+                _categoryProvider.getCategories(market.id!);
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return CategoryLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
+                  },
+                );
+              }
+
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: _categoryProvider.categories.length,
+                itemExtent: 150,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () => Navigator.pushNamed(context, Category.id,
+                        arguments: [
+                          market,
+                          _categoryProvider.categories[index].id
+                        ]),
+                    child: CategoryWidget(
+                            _categoryProvider.categories[index].name!,
+                            _categoryProvider.categories[index].image!)
+                        .paddingOnly(left: 20, right: 20, bottom: 30),
+                  );
                 },
-                iconSize: 30,
-                color: Config.white,
-                icon: Icon(CupertinoIcons.back)),
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                  onPressed: () {},
-                  iconSize: 26,
-                  color: Config.white,
-                  icon: Icon(CupertinoIcons.bell_fill)),
-            ],
-          )));
-
-  Widget buildFloating(double shrinkOffset) => Opacity(
-        opacity: disappear(shrinkOffset),
-        child: Container(
-          padding: EdgeInsets.all(10),
-          height: 120,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade400,
-                  spreadRadius: 2,
-                  blurRadius: 16,
-                  offset: Offset(0, 4),
-                )
-              ]),
-          child: Column(
-            children: [
-              Text(
-                "Marjane, Route Rabat",
-                style: GoogleFonts.ubuntu(
-                    color: Config.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500),
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Icon(CupertinoIcons.clock, size: 18, color: Color(0xff4A4B4D))
-                      .paddingOnly(right: 3, left: 10),
-                  Text("09:00 - 22:00",
-                      style: GoogleFonts.ubuntu(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                          color: Color(0xff4A4B4D))),
-                  Spacer(),
-                  Rating((s) {}, 5).paddingOnly(right: 10),
-                ],
-              ),
-              SizedBox(height: 20),
-              Text(
-                "Please do not exceed 15Kg",
-                style: GoogleFonts.ubuntu(
-                    color: Config.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300),
-              ),
-            ],
-          ),
-        ),
+              );
+            }),
       );
-
-  @override
-  double get maxExtent => expandedHeight;
-
-  @override
-  double get minExtent => kToolbarHeight + 30;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }

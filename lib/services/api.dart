@@ -9,20 +9,17 @@ class Api {
   Api._internal();
   String url = "https://app.daeem.ma/api/";
 
+  // ignore: todo
   //TODO:HERE YOU CHANGE THE BEARER TOKEN
   var headers = {
     'Accept': 'application/json',
-    'Authorization': 'Bearer oo3aD8L8TjT8huLCI8OzpZXX2u7uWsEzaCslXs2k',
+    'Authorization': 'Bearer 7aMhMdMcmLvLDxfVl4HhlRvKzM4mXfh35Ob7ISuc',
     'Content-Type': 'application/x-www-form-urlencoded'
   };
 
   Future<http.Response?> httpGet(String endPath,{Map<String,dynamic>? query}) async {
     try{
       Uri uri = Uri.parse('$url$endPath');
-      if(query!=null){
-        // ignore: unused_local_variable
-        Uri uri = Uri.parse('$url$endPath');
-      }
       return http.get(uri,headers:headers);
     }catch(e){
       print(e);

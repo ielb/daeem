@@ -1,28 +1,53 @@
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/locator.dart';
+import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/cart_screen.dart';
+import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/screens/client/add_address.dart';
+import 'package:daeem/screens/client/change_address.dart';
+import 'package:daeem/screens/client/change_password.dart';
+import 'package:daeem/screens/client/change_phone.dart';
+import 'package:daeem/screens/confirmed_screen.dart';
+import 'package:daeem/screens/connection.dart';
+import 'package:daeem/screens/map_screen.dart';
+import 'package:daeem/screens/notification_screen.dart';
+import 'package:daeem/screens/order_screen.dart';
+import 'package:daeem/screens/products_screen.dart';
+import 'package:daeem/screens/store_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'screens/email/verify_email.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
-import "package:daeem/screens/sous_category.dart";
+import 'package:daeem/screens/sub_category.dart';
 
-
-void main() async{
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  runApp(
-      MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => AuthProvider()),
-          ],
-          child:MyApp()
-      )
-  );
+  print('Handling a background message ${message.messageId}');
 }
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  setupLocator();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (context) => AuthProvider()),
+    ChangeNotifierProvider(create: (context) => MarketProvider()),
+    ChangeNotifierProvider(create: (context) => CategoryProvider()),
+    ChangeNotifierProvider(create: (context) => CartProvider()),
+    ChangeNotifierProvider(create: (context) => ClientProvider()),
+    ChangeNotifierProvider(create: (context) => AddressProvider())
+  ], child: MyApp()));
+}
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -55,32 +80,89 @@ Route<dynamic> routes(RouteSettings settings) {
     case Splash.id:
       return CupertinoPageRoute(builder: (_) => Setup(), settings: settings);
 
+    case MapScreen.id:
+      return CupertinoPageRoute(
+          builder: (_) => MapScreen(), settings: settings);
+    case LostConnection.id:
+      return CupertinoPageRoute(
+          builder: (_) => LostConnection(), settings: settings);
+    case ConfirmedPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => ConfirmedPage(), settings: settings);
+
     /// Home screen
     case Home.id:
       return CupertinoPageRoute(builder: (_) => Home(), settings: settings);
-      /// On boarding
+
+    case OrdersPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => OrdersPage(), settings: settings);
+
+    /// On boarding
     case OnBoardering.id:
-      return CupertinoPageRoute(builder: (_) => OnBoardering(), settings: settings);
-      ///Login
+      return CupertinoPageRoute(
+          builder: (_) => OnBoardering(), settings: settings);
+
+    case Store.id:
+      return CupertinoPageRoute(builder: (_) => Store(), settings: settings);
+
+    ///Login
     case Login.id:
       return CupertinoPageRoute(builder: (_) => Login(), settings: settings);
-      /// Sign up
+
+    /// Sign up
     case SignUp.id:
       return CupertinoPageRoute(builder: (_) => SignUp(), settings: settings);
-      /// Market
-    case Market.id:
-      return CupertinoPageRoute(builder: (_) => Market(), settings: settings);
-      /// Profile
+
+    /// Market
+    case MarketPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => MarketPage(), settings: settings);
+    case AddressPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => AddressPage(), settings: settings);
+
+    /// Profile
     case Profile.id:
       return CupertinoPageRoute(builder: (_) => Profile(), settings: settings);
+
     case VerifyEmail.id:
-      return CupertinoPageRoute(builder: (_) => VerifyEmail(), settings: settings);
-      /// Settings
+      return CupertinoPageRoute(
+          builder: (_) => VerifyEmail(), settings: settings);
+
+    /// Settings
     case Setting.id:
       return CupertinoPageRoute(builder: (_) => Setting(), settings: settings);
 
+    case MapScreen.id:
+      return CupertinoPageRoute(
+          builder: (_) => MapScreen(), settings: settings);
+
     case Category.id:
       return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
+    case CheckoutPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => CheckoutPage(), settings: settings);
+
+    case ProductsPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => ProductsPage(), settings: settings);
+    case ChangePassword.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangePassword(), settings: settings);
+    case ChangePhone.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangePhone(), settings: settings);
+    case ChangeAddress.id:
+      return CupertinoPageRoute(
+          builder: (_) => ChangeAddress(), settings: settings);
+          case CartPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => CartPage(), settings: settings);
+
+case NotificationScreen.id:
+      return CupertinoPageRoute(
+          builder: (_) => NotificationScreen(), settings: settings);
 
     /// Default route in case of error
     default:

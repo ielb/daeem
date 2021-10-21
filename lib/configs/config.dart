@@ -1,9 +1,12 @@
+import 'package:daeem/screens/client/add_address.dart';
+import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Config {
   static const background = "assets/background.png";
   static String logo = "assets/logo.png";
+  static const delivery_address = "assets/delivery_address.gif";
   static Color color_1 = Color(0xff3091BE);
   static Color color_2 = Color(0xff27A6C7);
   static Color darkBlue = Color(0xff173A60);
@@ -15,20 +18,64 @@ class Config {
   static const arrived = "assets/order_arrived.png";
   static const auth_background = "assets/market.png";
   static const shopping_cart = "assets/shopping_cart.png";
-  static Widget google = SvgPicture.asset("assets/Google.svg",height: 26,width: 26,);
-  static Widget facebook = SvgPicture.asset("assets/Facebook.svg",height: 26,width: 26,);
-  static Widget user = SvgPicture.asset("assets/user.svg",height: 26,width: 26,);
-  static Widget shoppingBag = SvgPicture.asset("assets/shopping-bag.svg",height: 26,width: 26,);
-  static Widget logout = SvgPicture.asset("assets/logout.svg",height: 26,width: 26,);
-  static Widget rate = SvgPicture.asset("assets/rate.svg",height: 26,width: 26,);
-  static Widget share = SvgPicture.asset("assets/share.svg",height: 26,width: 26,);
-  static Widget notification = SvgPicture.asset("assets/notifications.svg",height: 26,width: 26,);
-  static Widget question = SvgPicture.asset("assets/question.svg",height: 26,width: 26,);
-  static Widget closed = SvgPicture.asset("assets/closed.svg",height: 35,width: 35,);
-  static Widget emailSent = SvgPicture.asset("assets/email_sent.svg",height: 130,width: 130,);
+  static Widget google = SvgPicture.asset(
+    "assets/Google.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget facebook = SvgPicture.asset(
+    "assets/Facebook.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget user = SvgPicture.asset(
+    "assets/user.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget shoppingBag = SvgPicture.asset(
+    "assets/shopping-bag.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget logout = SvgPicture.asset(
+    "assets/logout.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget rate = SvgPicture.asset(
+    "assets/rate.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget share = SvgPicture.asset(
+    "assets/share.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget notification = SvgPicture.asset(
+    "assets/notifications.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget question = SvgPicture.asset(
+    "assets/question.svg",
+    height: 26,
+    width: 26,
+  );
+  static Widget closed = SvgPicture.asset(
+    "assets/closed.svg",
+    height: 35,
+    width: 35,
+  );
+  static Widget emailSent = SvgPicture.asset(
+    "assets/email_sent.svg",
+    height: 130,
+    width: 130,
+  );
 
   static const margane = "assets/market_4.jpg";
-  static const logo_white ="assets/logo_v.png";
+  static const logo_white = "assets/logo_v.png";
   static bool isEmail(String email) {
     String p =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -36,12 +83,12 @@ class Config {
 
     return regExp.hasMatch(email);
   }
+
   static bool isPassword(String password) {
-    bool isPass = password.length >= 8 ? true :false ;
+    bool isPass = password.length >= 8 ? true : false;
 
     return isPass;
   }
-
 
   static bool pwdValidator(String value) {
     if (value.length < 8) {
@@ -49,5 +96,62 @@ class Config {
     } else {
       return true;
     }
+  }
+
+  static bottomSheet(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(15)),
+            child: Container(
+              padding: EdgeInsets.all(20),
+              height: MediaQuery.of(context).size.height * .75,
+              width: MediaQuery.of(context).size.width * .8,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(15)),
+              child: Column(
+                children: [
+                  FadeInImage(
+                      height: 250,
+                      width: 250,
+                      placeholder: AssetImage("assets/placeholder.png"),
+                      image: AssetImage(
+                        Config.delivery_address,
+                      )),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    "Please add an address to see all stores near you",
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style:
+                        GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
+                  ),
+                  Spacer(),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AddressPage.id);
+                    },
+                    height: 50,
+                    elevation: 0,
+                    splashColor: Config.color_1,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    color: Config.color_2,
+                    child: Center(
+                      child: Text(
+                        "Add address",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

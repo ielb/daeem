@@ -1,8 +1,15 @@
 import 'dart:async';
+import 'package:daeem/configs/notification_manager.dart';
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/screens/connection.dart';
+import 'package:daeem/services/notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import "package:provider/provider.dart";
+import "package:simple_connection_checker/simple_connection_checker.dart";
 
 class Splash extends StatefulWidget {
   static const id = "/splash";
@@ -13,50 +20,87 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   Timer? _timer;
+  late PushNotificationService _notificationService;
+  StreamSubscription? subscription;
+  late AuthProvider auth ;
+  late ClientProvider client;
+  late AddressProvider addressProvider;
   @override
   void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((_) async { 
+      auth =  Provider.of<AuthProvider>(context, listen: false);
+      client = Provider.of<ClientProvider>(context, listen: false);
+      addressProvider =Provider.of<AddressProvider>(context,listen: false);
+        notifyManager.setOnNotificationClick(onNotificationClick);
+        notifyManager.setOnNotificationReceive(onNotificationReceive);
+        _notificationService =
+            PushNotificationService(FirebaseMessaging.instance);
+        _notificationService.initialize();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_)async {
-
-    _timer = new Timer(const Duration(milliseconds: 2000), () {
-      _getAuthClient();
-     // _skip();
-
+      _timer = new Timer(const Duration(milliseconds: 2000), () {
+     
+        SimpleConnectionChecker _simpleConnectionChecker =
+            SimpleConnectionChecker()
+              ..setLookUpAddress(
+                  'pub.dev'); //Optional method to pass the lookup string
+        subscription =
+            _simpleConnectionChecker.onConnectionChange.listen((connected) {
+          if (connected) {
+            _getAuthClient();
+          } else {
+            Navigator.pushReplacementNamed(context, LostConnection.id);
+          }
+        });
+      });
     });
-    });
+
     super.initState();
   }
 
- void _getAuthClient()async{
-    print("test");
-   final auth = Provider.of<AuthProvider>(context, listen: false);
+  onNotificationClick(RecieveNotification notification) {
+    print("Notification Received : ${notification.id}");
+  }
+
+  onNotificationReceive(String payload) {
+    print('Payload $payload');
+  }
+
+  void _getAuthClient() async {
     String? id = await Prefs.instance.getClient();
     bool? isAut = await Prefs.instance.getAuth();
 
-    if(id!=null&&isAut!=null){
-      bool result = await auth.getAuthenticatedClient(id);
+    if (id != null && isAut != null) {
+      bool result = await auth.getAuthenticatedClient(
+        id,
+      );
 
-         if(result){
-             Navigator.pushReplacementNamed(context, Home.id);
-         }else{
-           _skip();
-         }
+      if (result) {
+        client.setClient(auth.client!);
+        await client.getClientAddress(auth.client!);
+       
+        addressProvider.setAddress(client.client?.address);
+        Navigator.pushReplacementNamed(context, Home.id);
+      } else {
+        _skip();
+      }
+    } else {
+      _skip();
     }
-    _skip();
   }
 
-   void _skip() async{
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
-      if(isOnBoardingSkipped!=null&&isOnBoardingSkipped) {
-        Navigator.pushReplacementNamed(context, Login.id);
-      }else{
-        Navigator.pushReplacementNamed(context, OnBoardering.id);
-      }
+  void _skip() async {
+    bool? isOnBoardingSkipped = await auth.getOnBoardingSkipped();
+    if (isOnBoardingSkipped != null && isOnBoardingSkipped) {
+      Navigator.pushReplacementNamed(context, Login.id);
+    } else {
+      Navigator.pushReplacementNamed(context, OnBoardering.id);
     }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    subscription?.cancel();
     super.dispose();
   }
 
@@ -95,4 +139,3 @@ class _SplashState extends State<Splash> {
             )));
   }
 }
-
