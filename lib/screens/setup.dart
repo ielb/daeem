@@ -15,7 +15,7 @@ class _SetupState extends State<Setup> {
   void initState() {
    
     Timer(
-        Duration(milliseconds: 20),
+        Duration(milliseconds: 5),
         () => Navigator.pushReplacement(
             context, CupertinoPageRoute(builder: (context) => Splash())));
     super.initState();

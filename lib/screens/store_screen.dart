@@ -215,6 +215,7 @@ class _StoreState extends State<Store> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
+                    marketProvider.setCurrentMarket(marketProvider.markets[index]);
                     Navigator.pushNamed(context, MarketPage.id,
                         arguments: marketProvider.markets[index]);
                   },

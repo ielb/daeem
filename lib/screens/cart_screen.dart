@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
@@ -18,6 +19,7 @@ class _CartPageState extends State<CartPage> {
   ScrollController controller = ScrollController();
   bool called = false;
   late CartProvider cart;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -42,9 +44,10 @@ class _CartPageState extends State<CartPage> {
     return data.quantity;
   }
 
-  checkout() async{
-    await Provider.of<MarketProvider>(context, listen: false).getDeliveryPrice(double.parse(cart.getFinalPrice()));
-    Navigator.pushReplacementNamed(context, CheckoutPage.id);
+  checkout() async {
+    await Provider.of<MarketProvider>(context, listen: false)
+        .getDeliveryPrice(double.parse(cart.getSubPrice()));
+    Navigator.pushNamed(context, CheckoutPage.id);
   }
 
   deleteItem(Item item) {}
@@ -54,8 +57,7 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    var market = Provider.of<MarketProvider>(context, listen: false);
-    market.getDeliveryPrice(double.parse(cart.getFinalPrice()));
+    var market = Provider.of<MarketProvider>(context);
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -93,7 +95,9 @@ class _CartPageState extends State<CartPage> {
                               shrinkWrap: true,
                               itemCount: cart.basket.length,
                               itemBuilder: (context, index) {
-                                return content(item: cart.basket[index]);
+                                return cartItem(item: cart.basket[index],onTap: (){
+                                  print("item");
+                                });
                               },
                             ),
                           ],
@@ -123,13 +127,14 @@ class _CartPageState extends State<CartPage> {
                             InkWell(
                               onTap: () {
                                 Navigator.pop(context);
-                              },   
+                              },
                               child: Container(
-                              width: 200,
-                              height: 45,
-                              decoration: BoxDecoration(
-                               borderRadius: BorderRadius.circular(10),
-                              color: Config.color_2,),
+                                width: 200,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Config.color_2,
+                                ),
                                 child: Center(
                                   child: Text(
                                     "Start shopping",
@@ -167,94 +172,96 @@ class _CartPageState extends State<CartPage> {
             : null);
   }
 
-  Widget content({required Item item, Function()? onTap}) {
-    return GestureDetector(
+ 
+
+  Widget cartItem({required Item item, Function()? onTap}) {
+    return InkWell(
       onTap: onTap,
-      child: ListTile(
-          minVerticalPadding: 5,
-          leading: Container(
-            height: 60,
-            width: 60,
-            padding: EdgeInsets.all(5),
-            child: Image.network(
-              item.product.image ??
-                  "https://static.thenounproject.com/png/741653-200.png",
-              width: 55,
-              height: 55,
-            ),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    spreadRadius: 2,
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  )
-                ]),
-          ),
-          title: Text(item.product.name!),
-          subtitle: Text(item.product.price! + " MAD"),
-          trailing: Container(
-            width: 145,
-            child: Row(
+      child: Container(
+        height: 70,
+        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade300.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 4),
+              )
+            ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top:5,left: 5,bottom: 5),
+                height: 70,
+                child: ClipRRect(
+                  child: CachedNetworkImage(
+                      imageUrl: item.product.image ?? '',
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.cover,
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) =>
+                              CircularProgressIndicator(
+                                      value: downloadProgress.progress)
+                                  .center(),
+                      errorWidget: (context, url, error) => Image.asset(
+                            "assets/placeholder.png",
+                            filterQuality: FilterQuality.high,
+                            fit: BoxFit.cover,
+                          )),
+                  borderRadius: BorderRadius.circular(15),
+                )),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(35),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.shade300,
-                            spreadRadius: 2,
-                            blurRadius: 12,
-                            offset: Offset(0, 4),
-                          )
-                        ]),
-                    child: IconButton(
-                      iconSize: 18,
-                      onPressed: () => removeFromCart(item, context),
-                      icon: Icon(CupertinoIcons.minus),
-                      color: Colors.redAccent,
-                    ).center()),
-                Spacer(),
-                Text(" ${item.quantity}x"),
-                Spacer(),
-                Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(35),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.shade300,
-                            spreadRadius: 2,
-                            blurRadius: 16,
-                            offset: Offset(0, 4),
-                          )
-                        ]),
-                    child: IconButton(
-                      onPressed: () {
-                        addToCart(item, context);
-                      },
-                      icon: Icon(CupertinoIcons.add),
-                      color: Config.color_2,
-                      iconSize: 18,
-                    ).center()),
-                Spacer(),
-                IconButton(
-                    onPressed: deleteItem(item),
-                    icon: Icon(
-                      Ionicons.trash_bin_outline,
-                      color: Colors.redAccent.shade100,
-                    ))
+                  width: 140,
+                  child: Text("${item.product.name}",
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 18, fontWeight: FontWeight.w500))
+                      .paddingOnly(left: 5),
+                ),
+                Text( "${item.product.price} DH/${item.product.hasVariant==1 ? item.product.variants[1].option?.toLowerCase(): 'Item'}",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 16, fontWeight: FontWeight.w400))
+                    .paddingOnly(left: 5),
               ],
             ),
-          )),
+            Spacer(),
+            InkWell(
+              onTap: () {
+                removeFromCart(item, context);
+              },
+              child: Icon(Ionicons.remove),
+            ).paddingOnly(right: 10),
+            Text("${item.quantity}",
+                style: GoogleFonts.ubuntu(
+                    fontSize: 20, fontWeight: FontWeight.w500)),
+            InkWell(
+              onTap: () {
+                addToCart(item, context);
+              },
+              child: Icon(Ionicons.add),
+            ).paddingOnly(left: 10),
+            Spacer(),
+            InkWell(
+              onTap: () {
+                deleteItem(item);
+              },
+              child: Icon(
+                Ionicons.trash_outline,
+                color: Colors.redAccent,
+              ),
+            ).paddingOnly(right: 10),
+          ],
+        ),
+      ),
     );
   }
 }

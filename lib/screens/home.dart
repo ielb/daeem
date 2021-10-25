@@ -53,7 +53,7 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     marketProvider = Provider.of<MarketProvider>(context, listen: false);
     _clientProvider = Provider.of<ClientProvider>(context, listen: false);
-    _addressProvider = Provider.of<AddressProvider>(context, listen: false);
+   
     dataResult = _getMarkets();
     _scrollController.addListener(_scrollListener);
   }
@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print(_addressProvider.address?.address);
+     _addressProvider = Provider.of<AddressProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: RefreshIndicator(

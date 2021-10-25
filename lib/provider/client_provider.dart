@@ -2,19 +2,19 @@ import 'dart:convert';
 
 import 'package:daeem/models/address.dart';
 import 'package:daeem/models/client.dart';
-import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/base_provider.dart';
-import 'package:daeem/provider/locator.dart';
 import 'package:daeem/services/client_service.dart';
+import 'package:daeem/services/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 class ClientProvider extends BaseProvider {
   var _service = ClientService();
-  AddressProvider addressProvider = locator<AddressProvider>();
+
   Client? _client;
   Client? get client => _client;
+  String? sms;
   void setClient(Client val) {
     _client = val;
     setNotificationToken();
@@ -40,6 +40,7 @@ class ClientProvider extends BaseProvider {
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       if (data['status'] == "success") {
+        notifyListeners();
         return;
       }
     }
@@ -49,7 +50,7 @@ class ClientProvider extends BaseProvider {
   Future<String?> changePassword(String oldPassword, String newPassword) async {
     http.Response? response =
         await _service.changePassword(_client!.id, oldPassword, newPassword);
-  
+
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
 
@@ -63,22 +64,30 @@ class ClientProvider extends BaseProvider {
     notifyListeners();
   }
 
-  void changePhone(String phone) async {
-    http.Response? response = await _service.updatePhone(_client!.id, phone);
-    if (response != null && response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-    
-      if (data['status'] == "success") {
-        _client!.phone = phone;
-        notifyListeners();
+  changePhone({required String smsCode, required String phone}) async {
+    if (smsCode == sms) {
+      http.Response? response = await _service.updatePhone(_client!.id, phone);
+      if (response != null && response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+
+        if (data['status'] == "success") {
+          _client!.phone = phone;
+          notifyListeners();
+          return true;
+        } else
+          return false;
       }
-    }
+      return false;
+    } else
+      return false;
   }
 
-  Future<void> updateAddress(Address address) async {
+  updateAddress(Address address) async {
     http.Response? response = await _service.updateAddress(address);
+
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
+
       if (data['status'] == "success") {
         _client!.address = address;
         notifyListeners();
@@ -90,31 +99,29 @@ class ClientProvider extends BaseProvider {
     http.Response? response = await _service.getAddress(client.id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
+      print(data);
       if (data['status'] == "success") {
         _client!.address = Address.fromMap(data['data']);
-        addressProvider.setAddress(_client!.address);
-         notifyListeners();
+        notifyListeners();
       }
     }
   }
-  setClientAddress(Address address){
+
+  setClientAddress(Address address) {
     _client!.address = address;
     notifyListeners();
   }
-  verifyClientPhoneNumber(String phone){
-    FirebaseAuth.instance.verifyPhoneNumber(phoneNumber: phone,
-     verificationCompleted: (phoneAuthCredential){
-       
-     },
-     verificationFailed: (error){
 
-     },
-     codeSent: (text,_){
-
-     },
-      codeAutoRetrievalTimeout: (code){
-
-      });
+  verifyClientPhoneNumber(String phone) {
+    FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phone,
+        verificationCompleted: (phoneAuthCredential) {
+          sms = phoneAuthCredential.smsCode;
+          notifyListeners();
+        },
+        verificationFailed: (error) {},
+        codeSent: (text, _) {},
+        codeAutoRetrievalTimeout: (code) {});
   }
 
   clear() {

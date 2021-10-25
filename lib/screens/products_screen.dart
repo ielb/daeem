@@ -36,10 +36,9 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   void didChangeDependencies() {
-    setState(() {
+   
+    if (!_called) { 
       
-    });
-    if (!_called) {
       _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
         cart = Provider.of<CartProvider>(context, listen: false);
       var list = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
@@ -108,7 +107,10 @@ class _ProductsPageState extends State<ProductsPage> {
     return true;
   }
 
-  _productPressed(Product product) {
+  _productPressed(Product product)async {
+    if(product.hasVariant != null&& product.hasVariant==1){
+      product.variants =   await _categoryProvider.getProductVariant(product.id??1);
+    }
     Navigator.of(context).push(CupertinoPageRoute(
         builder: (context) => ProductDetails(product: product))); 
   }

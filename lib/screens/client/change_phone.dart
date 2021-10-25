@@ -1,7 +1,10 @@
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/screens/client/phone_verification.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ChangePhone extends StatefulWidget {
   static const id = "phone";
@@ -27,11 +30,13 @@ class _ChangePhoneState extends State<ChangePhone> {
     super.initState();
   }
 
+  String? phoneNumber;
+
   @override
   void didChangeDependencies() {
     if (!enter) {
       client = Provider.of<ClientProvider>(context);
-      _phoneController.text = client.client?.phone ?? '';
+      _phoneController.text = client.client?.phone?.substring(4,(client.client?.phone?.length??2-1)) ?? '';
       setState(() {
         enter = true;
       });
@@ -46,10 +51,28 @@ class _ChangePhoneState extends State<ChangePhone> {
     super.dispose();
   }
 
+  bool isNumber() {
+    if (_phoneController.text.startsWith("05") ||
+        _phoneController.text.startsWith("07") ||
+        _phoneController.text.startsWith("06") &&
+            _phoneController.text.length == 10)
+      return true;
+    else
+      return false;
+  }
+
   _change() {
-    if (_phoneController.text != '' && _phoneController.text.length == 10) {
-      client.changePhone(_phoneController.text);
-    }
+    bool result = formKey.currentState?.validate() ?? false;
+
+    if (_phoneController.text != '' && isNumber() && result) {
+      formKey.currentState?.save();
+     
+      Navigator.pushNamed(context, Verification.id,arguments: phoneNumber ?? _phoneController.text);
+    } else
+      showTopSnackBar(
+          context,
+          CustomSnackBar.error(
+              message: "The format of  provided number is wrong! "));
   }
 
   @override
@@ -80,21 +103,16 @@ class _ChangePhoneState extends State<ChangePhone> {
           children: [
             SingleChildScrollView(
               child: Form(
+                key: formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 10,
-                    ),
+                 
                     Container(
                       child: InternationalPhoneNumberInput(
                         hintText: "please add phone number",
                         maxLength: 10,
-                        onInputChanged: (PhoneNumber number) {
-                          print(number.phoneNumber);
-                        },
-                        onInputValidated: (bool value) {
-                          print(value);
-                        },
+                        onInputChanged: (PhoneNumber number) {},
                         selectorConfig: SelectorConfig(
                           selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
                         ),
@@ -107,7 +125,9 @@ class _ChangePhoneState extends State<ChangePhone> {
                         keyboardType: TextInputType.numberWithOptions(
                             signed: true, decimal: true),
                         onSaved: (PhoneNumber number) {
-                          print('On Saved: $number');
+                          setState(() {
+                            phoneNumber = number.phoneNumber;
+                          });
                         },
                       ),
                     ).paddingAll(30),
@@ -123,7 +143,7 @@ class _ChangePhoneState extends State<ChangePhone> {
                 fixedSize: MaterialStateProperty.all(
                     Size(screenSize(context).width, 50)),
               ),
-              child: Text("Done",
+              child: Text("Submit",
                   style: GoogleFonts.ubuntu(
                       fontSize: 24,
                       color: Config.color_1,

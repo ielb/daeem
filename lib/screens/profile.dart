@@ -17,6 +17,8 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   late TextEditingController _nameController, _emailController;
   late ClientProvider _clientProvider;
+  bool isPlatform = false;
+  bool called=false;
   @override
   void initState() {
     _nameController = TextEditingController();
@@ -32,6 +34,12 @@ class _ProfileState extends State<Profile> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if(!called){
+    getPlatform();
+    setState(() {
+      called=true;
+    });
+    }
   }
 
   @override
@@ -40,6 +48,13 @@ class _ProfileState extends State<Profile> {
     _emailController.dispose();
     print("dispose");
     super.dispose();
+  }
+
+  getPlatform() async {
+    var result = await Prefs.instance.getPlatform() ?? false;
+    setState(() {
+      isPlatform = result;
+    });
   }
 
   Future<bool> _backPressed() async {
@@ -73,141 +88,144 @@ class _ProfileState extends State<Profile> {
           elevation: 4,
           shadowColor: Colors.black38,
         ),
-        body: Container(
-          height: screenSize(context).height,
-          width: screenSize(context).width,
-          child: Column(
-            children: [
-              SizedBox(
-                height: 10,
-              ),
-              TextField(
-                      controller: _nameController,
-                      style: GoogleFonts.ubuntu(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                      decoration: InputDecoration(
-                          icon: Icon(
-                            CupertinoIcons.person,
-                            color: Colors.black54,
-                            size: 28,
-                          ).paddingOnly(left: 15, right: 5),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none))
-                  .paddingOnly(right: 20, top: 10),
-              TextField(
-                      controller: _emailController,
-                      style: GoogleFonts.ubuntu(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                      decoration: InputDecoration(
-                          icon: Icon(
-                            CupertinoIcons.envelope,
-                            color: Colors.black45,
-                            size: 24,
-                          ).paddingOnly(left: 17, right: 5),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none))
-                  .paddingOnly(right: 20, top: 20),
-              TextButton(
-                child: Container(
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.location,
-                        color: Colors.black54,
-                        size: 28,
-                      ),
-                      SizedBox(width: 18),
-                      Text(
-                        "Change Address",
+        body: SingleChildScrollView(
+          child: Container(
+            height: screenSize(context).height,
+            width: screenSize(context).width,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                        controller: _nameController,
                         style: GoogleFonts.ubuntu(
                             fontSize: 20,
                             color: Colors.black,
                             fontWeight: FontWeight.w400),
-                      ),
-                      Spacer(),
-                      Icon(
-                        CupertinoIcons.right_chevron,
-                        color: Colors.black54,
-                        size: 18,
-                      ).paddingOnly(right: 10)
-                    ],
-                  ),
-                ).center(),
-                onPressed: () {
-                   Navigator.of(context).pushNamed(ChangeAddress.id);
-                },
-              ).paddingOnly(left: 7, top: 20),
-              TextButton(
-                child: Container(
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.lock,
-                        color: Colors.black54,
-                        size: 28,
-                      ),
-                      SizedBox(width: 18),
-                      Text(
-                        "Change password",
+                        decoration: InputDecoration(
+                            icon: Icon(
+                              CupertinoIcons.person,
+                              color: Colors.black54,
+                              size: 28,
+                            ).paddingOnly(left: 15, right: 5),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none))
+                    .paddingOnly(right: 20, top: 10),
+                       TextField(
+                        readOnly: true,
+                        controller: _emailController,
                         style: GoogleFonts.ubuntu(
                             fontSize: 20,
                             color: Colors.black,
                             fontWeight: FontWeight.w400),
-                      ),
-                      Spacer(),
-                      Icon(
-                        CupertinoIcons.right_chevron,
-                        color: Colors.black54,
-                        size: 18,
-                      ).paddingOnly(right: 10)
-                    ],
-                  ),
-                ).center(),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(ChangePassword.id);
-                },
-              ).paddingOnly(left: 7, top: 20),
-              TextButton(
-                child: Container(
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.phone,
-                        color: Colors.black54,
-                        size: 28,
-                      ),
-                      SizedBox(width: 18),
-                      Text(
-                        "Change phone number",
-                        style: GoogleFonts.ubuntu(
-                            fontSize: 20,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      Spacer(),
-                      Icon(
-                        CupertinoIcons.right_chevron,
-                        color: Colors.black54,
-                        size: 18,
-                      ).paddingOnly(right: 10)
-                    ],
-                  ),
-                ).center(),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(ChangePhone.id);
-                },
-              ).paddingOnly(left: 7, top: 20),
-            ],
+                        decoration: InputDecoration(
+                            icon: Icon(
+                              CupertinoIcons.envelope,
+                              color: Colors.black45,
+                              size: 24,
+                            ).paddingOnly(left: 17, right: 5),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none))
+                    .paddingOnly(right: 20, top: 20),
+                TextButton(
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.location,
+                          color: Colors.black54,
+                          size: 28,
+                        ),
+                        SizedBox(width: 18),
+                        Text(
+                          "Change Address",
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Spacer(),
+                        Icon(
+                          CupertinoIcons.right_chevron,
+                          color: Colors.black54,
+                          size: 18,
+                        ).paddingOnly(right: 10)
+                      ],
+                    ),
+                  ).center(),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(ChangeAddress.id);
+                  },
+                ).paddingOnly(left: 7, top: 20),
+               !isPlatform ?  TextButton(
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.lock,
+                          color: Colors.black54,
+                          size: 28,
+                        ),
+                        SizedBox(width: 18),
+                        Text(
+                          "Change password",
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Spacer(),
+                        Icon(
+                          CupertinoIcons.right_chevron,
+                          color: Colors.black54,
+                          size: 18,
+                        ).paddingOnly(right: 10)
+                      ],
+                    ),
+                  ).center(),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(ChangePassword.id);
+                  },
+                ).paddingOnly(left: 7, top: 20) : Container(height: 0,width:0),
+                TextButton(
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.phone,
+                          color: Colors.black54,
+                          size: 28,
+                        ),
+                        SizedBox(width: 18),
+                        Text(
+                          "Change phone number",
+                          style: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Spacer(),
+                        Icon(
+                          CupertinoIcons.right_chevron,
+                          color: Colors.black54,
+                          size: 18,
+                        ).paddingOnly(right: 10)
+                      ],
+                    ),
+                  ).center(),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(ChangePhone.id);
+                  },
+                ).paddingOnly(left: 7, top: 20),
+              ],
+            ),
           ),
         ),
       ),

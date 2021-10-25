@@ -13,9 +13,10 @@ class PushNotificationService {
       _fcm.requestPermission();
     }
     
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
-      if(value!=null){
-         notifyManager.showNotification(int.tryParse(value.messageId!) ?? 0,value.notification!.title!, value.notification!.body!);
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      print(message?.data);
+      if(message!=null){
+         notifyManager.showNotification(0,message.data['title'], message.data['body']);
       }
     }
      
@@ -23,13 +24,12 @@ class PushNotificationService {
     );
     await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-
-      notifyManager.showNotification(int.tryParse(message.messageId!)??0,message.notification!.title!, message.notification!.body!);
+      print(message.data);
+      notifyManager.showNotification(0,message.data['title'], message.data['body']);
     });
     
     FirebaseMessaging.onMessage.listen((message) {
-      print(message.notification!.body);
-      notifyManager.showNotification(int.tryParse(message.messageId!)??0,message.notification!.title!, message.notification!.body!);
+      notifyManager.showNotification(0,message.data['title'], message.data['body']);
     });
   }
 }

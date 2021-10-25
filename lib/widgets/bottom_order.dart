@@ -27,7 +27,7 @@ class StickyOrder extends StatelessWidget {
                 return Positioned(
                   top: d,
                   right: -30,
-                  left: 170,
+                  left: 150,
                   child: GestureDetector(
                     onTap: () {
                       if (auth.isAuth()) {

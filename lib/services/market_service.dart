@@ -113,4 +113,12 @@ class MarketService extends BaseApi {
     }
   }
 
+   Future<http.Response?> getProductVariant(id) async {
+    try {
+      return await api.httpGet('product/$id');
+    } catch (e) {
+      throw e;
+    }
+  }
+
 }

@@ -28,6 +28,11 @@ apply plugin: 'com.google.gms.google-services'
 dependencies {
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:28.4.0')
+    implementation 'com.google.firebase:firebase-core:18.0.2'
+    implementation 'com.google.firebase:firebase-firestore:22.1.2'
+    implementation 'com.google.firebase:firebase-auth:20.0.3'
+    implementation 'com.google.firebase:firebase-storage:19.2.2'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.facebook.android:facebook-core:[8,9)'
     implementation 'com.facebook.android:facebook-login:[8,9)'

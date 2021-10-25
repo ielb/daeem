@@ -1,6 +1,7 @@
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/rating.dart';
@@ -47,6 +48,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     var _categoryProvider =
         Provider.of<CategoryProvider>(context, );
     var cart = Provider.of<CartProvider>(context, );
+    var _market = Provider.of<MarketProvider>(context, );
     return Opacity(
       opacity: appear(shrinkOffset),
       child: AppBar(
@@ -68,6 +70,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               } else {
                 _categoryProvider.close();
                 _categoryProvider.closeSub();
+                _market.unSetCurrentMarket();
                 if (cart.isCartEmpty()) {
                   _categoryProvider.closeProducts();
                   Navigator.pop(context);
@@ -194,7 +197,9 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   Widget buildBackground(double shrinkOffset, context) {
     var _categoryProvider =
-        Provider.of<CategoryProvider>(context, );
+        Provider.of<CategoryProvider>(context,);
+         var __marketProvider =
+        Provider.of<MarketProvider>(context,);
     var cart = Provider.of<CartProvider>(context, );
     return Opacity(
         opacity: disappear(shrinkOffset),
@@ -229,12 +234,13 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                     } else {
                       _categoryProvider.close();
                       _categoryProvider.closeSub();
+                      __marketProvider.unSetCurrentMarket();
                       if (cart.isCartEmpty()) {
                         _categoryProvider.closeProducts();
                         Navigator.of(context).pop(context);
                       } else
                         showDialog(
-                          context: context, // <<----
+                          context: context, 
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return Dialog(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:daeem/models/market_category.dart';
 import 'package:daeem/models/product.dart';
+import 'package:daeem/models/product_variant.dart';
 import 'package:daeem/models/sub_category.dart';
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/market_service.dart';
@@ -67,7 +68,7 @@ class CategoryProvider extends BaseProvider {
 
   _setProductsFormJson(List data) {
     data.forEach((element) {
-      _addProducts(Product.fromJson(element));
+      _addProducts(Product.fromMap(element));
     });
     notifyListeners();
   }
@@ -92,6 +93,36 @@ class CategoryProvider extends BaseProvider {
         return false;
     } else
       return false;
+  }
+
+  /// -----------------   Product Variant ............................ ///
+
+  Future<List<Variant>> getProductVariant(int id) async {
+    List<Variant> variants = List.empty(growable: true);
+    setBusy(true);
+    Response? response = await _service.getProductVariant(id);
+    if (response != null && response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      if (data['status'] != "error") {
+        print(data['data'][0]);
+        data['data'][0].forEach((variant) {
+          variants.add(Variant.fromMap(variant));
+        });
+
+        variants.forEach((vari) {
+          print(vari.toString());
+        });
+
+        setBusy(false);
+        return variants;
+      } else {
+        setBusy(false);
+        return List.empty(growable: true);
+      }
+    } else {
+      setBusy(false);
+      return List.empty(growable: true);
+    }
   }
 
   Future<List<Product>> searchForProduct(String name) async {
@@ -147,11 +178,11 @@ class CategoryProvider extends BaseProvider {
           notifyListeners();
           return _searchedCategories;
         } else
-        notifyListeners();
-          return List.empty();
-      } else
-      notifyListeners();
+          notifyListeners();
         return List.empty();
+      } else
+        notifyListeners();
+      return List.empty();
     }
   }
 
@@ -204,12 +235,11 @@ class CategoryProvider extends BaseProvider {
           setBusy(false);
           return _searchedSubCategories;
         } else
-        setBusy(false);
-          return List.empty();
-      } else
-      setBusy(false);
+          setBusy(false);
         return List.empty();
-
+      } else
+        setBusy(false);
+      return List.empty();
     }
   }
 

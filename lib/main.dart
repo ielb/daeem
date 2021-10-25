@@ -1,9 +1,9 @@
+import 'package:daeem/configs/notification_manager.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
-import 'package:daeem/provider/locator.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
@@ -11,6 +11,7 @@ import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/screens/client/change_address.dart';
 import 'package:daeem/screens/client/change_password.dart';
 import 'package:daeem/screens/client/change_phone.dart';
+import 'package:daeem/screens/client/phone_verification.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/map_screen.dart';
@@ -28,15 +29,25 @@ import 'package:daeem/screens/sub_category.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
+  notifyManager.showNotification(
+      1, message.data['body'], message.data['title']);
+  notifyManager.setOnNotificationClick(onNotificationClick);
+  notifyManager.setOnNotificationReceive(onNotificationReceive);
+}
+
+onNotificationClick(RecieveNotification notification) {
+  print("Notification Received : ${notification.id}");
+}
+
+onNotificationReceive(String payload) {
+  print('Payload $payload');
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupLocator();
+
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
     ChangeNotifierProvider(create: (context) => MarketProvider()),
@@ -156,13 +167,15 @@ Route<dynamic> routes(RouteSettings settings) {
     case ChangeAddress.id:
       return CupertinoPageRoute(
           builder: (_) => ChangeAddress(), settings: settings);
-          case CartPage.id:
-      return CupertinoPageRoute(
-          builder: (_) => CartPage(), settings: settings);
+    case CartPage.id:
+      return CupertinoPageRoute(builder: (_) => CartPage(), settings: settings);
 
-case NotificationScreen.id:
+    case NotificationScreen.id:
       return CupertinoPageRoute(
           builder: (_) => NotificationScreen(), settings: settings);
+    case Verification.id:
+      return CupertinoPageRoute(
+          builder: (_) => Verification(), settings: settings);
 
     /// Default route in case of error
     default:

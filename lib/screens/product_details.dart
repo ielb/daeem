@@ -29,12 +29,17 @@ class _ProductDetailsState extends State<ProductDetails> {
   @override
   void didChangeDependencies() {
     if (!called) {
-      cart = Provider.of<CartProvider>(context, listen: false);
+      cart = Provider.of<CartProvider>(context);
       setState(() {
         called = true;
       });
     }
     super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   addToCart(Product product, BuildContext context) {
@@ -48,16 +53,15 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
     setState(() {});
   }
-    removeFromCart(Product product, BuildContext context) {
+
+  removeFromCart(Product product, BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
     Item item = Item(product: product);
     cart.removeFromBasket(item);
     setState(() {});
   }
 
-
   int? getItemCount(int id, BuildContext context) {
-   
     Item data = cart.basket.singleWhere((element) => id == element.product.id,
         orElse: () => Item(product: Product()));
     return data.quantity;
@@ -143,7 +147,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: screenSize(context).width*.7,
+                                width: screenSize(context).width * .7,
                                 child: Text(
                                   widget.product.name!,
                                   overflow: TextOverflow.ellipsis,
@@ -159,12 +163,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 height: 15,
                               ),
                               Text(
-                            "${widget.product.price} MAD",
-                            style: TextStyle(color: Config.color_1, fontSize: 18,fontWeight: FontWeight.w700),
-                          ),
+                                "${widget.product.price} MAD",
+                                style: TextStyle(
+                                    color: Config.color_1,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700),
+                              ),
                             ],
                           ),
-                         
                         ],
                       ),
                       SizedBox(
@@ -197,12 +203,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                               height: 60,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: size.length,
+                                itemCount: widget.product.variants.length,
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
                                       setState(() {
                                         _selectedSize = index;
+                                        widget.product.price = widget
+                                            .product.variants[index].price;
                                       });
                                     },
                                     child: AnimatedContainer(
@@ -217,12 +225,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       height: 40,
                                       child: Center(
                                         child: Text(
-                                          size[index],
+                                          widget.product.variants[index].option
+                                                  ?.toLowerCase() ??
+                                              "",
                                           style: TextStyle(
                                               color: _selectedSize == index
                                                   ? Colors.white
                                                   : Colors.black,
-                                              fontSize: 15),
+                                              fontSize: 14),
                                         ),
                                       ),
                                     ),
@@ -240,7 +250,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         bottomNavigationBar: Container(
           height: 60,
           padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-          child: getItemCount(widget.product.id!, context)==0
+          child: getItemCount(widget.product.id!, context) == 0
               ? MaterialButton(
                   onPressed: () {
                     addToCart(widget.product, context);
@@ -283,7 +293,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                           text:
                               //!count the product
                               TextSpan(
-                                  text: "${getItemCount(widget.product.id!, context)} ",
+                                  text:
+                                      "${getItemCount(widget.product.id!, context)} ",
                                   style: GoogleFonts.ubuntu(
                                       color: Config.color_1,
                                       fontSize: 20,

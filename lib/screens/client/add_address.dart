@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 import 'package:daeem/models/address.dart';
@@ -11,6 +10,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:daeem/services/client_location.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
 class AddressPage extends StatefulWidget {
   static const id = "add_address";
 
@@ -23,14 +25,15 @@ class _AddressPageState extends State<AddressPage> {
 
   Position? _currentPosition;
   Marker? marker;
-  GoogleMapController? _controller ;
+  GoogleMapController? _controller;
 
   CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(35.7651929, -5.7999158), zoom: 11);
 
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  String? fromRoute;
   List<Placemark> address = [];
-  late ClientProvider _clientProvider ;
+  late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
   @override
   void initState() {
@@ -40,31 +43,38 @@ class _AddressPageState extends State<AddressPage> {
     _floor = TextEditingController();
     _post = TextEditingController();
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      _clientProvider =  Provider.of<ClientProvider>(context,listen:false);
-      _addressProvider    =   Provider.of<AddressProvider>(context,listen: false);
+      _clientProvider = Provider.of<ClientProvider>(context, listen: false);
+      _addressProvider = Provider.of<AddressProvider>(context, listen: false);
+      getLocation();
+
+      fromRoute = ModalRoute.of(context)?.settings.arguments as String?;
     });
 
     super.initState();
   }
- 
-
-  
 
   void getLocation() async {
+    showDialog(
+        context: context,
+        builder: (context) => CircularProgressIndicator().center());
     _currentPosition = await LocationService().getLoc();
-    
+
     if (_currentPosition != null) {
-      print("${_currentPosition!.latitude}" +"dd"+"${ _currentPosition!.latitude}");
+      print("${_currentPosition!.latitude}" +
+          "dd" +
+          "${_currentPosition!.latitude}");
       _kGooglePlex = CameraPosition(
-        zoom: 20,
+          zoom: 20,
           target:
               LatLng(_currentPosition!.latitude, _currentPosition!.longitude));
-       _controller?.animateCamera(CameraUpdate.newLatLng( LatLng(_currentPosition!.latitude, _currentPosition!.longitude)));
-       address = await LocationService()
+      _controller?.animateCamera(CameraUpdate.newLatLng(
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude)));
+      address = await LocationService()
           .getAddress(_currentPosition!.latitude, _currentPosition!.longitude);
-      _street.text = "${address.first.street??''}";
-    _post.text = "${address.first.postalCode??''}";
+      _street.text = "${address.first.street ?? ''}";
+      _post.text = "${address.first.postalCode ?? ''}";
     }
+    Navigator.pop(context);
   }
 
   ScrollPhysics _physiques = BouncingScrollPhysics();
@@ -79,20 +89,37 @@ class _AddressPageState extends State<AddressPage> {
     _controller?.dispose();
     super.dispose();
   }
-   _submit()async{
-     var result = _formkey.currentState?.validate();
-     if(result!=null&&result){
-       Address _address = Address(streetName: _street.text,codePostal: _post.text,lat: "${_currentPosition?.latitude??''}",lng:"${_currentPosition?.longitude??''}", city: address.first.locality);
-      _addressProvider.setAddress(_address);
-       if(_clientProvider.client!=null)
-       await _clientProvider.updateAddress(_address);
-       Toast.show("Address was added with  success", context,duration: 4);
-       Navigator.pushReplacementNamed(context,Home.id);
-       
-  
 
-     }
-   }
+  _submit() async {
+    var result = _formkey.currentState?.validate();
+    if (result != null && result) {
+      Address _address = Address(
+        address:  _number.text.isEmpty ? _street.text :   _street.text + " Nº" +  _number.text  ,
+          clientId: _clientProvider.client?.id,
+          streetName: _street.text,
+          codePostal: _post.text,
+          lat: "${_currentPosition?.latitude ?? ''}",
+          lng: "${_currentPosition?.longitude ?? ''}",
+          city: address.first.locality);
+
+      if (_clientProvider.client != null) {
+        print(_address.clientId);
+        _addressProvider.setAddress(_address);
+        _clientProvider.setClientAddress(_address);
+        await _clientProvider.updateAddress(_address);
+        showTopSnackBar(
+          context,
+          CustomSnackBar.success(
+            message: "Address added with success",
+          ),
+        );
+      }
+      if (fromRoute == null) Navigator.pushReplacementNamed(context, Home.id);
+      //else
+      //  Navigator.pop(context);
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +162,7 @@ class _AddressPageState extends State<AddressPage> {
               myLocationButtonEnabled: false,
               mapToolbarEnabled: false,
               onMapCreated: (GoogleMapController controller) {
-                _controller=controller;
+                _controller = controller;
               },
             ),
           ),
