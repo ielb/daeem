@@ -16,9 +16,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController? _emailController;
   TextEditingController? _passwordController;
-  AuthProvider _authProvider = AuthProvider();
-  ClientProvider _clientProvider = ClientProvider();
-  AddressProvider _addressProvider = AddressProvider();
+  late AuthProvider _authProvider;
+  late ClientProvider _clientProvider;
+  late AddressProvider _addressProvider;
   bool _isVisible = true;
   bool _isValidate = true;
   var isCheckout;
@@ -76,12 +76,15 @@ class _LoginState extends State<Login> {
     var result = await _authProvider.loginWithEmail(email, password);
 
     if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
+      _clientProvider.setClient(_authProvider.client!);
+      await _clientProvider.getClientAddress(_authProvider.client!);
+      Provider.of<AddressProvider>(context,listen: false)
+          .setAddress(_clientProvider.client?.address);
       if (isCheckout != null && isCheckout) {
         Navigator.pushReplacementNamed(context, CheckoutPage.id);
-      } else
+      } else {
         Navigator.pushReplacementNamed(context, Home.id);
+      }
     } else
       Toast.show(AppLocalizations.of(context)!.wentWrong, context);
   }
@@ -90,8 +93,8 @@ class _LoginState extends State<Login> {
   void signInWithGoogle() async {
     bool result = await _authProvider.socialLogin("google");
     if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
+      _clientProvider.setClient(_authProvider.client!);
+      
       Navigator.pushReplacementNamed(context, Home.id);
     } else
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
@@ -101,8 +104,7 @@ class _LoginState extends State<Login> {
   void signInWithFacebook() async {
     bool result = await _authProvider.socialLogin("facebook");
     if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
+      _clientProvider.setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
     } else
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
@@ -242,7 +244,7 @@ class _LoginState extends State<Login> {
                               onPressed: () {
                                 if (_clientProvider.client == null ||
                                     _addressProvider.address == null) {
-                                   Config.bottomSheet(context);
+                                  Config.bottomSheet(context);
                                 } else {
                                   Prefs.instance.setAuth(false);
                                   Navigator.pushReplacementNamed(

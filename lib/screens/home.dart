@@ -1,6 +1,8 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/screens/client/add_address.dart';
+import 'package:daeem/screens/loading/category_shimmer.dart';
 import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Home extends StatefulWidget {
   static const id = "home";
@@ -27,44 +30,47 @@ class _HomeState extends State<Home> {
   late ScrollController _scrollController;
   int itemCount = 5;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  late Future dataResult;
   late MarketProvider marketProvider;
   late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
   bool isSearching = false;
   String query = '';
-  @override
-  void initState() {
-    _scrollController = ScrollController();
-    _controller = TextEditingController();
-    WidgetsBinding.instance?.scheduleFrameCallback((timeStamp) {
-      if (Provider.of<AddressProvider>(context, listen: false).address ==
-          null) {
-        Config.bottomSheet(context);
-      }
-    });
-    super.initState();
-  }
-
   int counter = 0;
+  bool called = false;
+  Future dataResult = Future(() => false);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    marketProvider = Provider.of<MarketProvider>(context, listen: false);
-    _clientProvider = Provider.of<ClientProvider>(context, listen: false);
-   
-    dataResult = _getMarkets();
-    _scrollController.addListener(_scrollListener);
+    if (!called) {
+      _scrollController = ScrollController();
+      _controller = TextEditingController();
+      marketProvider = Provider.of<MarketProvider>(context);
+      _clientProvider = Provider.of<ClientProvider>(context);
+      _addressProvider = Provider.of<AddressProvider>(context);
+      _scrollController.addListener(_scrollListener);
+      if (_clientProvider.client?.address == null ||
+          _addressProvider.address == null) {
+        Config.bottomSheet(context);
+      } else {
+        dataResult = _getMarkets();
+        setState(() {
+          called = !called;
+        });
+      }
+    }
   }
 
   _getMarkets() async {
-    return await marketProvider.getMarkets();
+    var result = await marketProvider.getStoreType();
+    await marketProvider.getTypedStores(_clientProvider.client!);
+    return result;
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -98,7 +104,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-     _addressProvider = Provider.of<AddressProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: RefreshIndicator(
@@ -118,7 +123,7 @@ class _HomeState extends State<Home> {
             elevation: 0,
             title: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, MapScreen.id);
+                Navigator.pushNamed(context, AddressPage.id);
               },
               child: Container(
                 width: 300,
@@ -134,20 +139,23 @@ class _HomeState extends State<Home> {
                     ).align(alignment: Alignment.topLeft),
                     Row(
                       children: [
-                        Text(
-                          "${_addressProvider.address?.address ?? 'current Location'}",
-                          maxLines: 1,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.ubuntu(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w300,
-                              color: Config.darkBlue),
+                        Container(
+                          width: screenSize(context).width * 0.5,
+                          child: Text(
+                            "${_addressProvider.address?.address ?? 'current Location'}",
+                            maxLines: 1,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.ubuntu(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                                color: Config.darkBlue),
+                          ),
                         ),
                         Icon(
                           CupertinoIcons.chevron_down,
                           color: Config.color_2,
-                          size: 20,
+                          size: 18,
                         ).paddingOnly(left: 5, top: 5)
                       ],
                     ),
@@ -229,7 +237,8 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-   Widget _content() {
+
+  Widget _content() {
     return SliverToBoxAdapter(
         child: Container(
       height: 165,
@@ -243,29 +252,84 @@ class _HomeState extends State<Home> {
           ).paddingOnly(bottom: 10, left: 15),
           Container(
             height: 120,
-            child: ListView.builder(
-              physics: BouncingScrollPhysics(),
-              shrinkWrap: true,
-              primary: false,
-              itemExtent: 100,
-              scrollDirection: Axis.horizontal,
-              itemCount: 7,
-              itemBuilder: (context, i) {
-                return InkWell(
-                    onTap: () {
-                      marketProvider.setStoreType("Grocery");
-                      Navigator.pushNamed(context, Store.id);
+            child: FutureBuilder(
+                future: dataResult,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemCount: 5,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return typeLoader().paddingOnly(left: 10, right: 10);
+                      },
+                    );
+                  }
+                  if (marketProvider.storesType.length == 0) {
+                    marketProvider.getStoreType();
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        return typeLoader().paddingOnly(left: 15, right: 15);
+                      },
+                    );
+                  }
+                  return ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    primary: false,
+                    itemExtent: 100,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: marketProvider.storesType.length,
+                    itemBuilder: (context, i) {
+                      return InkWell(
+                          onTap: () {
+                            marketProvider.setStoreType(
+                                marketProvider.storesType[i].name ?? 'Grocery');
+                            Navigator.pushNamed(context, Store.id);
+                          },
+                          child: StoreWidget(
+                              title: "${marketProvider.storesType[i].name}",
+                              imageUrl: marketProvider.storesType[i].image));
                     },
-                    child: StoreWidget(
-                      title: "Grocery",
-                      imageUrl: "assets/grocery.png",
-                    ));
-              },
-            ),
+                  ).paddingOnly(left: 10);
+                }),
           ),
         ],
       ),
     ));
+  }
+
+  Widget typeLoader() {
+    return Column(
+      children: [
+        Shimmer.fromColors(
+                child: Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(15)),
+                ),
+                baseColor: Colors.grey.shade200,
+                highlightColor: Colors.grey.shade50)
+            .paddingOnly(bottom: 10),
+        Shimmer.fromColors(
+            child: Container(
+              height: 10,
+              width: 70,
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(15)),
+            ),
+            baseColor: Colors.grey.shade200,
+            highlightColor: Colors.grey.shade50)
+      ],
+    );
   }
 
   int length = 5;
@@ -290,10 +354,17 @@ class _HomeState extends State<Home> {
             width: screenSize(context).width * .75,
             decoration: BoxDecoration(
                 color: Config.color_2, borderRadius: BorderRadius.circular(15)),
-                child: Align(alignment: Alignment.center,child: Text("View all stores (${length-3})",
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,style: GoogleFonts.ubuntu(
-              fontSize: 22, color: Colors.white, fontWeight: FontWeight.w500),)),
+            child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  "View all stores (${length - 3})",
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.ubuntu(
+                      fontSize: 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500),
+                )),
           ),
         ).align(
           alignment: Alignment.center,
@@ -301,6 +372,4 @@ class _HomeState extends State<Home> {
       ],
     ));
   }
-
- 
 }

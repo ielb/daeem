@@ -42,3 +42,10 @@ LINK      : {{URL}}/order/{ID}/statuses
 METHODE   : GET
 Accept    : application/json
 Authorization : Bearer Cf1YJ53jv7aZjMVV78B8giP7S1fP2oBtGkLGsmGy
+
+# GET NEARBY STORES BY STYPE
+LINK      : {{URL}}/stores_by_type
+METHODE   : POST
+DATA	  : lng , lat , store_type
+Accept    : application/json
+Authorization : Bearer Cf1YJ53jv7aZjMVV78B8giP7S1fP2oBtGkLGsmGy

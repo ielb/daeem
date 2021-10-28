@@ -221,7 +221,7 @@ class _ProfileState extends State<Profile> {
                     ),
                   ).center(),
                   onPressed: () {
-                    Navigator.of(context).pushNamed(ChangePhone.id);
+                    Navigator.of(context).pushNamed(ChangePhone.id,arguments: 0);
                   },
                 ).paddingOnly(left: 7, top: 20),
               ],

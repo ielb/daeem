@@ -4,6 +4,7 @@ import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/services/services.dart';
+import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -57,7 +58,9 @@ class _AddressPageState extends State<AddressPage> {
     showDialog(
         context: context,
         builder: (context) => CircularProgressIndicator().center());
-    _currentPosition = await LocationService().getLoc();
+    _currentPosition = await LocationService().getLoc().catchError((error){
+      print(error);
+    });
 
     if (_currentPosition != null) {
       print("${_currentPosition!.latitude}" +
@@ -67,8 +70,12 @@ class _AddressPageState extends State<AddressPage> {
           zoom: 20,
           target:
               LatLng(_currentPosition!.latitude, _currentPosition!.longitude));
-      _controller?.animateCamera(CameraUpdate.newLatLng(
-          LatLng(_currentPosition!.latitude, _currentPosition!.longitude)));
+      _controller!.animateCamera(CameraUpdate.newLatLngZoom(
+          LatLng(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+          ),
+          18));
       address = await LocationService()
           .getAddress(_currentPosition!.latitude, _currentPosition!.longitude);
       _street.text = "${address.first.street ?? ''}";
@@ -94,7 +101,9 @@ class _AddressPageState extends State<AddressPage> {
     var result = _formkey.currentState?.validate();
     if (result != null && result) {
       Address _address = Address(
-        address:  _number.text.isEmpty ? _street.text :   _street.text + " Nº" +  _number.text  ,
+          address: _number.text.isEmpty
+              ? _street.text
+              : _street.text + " Nº" + _number.text,
           clientId: _clientProvider.client?.id,
           streetName: _street.text,
           codePostal: _post.text,
@@ -114,100 +123,83 @@ class _AddressPageState extends State<AddressPage> {
           ),
         );
       }
-      if (fromRoute == null) Navigator.pushReplacementNamed(context, Home.id);
-      //else
-      //  Navigator.pop(context);
-
+      if (fromRoute == null)
+        Navigator.pushReplacementNamed(context, Home.id);
+      else
+        Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: CustomScrollView(physics: _physiques, slivers: [
-        SliverAppBar(
-          expandedHeight: MediaQuery.of(context).size.height * 0.6,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(CupertinoIcons.back),
-            color: Colors.black,
-            iconSize: 26,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          snap: true,
-          floating: true,
-          stretch: true,
-          backgroundColor: Colors.grey.shade50,
-          flexibleSpace: FlexibleSpaceBar(
-            background: GoogleMap(
-              onTap: (latLang) {
-                setState(() {
-                  _physiques = NeverScrollableScrollPhysics();
-                });
-              },
-              onLongPress: (latLang) {
-                setState(() {
-                  _physiques = NeverScrollableScrollPhysics();
-                });
-              },
-              initialCameraPosition: _kGooglePlex,
-              compassEnabled: false,
+        body: ExpandableBottomSheet(
+            enableToggle: true,
+            background: Stack(
+              children: [
+                GoogleMap(
+                  onTap: (latLang) {
+                    setState(() {
+                      _physiques = NeverScrollableScrollPhysics();
+                    });
+                  },
+                  onLongPress: (latLang) {
+                    setState(() {
+                      _physiques = NeverScrollableScrollPhysics();
+                    });
+                  },
+                  initialCameraPosition: _kGooglePlex,
+                  compassEnabled: false,
 
-              ///Todo:When published set to false
-              zoomControlsEnabled: false,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              mapToolbarEnabled: false,
-              onMapCreated: (GoogleMapController controller) {
-                _controller = controller;
-              },
-            ),
-          ),
-          bottom: PreferredSize(
-              preferredSize: Size.fromHeight(75),
-              child: Transform.translate(
-                offset: Offset(0, 1),
-                child: Container(
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Center(
-                      child: Container(
-                    width: 50,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  )),
+                  ///Todo:When published set to false
+                  zoomControlsEnabled: false,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  mapToolbarEnabled: false,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller = controller;
+                  },
                 ),
-              )),
-        ),
-        SliverList(
-            delegate: SliverChildListDelegate([
-          InkWell(
-            onLongPress: () {
-              setState(() {
-                _physiques = BouncingScrollPhysics();
-              });
-            },
-            onTap: () {
-              setState(() {
-                _physiques = BouncingScrollPhysics();
-              });
-            },
-            child: Container(
-                height: MediaQuery.of(context).size.height * 0.65,
+                Positioned(
+                  top: 35,
+                  left: 5,
+                  child: IconButton(
+                    icon: Icon(CupertinoIcons.back),
+                    color: Colors.black,
+                    iconSize: 30,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
+              ],
+            ),
+            persistentHeader: Transform.translate(
+              offset: Offset(0, 1),
+              child: Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Center(
+                    child: Container(
+                  width: 50,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                )),
+              ),
+            ),
+            persistentContentHeight: 70,
+            expandableContent: Container(
                 color: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,9 +233,7 @@ class _AddressPageState extends State<AddressPage> {
                             )
                           ],
                         ),
-                      ).paddingOnly(
-                        left: 10,
-                      ),
+                      ).paddingOnly(left: 10, bottom: 20),
                       Form(
                         key: _formkey,
                         child: Column(
@@ -374,9 +364,7 @@ class _AddressPageState extends State<AddressPage> {
                                         errorBorder: InputBorder.none,
                                         focusedBorder: InputBorder.none,
                                         disabledBorder: InputBorder.none))
-                                .paddingOnly(
-                              right: 20,
-                            ),
+                                .paddingOnly(right: 20, bottom: 20),
                           ],
                         ),
                       ),
@@ -399,10 +387,6 @@ class _AddressPageState extends State<AddressPage> {
                       ),
                     ],
                   ),
-                )),
-          )
-        ])),
-      ]),
-    );
+                ))));
   }
 }

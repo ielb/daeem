@@ -15,6 +15,7 @@ class Product {
   bool? available;
   bool? status;
   int? hasVariant;
+  Variant? currentVariant;
   List<Variant> variants = List.empty(growable: true);
  
 

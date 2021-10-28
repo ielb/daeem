@@ -22,6 +22,7 @@ import 'package:daeem/screens/store_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'screens/email/verify_email.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
@@ -29,24 +30,29 @@ import 'package:daeem/screens/sub_category.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  print(" data ${message.data['title']}");
   notifyManager.showNotification(
-      1, message.data['body'], message.data['title']);
+      5, message.notification?.title??message.data['title'], message.notification?.body ?? message.data['body']);
   notifyManager.setOnNotificationClick(onNotificationClick);
   notifyManager.setOnNotificationReceive(onNotificationReceive);
 }
 
-onNotificationClick(RecieveNotification notification) {
-  print("Notification Received : ${notification.id}");
+onNotificationClick(String? notification) {
+  print("Notification Received : $notification");
 }
 
-onNotificationReceive(String payload) {
-  print('Payload $payload');
-}
+onNotificationReceive(notification) {}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: 'AIzaSyD06NHrE7Q0bvZKU4bbb_iCu_JbwuIhp7U',
+          appId: "1:754880333308:android:24877d09b33939c6749e79",
+          messagingSenderId: '754880333308',
+          projectId: 'daeem-10b87'));
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),

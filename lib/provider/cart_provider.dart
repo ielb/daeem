@@ -75,6 +75,20 @@ class CartProvider extends BaseProvider {
       print("empty");
       return false;
     } else {
+      var list = List.empty(growable: true);
+     
+   _basket.forEach((element) {
+     var data = {
+       "id":element.product.id,
+        "price":element.product.price,
+        "quantity":element.quantity,
+        "variant":element.product.currentVariant?.id,
+     };
+     list.add(data);
+   });
+
+
+
       var data = {
         'client_id': client.id,
         'store_id': marketId,
@@ -87,9 +101,10 @@ class CartProvider extends BaseProvider {
         'discount_price': coupon!=null ? coupon!.discount_price :0,
         'use_delivery_time': deliveryTime != null ? 1 : 0,
         'delivery_time': deliveryTime != null ? deliveryTime.toString() : "",
-        'products': _basket.toList().toString()
+        'products': list
       };
       var result = jsonEncode(data);
+      print(result);
       Response? response = await _clientService.order(result);
       print("response : ${response?.body}");
       if (response != null && response.statusCode == 200) {
@@ -97,6 +112,7 @@ class CartProvider extends BaseProvider {
         return true;
       } else
         return false;
+      
     }
   }
 
@@ -154,7 +170,9 @@ class CartProvider extends BaseProvider {
   }
 
   bool deleteItem(Item item) {
-    return _basket.remove(item);
+    _basket.remove(item);
+    notifyListeners();
+      return true;
   }
 
   clearCart() {

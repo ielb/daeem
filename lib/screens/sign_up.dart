@@ -1,6 +1,7 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
@@ -16,10 +17,10 @@ class _SignUpState extends State<SignUp> {
   TextEditingController? _emailController;
   TextEditingController? _passwordController;
   TextEditingController? _nameController;
-  AuthProvider _authProvider = AuthProvider();
-
-  ClientProvider _clientProvider = ClientProvider();
-  AddressProvider _addressProvider = AddressProvider();
+  late AuthProvider _authProvider;
+  late ClientProvider _clientProvider;
+  late AddressProvider _addressProvider;
+  late MarketProvider _marketProvider;
   bool _isVisible = true;
   bool _isValidate = true;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -34,8 +35,9 @@ class _SignUpState extends State<SignUp> {
   @override
   void didChangeDependencies() {
     _authProvider = Provider.of<AuthProvider>(context);
-    _clientProvider =  Provider.of<ClientProvider>(context);
+    _clientProvider = Provider.of<ClientProvider>(context);
     _addressProvider = Provider.of<AddressProvider>(context);
+    _marketProvider = Provider.of<MarketProvider>(context);
     super.didChangeDependencies();
   }
 
@@ -83,6 +85,8 @@ class _SignUpState extends State<SignUp> {
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
     if (result) {
+      if(_marketProvider.storesType.isEmpty)
+      await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
@@ -94,6 +98,8 @@ class _SignUpState extends State<SignUp> {
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
     if (result) {
+       if(_marketProvider.storesType.isEmpty)
+      await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
@@ -227,7 +233,6 @@ class _SignUpState extends State<SignUp> {
                                 Navigator.pushReplacementNamed(
                                     context, Home.id);
                               }
-                              
                             },
                             child: Text(AppLocalizations.of(context)!.skip),
                             style: OutlinedButton.styleFrom(

@@ -209,8 +209,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     onTap: () {
                                       setState(() {
                                         _selectedSize = index;
-                                        widget.product.price = widget
-                                            .product.variants[index].price;
+                                        widget.product.price = widget.product.variants[index].price;
+                                        widget.product.currentVariant = widget.product.variants[index];
                                       });
                                     },
                                     child: AnimatedContainer(

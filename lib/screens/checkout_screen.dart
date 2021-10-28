@@ -36,8 +36,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void didChangeDependencies() {
     if (!called) {
-      cart = Provider.of<CartProvider>(context, listen: false);
-      market = Provider.of<MarketProvider>(context, listen: false);
+      cart = Provider.of<CartProvider>(context);
+      market = Provider.of<MarketProvider>(context);
       _controller = TextEditingController();
       setState(() {
         called = true;
@@ -199,7 +199,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                     horizontalTitleGap: 0,
                                     title: Text(
-                                      "${client.client!.address?.streetName}",
+                                      "${client.client!.address?.address} ",
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                       style: GoogleFonts.ubuntu(
                                         fontSize: 18,
                                         color: Colors.black,
@@ -266,7 +269,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             borderRadius: BorderRadius.circular(15)),
                         child: ListTile(
                           onTap: () {
-                            Navigator.pushNamed(context, ChangePhone.id);
+                            Navigator.pushNamed(context, ChangePhone.id,arguments: 1);
                           },
                           leading: Icon(
                             CupertinoIcons.phone,
@@ -278,7 +281,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             client.client?.phone ?? '',
                             style: GoogleFonts.ubuntu(
                               fontSize: 18,
-                              color: Colors.grey[700],
+                              color: Colors.black,
                             ),
                           ),
                           trailing: Icon(
@@ -432,7 +435,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 fontSize: 17, fontWeight: FontWeight.w500))
                       ],
                     ).paddingOnly(left: 20, bottom: 10, right: 20),
-                    client.client!.address != null &&
+                    client.client!.address != null ||
                             client.client!.phone != null
                         ? ElevatedButton(
                             onPressed: () async {

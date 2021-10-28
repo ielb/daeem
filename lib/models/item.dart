@@ -1,37 +1,25 @@
 import 'dart:convert';
 
 import 'package:daeem/models/product.dart';
+import 'package:daeem/models/product_variant.dart';
 
 class Item {
   Product product;
   int quantity;
-  String variant;
+  Variant? variant;
   
   Item({
     required this.product,
     this.quantity=0,
-    this.variant="item",
+    this.variant,
   });
  
- 
-
-  Item copyWith({
-    Product? product,
-    int? quantity,
-    String? variant,
-  }) {
-    return Item(
-      product: product ?? this.product,
-      quantity: quantity ?? this.quantity,
-      variant: variant ?? this.variant,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
       'product': product.toMap(),
       'quantity': quantity,
-      'variant': variant,
+      'variant': variant?.toMap(),
     };
   }
 
@@ -39,7 +27,7 @@ class Item {
     return Item(
       product: Product.fromMap(map['product']),
       quantity: map['quantity'],
-      variant: map['variant'],
+      variant: map['variant'] != null ? Variant.fromMap(map['variant']) : null,
     );
   }
 
@@ -49,20 +37,7 @@ class Item {
 
   @override
   String toString() => 'Item(product: $product, quantity: $quantity, variant: $variant)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-  
-    return other is Item &&
-      other.product == product &&
-      other.quantity == quantity &&
-      other.variant == variant;
-  }
-
-  @override
-  int get hashCode => product.hashCode ^ quantity.hashCode ^ variant.hashCode;
-  }
+   }
 
  
 

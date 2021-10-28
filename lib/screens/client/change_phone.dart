@@ -19,6 +19,7 @@ class _ChangePhoneState extends State<ChangePhone> {
 
   String initialCountry = 'MA';
   bool enter = false;
+  int from = 0;
 
   PhoneNumber number = PhoneNumber(isoCode: 'MA');
   late ClientProvider client;
@@ -35,6 +36,7 @@ class _ChangePhoneState extends State<ChangePhone> {
   @override
   void didChangeDependencies() {
     if (!enter) {
+      from = ModalRoute.of(context)?.settings.arguments as int;
       client = Provider.of<ClientProvider>(context);
       _phoneController.text = client.client?.phone?.substring(4,(client.client?.phone?.length??2-1)) ?? '';
       setState(() {
@@ -67,7 +69,7 @@ class _ChangePhoneState extends State<ChangePhone> {
     if (_phoneController.text != '' && isNumber() && result) {
       formKey.currentState?.save();
      
-      Navigator.pushNamed(context, Verification.id,arguments: phoneNumber ?? _phoneController.text);
+      Navigator.pushNamed(context, Verification.id,arguments: { 'phoneNumber':phoneNumber ?? _phoneController.text,'from':from});
     } else
       showTopSnackBar(
           context,

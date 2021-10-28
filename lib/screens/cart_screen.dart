@@ -24,7 +24,7 @@ class _CartPageState extends State<CartPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!called) {
-      cart = Provider.of<CartProvider>(context, listen: false);
+      cart = Provider.of<CartProvider>(context);
     }
   }
 
@@ -50,10 +50,84 @@ class _CartPageState extends State<CartPage> {
     Navigator.pushNamed(context, CheckoutPage.id);
   }
 
-  deleteItem(Item item) {}
+  deleteItem(Item item) {
+    if (cart.basket.length == 1) {
+      showDialog(
+          context: context,
+          builder: (context) => Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(15.0),
+                ),
+                child: Container(
+                  height: 200,
+                  width: screenSize(context).width * .9,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: new BorderRadius.circular(15.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Oh, No ! 😞",
+                        style: GoogleFonts.ubuntu(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 20),
+                      ).paddingOnly(top: 15, left: 15),
+                      Spacer(),
+                      Text(
+                        "Did you pressed here by wrong or want to add other products ?",
+                        style: GoogleFonts.ubuntu(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16),
+                      ).paddingOnly(left: 15, right: 5),
+                      Spacer(
+                        flex: 2,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Undo',
+                                style: GoogleFonts.ubuntu(
+                                    color: Config.color_2,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              )),
+                          TextButton(
+                              onPressed: () {
+                               var result =  cart.deleteItem(item);
+                               if(result) {
+                                  Navigator.of(context).pop();
+                               }else{
+                                  Navigator.of(context).pop();
+                               }
+                                
+                              },
+                              child: Text(
+                                'Empty cart',
+                                style: GoogleFonts.ubuntu(
+                                    color: Colors.redAccent.shade400,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ))
+                        ],
+                      ).align(alignment: Alignment.centerRight)
+                    ],
+                  ).paddingAll(5),
+                ),
+              ));
+    } else
+      cart.deleteItem(item);
+  }
 
-  var address = true;
-  var couponChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -95,9 +169,11 @@ class _CartPageState extends State<CartPage> {
                               shrinkWrap: true,
                               itemCount: cart.basket.length,
                               itemBuilder: (context, index) {
-                                return cartItem(item: cart.basket[index],onTap: (){
-                                  print("item");
-                                });
+                                return cartItem(
+                                    item: cart.basket[index],
+                                    onTap: () {
+                                      print("item");
+                                    });
                               },
                             ),
                           ],
@@ -123,7 +199,8 @@ class _CartPageState extends State<CartPage> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.w400,
                                             color: Colors.grey)))
-                                .paddingOnly(bottom: 20),
+                                .paddingOnly(bottom: 100),
+                               
                             InkWell(
                               onTap: () {
                                 Navigator.pop(context);
@@ -172,8 +249,6 @@ class _CartPageState extends State<CartPage> {
             : null);
   }
 
- 
-
   Widget cartItem({required Item item, Function()? onTap}) {
     return InkWell(
       onTap: onTap,
@@ -195,23 +270,25 @@ class _CartPageState extends State<CartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              margin: EdgeInsets.only(top:5,left: 5,bottom: 5),
-                height: 70,
+                margin: EdgeInsets.only(right: 5),
                 child: ClipRRect(
                   child: CachedNetworkImage(
-                      imageUrl: item.product.image ?? '',
+                    imageUrl: item.product.image ?? '',
+                    filterQuality: FilterQuality.high,
+                    fit: BoxFit.cover,
+                    progressIndicatorBuilder:
+                        (context, url, downloadProgress) =>
+                            CircularProgressIndicator(
+                                    value: downloadProgress.progress)
+                                .center(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      "assets/placeholder.png",
                       filterQuality: FilterQuality.high,
                       fit: BoxFit.cover,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              CircularProgressIndicator(
-                                      value: downloadProgress.progress)
-                                  .center(),
-                      errorWidget: (context, url, error) => Image.asset(
-                            "assets/placeholder.png",
-                            filterQuality: FilterQuality.high,
-                            fit: BoxFit.cover,
-                          )),
+                    ),
+                    height: 70,
+                    width: 80,
+                  ),
                   borderRadius: BorderRadius.circular(15),
                 )),
             Column(
@@ -227,7 +304,7 @@ class _CartPageState extends State<CartPage> {
                               fontSize: 18, fontWeight: FontWeight.w500))
                       .paddingOnly(left: 5),
                 ),
-                Text( "${item.product.price} DH/${item.product.hasVariant==1 ? item.product.variants[1].option?.toLowerCase(): 'Item'}",
+                Text("${item.product.price} DH/${item.product.hasVariant == 1 ? item.product.variants[1].option?.toLowerCase() : 'Item'}",
                         style: GoogleFonts.ubuntu(
                             fontSize: 16, fontWeight: FontWeight.w400))
                     .paddingOnly(left: 5),
@@ -236,18 +313,18 @@ class _CartPageState extends State<CartPage> {
             Spacer(),
             InkWell(
               onTap: () {
-                removeFromCart(item, context);
+                addToCart(item, context);
               },
-              child: Icon(Ionicons.remove),
+              child: Icon(Ionicons.add),
             ).paddingOnly(right: 10),
             Text("${item.quantity}",
                 style: GoogleFonts.ubuntu(
                     fontSize: 20, fontWeight: FontWeight.w500)),
             InkWell(
               onTap: () {
-                addToCart(item, context);
+                removeFromCart(item, context);
               },
-              child: Icon(Ionicons.add),
+              child: Icon(Ionicons.remove),
             ).paddingOnly(left: 10),
             Spacer(),
             InkWell(

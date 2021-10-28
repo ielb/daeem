@@ -71,14 +71,17 @@ class ClientProvider extends BaseProvider {
         var data = jsonDecode(response.body);
 
         if (data['status'] == "success") {
+          print(data);
           _client!.phone = phone;
           notifyListeners();
           return true;
         } else
           return false;
       }
+       notifyListeners();
       return false;
     } else
+       notifyListeners();
       return false;
   }
 
@@ -87,7 +90,7 @@ class ClientProvider extends BaseProvider {
 
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-
+                print(data);
       if (data['status'] == "success") {
         _client!.address = address;
         notifyListeners();
@@ -96,13 +99,14 @@ class ClientProvider extends BaseProvider {
   }
 
   getClientAddress(Client client) async {
+    setBusy(true);
     http.Response? response = await _service.getAddress(client.id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       print(data);
       if (data['status'] == "success") {
         _client!.address = Address.fromMap(data['data']);
-        notifyListeners();
+        setBusy(false);
       }
     }
   }

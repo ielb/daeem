@@ -1,4 +1,5 @@
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
@@ -21,6 +22,7 @@ class _VerificationState extends State<Verification> {
   bool _isLoading = false;
   String phoneNumber = '';
   bool called = false;
+  Map<String, dynamic> from = {'phoneNumber': '', "from": 0};
 
   String _code = '';
 
@@ -54,9 +56,10 @@ class _VerificationState extends State<Verification> {
     super.didChangeDependencies();
     if (!called) {
       client = Provider.of<ClientProvider>(context);
-      phoneNumber = ModalRoute.of(context)!.settings.arguments as String;
-      client.verifyClientPhoneNumber(phoneNumber);
+      from = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      client.verifyClientPhoneNumber(from['phoneNumber']);
       setState(() {
+       phoneNumber = from['phoneNumber'];
         called = !called;
       });
     }
@@ -69,8 +72,10 @@ class _VerificationState extends State<Verification> {
           context,
           CustomSnackBar.success(
               message: "Phone number has been successfuly changed"));
-
-      Navigator.pushReplacementNamed(context, Home.id);
+      if (from['from'] == 0)
+        Navigator.pushReplacementNamed(context, Home.id);
+      else
+        Navigator.pushReplacementNamed(context, CheckoutPage.id);
     } else {
       showTopSnackBar(
           context,
