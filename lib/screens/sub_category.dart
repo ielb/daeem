@@ -19,7 +19,7 @@ class Category extends StatefulWidget {
 class _CategoryState extends State<Category> {
   late TextEditingController _searchController;
   bool _isClosed = false;
-  Market market = Market();
+  Store market = Store();
   CategoryProvider _categoryProvider = CategoryProvider();
   late Future dataResult;
   bool isSearching = false;
@@ -36,7 +36,7 @@ class _CategoryState extends State<Category> {
     if (!_called) {
       _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
       var list = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
-      market = list[0] as Market;
+      market = list[0] as Store;
       int id = list[1] as int;
 
       dataResult = _getSubCategories(id);
@@ -82,83 +82,87 @@ class _CategoryState extends State<Category> {
       onWillPop: _backPressed,
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: CustomScrollView(
-          physics: BouncingScrollPhysics(),
-          slivers: [
-            ///App bar
-            SliverPersistentHeader(
-              delegate: CustomSliverAppBarDelegate(market, 200),
-              pinned: true,
-            ),
+        body: StickyOrder(
+          child: CustomScrollView(
+            physics: BouncingScrollPhysics(),
+            slivers: [
+              ///App bar
+              SliverPersistentHeader(
+                delegate: CustomSliverAppBarDelegate(market, 200),
+                pinned: true,
+              ),
     
-            ///Closed sign
-            if (_isClosed)
-              SliverToBoxAdapter(
-                  child: Container(
-                height: 55,
-                width: 300,
-                margin: EdgeInsets.only(left: 20, right: 20, top: 80),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Config.closed,
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          RichText(
-                              text: TextSpan(
-                                  text: "This store is closed at the moment.",
-                                  style: GoogleFonts.ubuntu(
-                                      color: Colors.black,
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w400),
-                                  children: [
-                                TextSpan(
-                                    text: "Looking for something similar?",
+              ///Closed sign
+              if (_isClosed)
+                SliverToBoxAdapter(
+                    child: Container(
+                  height: 55,
+                  width: 300,
+                  margin: EdgeInsets.only(left: 20, right: 20, top: 80),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Config.closed,
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RichText(
+                                text: TextSpan(
+                                    text: "This store is closed at the moment.",
                                     style: GoogleFonts.ubuntu(
                                         color: Colors.black,
                                         fontSize: 8,
-                                        fontWeight: FontWeight.w600))
-                              ])),
-                          Text("Explore stores near you",
-                                  style:
-                                      GoogleFonts.ubuntu(color: Config.color_1))
-                              .align(alignment: Alignment.bottomLeft)
-                              .paddingOnly(right: 105)
-                        ])
-                  ],
-                ),
-                decoration: BoxDecoration(
-                    color: Color(0xffFFF3DA),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade200,
-                        spreadRadius: 2,
-                        blurRadius: 16,
-                        offset: Offset(0, 4),
-                      )
-                    ]),
-              )),
+                                        fontWeight: FontWeight.w400),
+                                    children: [
+                                  TextSpan(
+                                      text: "Looking for something similar?",
+                                      style: GoogleFonts.ubuntu(
+                                          color: Colors.black,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w600))
+                                ])),
+                            Text("Explore stores near you",
+                                    style:
+                                        GoogleFonts.ubuntu(color: Config.color_1))
+                                .align(alignment: Alignment.bottomLeft)
+                                .paddingOnly(right: 105)
+                          ])
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      color: Color(0xffFFF3DA),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade200,
+                          spreadRadius: 2,
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        )
+                      ]),
+                )),
     
-            ///SearchField
-            SliverToBoxAdapter(
-                child: SearchInput(
-              _searchController,
-              "Search for supermarket",
-              screenSize(context).width * .81,
-              CupertinoIcons.search,
-              onChanged: onChange,
-              onClose: onClose,
-              onTap: onTap,
-              searching: isSearching,
-              isHavingShadow: true,
-            ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
-            isSearching ? _searchedContent() : _content()
-          ],
+              ///SearchField
+              SliverToBoxAdapter(
+                  child: SearchInput(
+                _searchController,
+                "Search for sub category",
+                screenSize(context).width * .81,
+                CupertinoIcons.search,
+                onChanged: onChange,
+                onClose: onClose,
+                onTap: onTap,
+                searching: isSearching,
+                isHavingShadow: true,
+              ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
+              isSearching ? _searchedContent() : _content()
+            ],
+
+          ),
+          mcontext: context,
         ),
       ),
     );

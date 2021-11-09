@@ -1,10 +1,13 @@
 import 'package:daeem/configs/notification_manager.dart';
+import 'package:daeem/models/order.dart';
+import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/provider/orders_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/screens/client/add_address.dart';
@@ -14,9 +17,10 @@ import 'package:daeem/screens/client/change_phone.dart';
 import 'package:daeem/screens/client/phone_verification.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/screens/connection.dart';
-import 'package:daeem/screens/map_screen.dart';
 import 'package:daeem/screens/notification_screen.dart';
+import 'package:daeem/screens/order_details_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
+import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -56,11 +60,12 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
-    ChangeNotifierProvider(create: (context) => MarketProvider()),
+    ChangeNotifierProvider(create: (context) => StoreProvider()),
     ChangeNotifierProvider(create: (context) => CategoryProvider()),
     ChangeNotifierProvider(create: (context) => CartProvider()),
     ChangeNotifierProvider(create: (context) => ClientProvider()),
-    ChangeNotifierProvider(create: (context) => AddressProvider())
+    ChangeNotifierProvider(create: (context) => AddressProvider()),
+    ChangeNotifierProvider(create: (context) => OrdersProvider()),
   ], child: MyApp()));
 }
 
@@ -97,9 +102,7 @@ Route<dynamic> routes(RouteSettings settings) {
     case Splash.id:
       return CupertinoPageRoute(builder: (_) => Setup(), settings: settings);
 
-    case MapScreen.id:
-      return CupertinoPageRoute(
-          builder: (_) => MapScreen(), settings: settings);
+ 
     case LostConnection.id:
       return CupertinoPageRoute(
           builder: (_) => LostConnection(), settings: settings);
@@ -151,9 +154,6 @@ Route<dynamic> routes(RouteSettings settings) {
     case Setting.id:
       return CupertinoPageRoute(builder: (_) => Setting(), settings: settings);
 
-    case MapScreen.id:
-      return CupertinoPageRoute(
-          builder: (_) => MapScreen(), settings: settings);
 
     case Category.id:
       return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
@@ -164,6 +164,9 @@ Route<dynamic> routes(RouteSettings settings) {
     case ProductsPage.id:
       return CupertinoPageRoute(
           builder: (_) => ProductsPage(), settings: settings);
+          case ProductDetails.id:
+      return CupertinoPageRoute(
+          builder: (_) => ProductDetails(product : settings.arguments as Product), settings: settings);
     case ChangePassword.id:
       return CupertinoPageRoute(
           builder: (_) => ChangePassword(), settings: settings);
@@ -175,7 +178,9 @@ Route<dynamic> routes(RouteSettings settings) {
           builder: (_) => ChangeAddress(), settings: settings);
     case CartPage.id:
       return CupertinoPageRoute(builder: (_) => CartPage(), settings: settings);
-
+    case OrderDetails.id:
+      return CupertinoPageRoute(
+          builder: (_) => OrderDetails(order: settings.arguments as Order), settings: settings);
     case NotificationScreen.id:
       return CupertinoPageRoute(
           builder: (_) => NotificationScreen(), settings: settings);

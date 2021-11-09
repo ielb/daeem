@@ -1,14 +1,18 @@
 import 'dart:convert';
 
+import 'package:daeem/models/market.dart';
+
 class StoreType {
-  String? id;
-  String? name;
-  String? image;
+  String id;
+  String name;
+  String image;
+  List<Store> stores = List.empty(growable: true);
   StoreType({
-    this.id,
-    this.name,
-    this.image,
+    required this.id,
+    required this.name,
+    required this.image,
   });
+
 
   StoreType copyWith({
     String? id,
@@ -29,19 +33,18 @@ class StoreType {
       'image': image,
     };
   }
+   
 
-  factory StoreType.fromMap(Map<String, dynamic> map) {
-    return StoreType(
-      id: map['id'] != null ? map['id'].toString() : null,
-      name: map['name'] != null ?  map['name'] : null,
-      image: map['image'] != null ? "https://app.daeem.ma/images/type-store/"+map['image'] : null,
+
+  factory StoreType.fromMap(Map<String, dynamic> map) => StoreType(
+      id: map['id'].toString(),
+      name: map['name'],
+      image:  "https://app.daeem.ma/images/type-store/"+map['image'],
     );
-  }
 
   String toJson() => json.encode(toMap());
 
-  factory StoreType.fromJson(String source) =>
-      StoreType.fromMap(json.decode(source));
+  factory StoreType.fromJson(String source) => StoreType.fromMap(json.decode(source));
 
   @override
   String toString() => 'StoreType(id: $id, name: $name, image: $image)';
@@ -49,11 +52,11 @@ class StoreType {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
+  
     return other is StoreType &&
-        other.id == id &&
-        other.name == name &&
-        other.image == image;
+      other.id == id &&
+      other.name == name &&
+      other.image == image;
   }
 
   @override

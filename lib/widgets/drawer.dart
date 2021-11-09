@@ -2,6 +2,7 @@ import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/login.dart';
+import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,9 +12,9 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _clientProvider = Provider.of<AuthProvider>(context, listen: false);
-    var _client = Provider.of<ClientProvider>(context, listen: false);
-    var _store= Provider.of<MarketProvider>(context, listen: false);
+    var _clientProvider = Provider.of<AuthProvider>(context);
+    var _client = Provider.of<ClientProvider>(context);
+    var _store= Provider.of<StoreProvider>(context);
     return Container(
       height: screenSize(context).height,
       width: screenSize(context).width * .8,
@@ -69,7 +70,9 @@ class CustomDrawer extends StatelessWidget {
                 container(
                     label: "Notifications",
                     icon: Config.notification,
-                    onPressed: () {}),
+                    onPressed: () {
+                       Navigator.pushNamed(context, NotificationScreen.id);
+                    }),
                 container(
                     label: "Rate us", icon: Config.rate, onPressed: () {}),
                 container(
@@ -86,6 +89,7 @@ class CustomDrawer extends StatelessWidget {
                       _clientProvider.logOut().then((result) {
                         _client.clear();
                         _store.clear();
+                      
                         if (result) {
                           Navigator.of(context).pushReplacementNamed(Login.id);
                         }

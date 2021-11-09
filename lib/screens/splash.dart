@@ -1,8 +1,11 @@
+// ignore_for_file: cancel_subscriptions
+
 import 'dart:async';
 import 'package:daeem/configs/notification_manager.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,16 +24,19 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   Timer? _timer;
   late PushNotificationService _notificationService;
+  
   StreamSubscription? subscription;
   late AuthProvider auth ;
   late ClientProvider client;
   late AddressProvider addressProvider;
+  late StoreProvider _storeProvider;
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((_) async { 
       auth =  Provider.of<AuthProvider>(context, listen: false);
       client = Provider.of<ClientProvider>(context, listen: false);
       addressProvider =Provider.of<AddressProvider>(context,listen: false);
+      _storeProvider =Provider.of<StoreProvider>(context,listen: false);
         notifyManager.setOnNotificationClick(onNotificationClick);
         notifyManager.setOnNotificationReceive(onNotificationReceive);
         _notificationService =
@@ -67,9 +73,9 @@ class _SplashState extends State<Splash> {
 
   void _getAuthClient() async {
     String? id = await Prefs.instance.getClient();
-    bool? isAut = await Prefs.instance.getAuth();
+    bool? isAuth = await Prefs.instance.getAuth();
 
-    if (id != null && isAut != null) {
+    if (id != null && isAuth != null) {
       bool result = await auth.getAuthenticatedClient(
         id,
       );
@@ -79,6 +85,11 @@ class _SplashState extends State<Splash> {
         await client.getClientAddress(auth.client!);
        
         addressProvider.setAddress(client.client?.address);
+        if (client.client!.address != null) {
+        await  _storeProvider.getStoreType();
+        await _storeProvider.getStores(client.client!.address!);
+      }
+
         Navigator.pushReplacementNamed(context, Home.id);
       } else {
         _skip();
@@ -100,42 +111,44 @@ class _SplashState extends State<Splash> {
   @override
   void dispose() {
     _timer?.cancel();
-    subscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-            height: screenSize(context).height,
-            width: screenSize(context).width,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              image: DecorationImage(
-                image: AssetImage(Config.background),
-                fit: BoxFit.fitWidth,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          body: Container(
+              height: screenSize(context).height,
+              width: screenSize(context).width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                  image: AssetImage(Config.background),
+                  fit: BoxFit.fitWidth,
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  Config.logo,
-                ).paddingOnly(bottom: screenSize(context).height * .02),
-                Text(
-                  "Slogan Place",
-                  style: GoogleFonts.ubuntu(
-                      fontWeight: FontWeight.w300,
-                      fontSize: 22,
-                      color: Config.color_2,
-                      letterSpacing: 7),
-                ).center(),
-                CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Config.color_1,
-                ).paddingOnly(top: screenSize(context).height * .15)
-              ],
-            )));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    Config.logo,
+                  ).paddingOnly(bottom: screenSize(context).height * .02),
+                  Text(
+                    "Slogan Place",
+                    style: GoogleFonts.ubuntu(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 22,
+                        color: Config.color_2,
+                        letterSpacing: 7),
+                  ).center(),
+                  CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Config.color_1,
+                  ).paddingOnly(top: screenSize(context).height * .15)
+                ],
+              ))),
+    );
   }
 }

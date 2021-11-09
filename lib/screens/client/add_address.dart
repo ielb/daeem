@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:ui';
-
 import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -30,12 +32,18 @@ class _AddressPageState extends State<AddressPage> {
 
   CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(35.7651929, -5.7999158), zoom: 11);
-
+  Set<Marker> _markers = {};
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  GlobalKey<ExpandableBottomSheetState> key = new GlobalKey();
   String? fromRoute;
   List<Placemark> address = [];
   late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
+  late StoreProvider _storeProvider;
+  late BitmapDescriptor icon;
+  late LatLng? markerPosition;
+  bool isVisible = false;
+
   @override
   void initState() {
     _street = TextEditingController();
@@ -43,8 +51,14 @@ class _AddressPageState extends State<AddressPage> {
     _business = TextEditingController();
     _floor = TextEditingController();
     _post = TextEditingController();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      icon = await BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(
+              devicePixelRatio: screenSize(context).aspectRatio,
+              size: Size(1, 1)),
+          "assets/pin.png");
       _clientProvider = Provider.of<ClientProvider>(context, listen: false);
+      _storeProvider = Provider.of<StoreProvider>(context, listen: false);
       _addressProvider = Provider.of<AddressProvider>(context, listen: false);
       getLocation();
 
@@ -58,14 +72,11 @@ class _AddressPageState extends State<AddressPage> {
     showDialog(
         context: context,
         builder: (context) => CircularProgressIndicator().center());
-    _currentPosition = await LocationService().getLoc().catchError((error){
+    _currentPosition = await LocationService().getLoc().catchError((error) {
       print(error);
     });
 
     if (_currentPosition != null) {
-      print("${_currentPosition!.latitude}" +
-          "dd" +
-          "${_currentPosition!.latitude}");
       _kGooglePlex = CameraPosition(
           zoom: 20,
           target:
@@ -80,11 +91,22 @@ class _AddressPageState extends State<AddressPage> {
           .getAddress(_currentPosition!.latitude, _currentPosition!.longitude);
       _street.text = "${address.first.street ?? ''}";
       _post.text = "${address.first.postalCode ?? ''}";
+      _markers.add(Marker(
+          markerId: MarkerId('marker_2'),
+          position:
+              LatLng(_currentPosition!.latitude, _currentPosition!.latitude),
+          draggable: true,
+          icon: icon,
+          infoWindow: InfoWindow(title: "test")));
+      Navigator.pop(context);
     }
-    Navigator.pop(context);
-  }
+    Timer(Duration(milliseconds:2500), () {
+     if(mounted)
+       expand();
+    });
+    
 
-  ScrollPhysics _physiques = BouncingScrollPhysics();
+  }
 
   @override
   void dispose() {
@@ -98,6 +120,9 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   _submit() async {
+    showDialog(
+        context: context,
+        builder: (context) => CircularProgressIndicator().center());
     var result = _formkey.currentState?.validate();
     if (result != null && result) {
       Address _address = Address(
@@ -116,13 +141,27 @@ class _AddressPageState extends State<AddressPage> {
         _addressProvider.setAddress(_address);
         _clientProvider.setClientAddress(_address);
         await _clientProvider.updateAddress(_address);
+        await _storeProvider.getStoreType();
+        await _storeProvider.getStores(_address);
         showTopSnackBar(
           context,
           CustomSnackBar.success(
             message: "Address added with success",
           ),
         );
+      } else {
+        await _storeProvider.getStoreType();
+        await _storeProvider.getStores(_address);
+        showTopSnackBar(
+          context,
+          CustomSnackBar.info(
+            message: "For better experience sign in",
+          ),
+        );
+        _addressProvider.setAddress(_address);
       }
+      Navigator.pop(context);
+
       if (fromRoute == null)
         Navigator.pushReplacementNamed(context, Home.id);
       else
@@ -130,35 +169,126 @@ class _AddressPageState extends State<AddressPage> {
     }
   }
 
+  void _updatePosition(CameraPosition _position) {
+    _markers.clear();
+    _markers.add(
+      Marker(
+          markerId: MarkerId('marker_2'),
+          position:
+              LatLng(_position.target.latitude, _position.target.longitude),
+          icon: icon),
+    );
+    setState(() {
+      markerPosition =
+          LatLng(_position.target.latitude, _position.target.longitude);
+    });
+  }
+
+  getPostion() async {
+    if (markerPosition != null) {
+      address.clear();
+      address = await LocationService()
+          .getAddress(markerPosition!.latitude, markerPosition!.longitude);
+      if (address.first.street != null &&
+          address.first.street != 'Unnamed Road') {
+        _street.text =
+            "${address.first.street!}   ${address.first.subLocality ?? ''}";
+        _post.text = "${address.first.postalCode ?? ''}";
+
+        expand();
+      } else {
+        if(mounted) {
+          showTopSnackBar(context,
+            CustomSnackBar.info(message: "Please select a valid address"));
+        }
+      }
+    }
+  }
+
+  void expand() => key.currentState!.expand();
+
+  void contract() => key.currentState!.contract();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ExpandableBottomSheet(
+        body:  ExpandableBottomSheet(
+            key: key,
             enableToggle: true,
             background: Stack(
               children: [
-                GoogleMap(
-                  onTap: (latLang) {
+                Listener(
+                  onPointerMove: (PointerMoveEvent event) {
                     setState(() {
-                      _physiques = NeverScrollableScrollPhysics();
+                      isVisible = false;
                     });
                   },
-                  onLongPress: (latLang) {
-                    setState(() {
-                      _physiques = NeverScrollableScrollPhysics();
-                    });
-                  },
-                  initialCameraPosition: _kGooglePlex,
-                  compassEnabled: false,
 
-                  ///Todo:When published set to false
-                  zoomControlsEnabled: false,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  mapToolbarEnabled: false,
-                  onMapCreated: (GoogleMapController controller) {
-                    _controller = controller;
+                  onPointerUp: (event) {
+                    setState(() {
+                      isVisible = true;
+                    });
                   },
+                  child: GoogleMap(
+                    initialCameraPosition: _kGooglePlex,
+                    compassEnabled: false,
+                    markers: _markers,
+                    zoomControlsEnabled: false,
+                    onCameraMove: ((_position) => _updatePosition(_position)),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: false,
+                    mapToolbarEnabled: false,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller = controller;
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  left: 0,
+                  bottom: screenSize(context).height * 0.4,
+                  child: Visibility(
+                    visible: isVisible,
+                    child: Center(
+                      child: Container(
+                        height: 85,
+                        width: screenSize(context).width * .75,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(15)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade50,
+                              spreadRadius: 2,
+                              blurRadius: 16,
+                              offset: Offset(0, 4),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Spacer(),
+                            Text("Place the pin exacly on your door",
+                                    style: GoogleFonts.ubuntu(fontSize: 18))
+                                .paddingOnly(top: 15),
+                            Spacer(),
+                            TextButton(
+                              onPressed: () {
+                                getPostion();
+                              },
+                              child: Text("Use this position  >",
+                                  style: GoogleFonts.ubuntu(
+                                      fontSize: 16, color: Config.color_2)),
+                            ),
+                            Spacer(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 Positioned(
                   top: 35,

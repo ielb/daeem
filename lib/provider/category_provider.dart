@@ -5,11 +5,11 @@ import 'package:daeem/models/product.dart';
 import 'package:daeem/models/product_variant.dart';
 import 'package:daeem/models/sub_category.dart';
 import 'package:daeem/provider/base_provider.dart';
-import 'package:daeem/services/market_service.dart';
+import 'package:daeem/services/store_service.dart';
 import 'package:http/http.dart';
 
 class CategoryProvider extends BaseProvider {
-  MarketService _service = MarketService();
+  StoreService _service = StoreService();
   //*Market Category
   List<MarketCategory> _categories = List.empty(growable: true);
   List<MarketCategory> get categories => _categories;
@@ -75,7 +75,7 @@ class CategoryProvider extends BaseProvider {
 
   _setSearchedProducts(List data) {
     data.forEach((element) {
-      _searchedProducts.add(Product.fromJson(element));
+      _searchedProducts.add(Product.fromMap(element));
     });
     notifyListeners();
   }
@@ -151,9 +151,11 @@ class CategoryProvider extends BaseProvider {
   }
 
   Future<bool> getCategories(int id) async {
+    if (_categories.isNotEmpty) _categories.clear();
     Response? response = await _service.getMarketsCategory(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
+      print(data);
       if (data['status'] != "error") {
         _setCategoryFromJson(data['data']);
         notifyListeners();
@@ -198,16 +200,15 @@ class CategoryProvider extends BaseProvider {
 
   closeProducts() {
     _products.clear();
-    notifyListeners();
   }
 
   close() {
     _categories.clear();
-    notifyListeners();
   }
   // * Subcategories
 
   Future<bool> getSubCategories(int id) async {
+    _subCategories.clear();
     Response? response = await _service.getMarketsSubCategory(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
@@ -245,6 +246,5 @@ class CategoryProvider extends BaseProvider {
 
   closeSub() {
     _subCategories.clear();
-    notifyListeners();
   }
 }

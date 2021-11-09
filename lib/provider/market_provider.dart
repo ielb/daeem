@@ -2,30 +2,29 @@
 
 import 'dart:convert';
 
-import 'package:daeem/models/client.dart';
+import 'package:daeem/models/address.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/store_type.dart';
 import 'package:daeem/provider/base_provider.dart';
-import 'package:daeem/services/market_service.dart';
+import 'package:daeem/services/store_service.dart';
 
-class MarketProvider extends BaseProvider {
-  List<Market> _markets = List.empty(growable: true);
-  List<Market> get markets => _markets;
-  MarketService _marketService = MarketService();
-  List<Market> _searchedMarkets = List.empty(growable: true);
+class StoreProvider extends BaseProvider {
+  List<Store> _markets = List.empty(growable: true);
+  List<Store> get markets => _markets;
+  StoreService _marketService = StoreService();
+  List<Store> _searchedMarkets = List.empty(growable: true);
   List<StoreType> _storesTypes = List.empty(growable: true);
   List<StoreType> get storesType => _storesTypes;
   double deliveryCost = 0;
-  int _offset = 0;
   String? _storeType;
   String? get storeType => _storeType;
 
-  Market? _currentMarket;
-  Market? get currentMarket => _currentMarket;
+  Store? _currentMarket;
+  Store? get currentMarket => _currentMarket;
 
-  setCurrentMarket(Market market) {
+  setCurrentMarket(Store market) {
     _currentMarket = market;
     notifyListeners();
   }
@@ -40,20 +39,20 @@ class MarketProvider extends BaseProvider {
     notifyListeners();
   }
 
-  _addMarket(Market market) {
+  _addMarket(Store market) {
     _markets.add(market);
   }
 
   setMarketFromJson(List data) {
     data.forEach((element) {
-      _addMarket(Market.fromJson(element));
+      _addMarket(Store.fromJson(element));
     });
     notifyListeners();
   }
 
   setSearchedMarkets(List data) {
     data.forEach((element) {
-      _searchedMarkets.add(Market.fromJson(element));
+      _searchedMarkets.add(Store.fromJson(element));
     });
   }
 
@@ -63,12 +62,12 @@ class MarketProvider extends BaseProvider {
   }
 
   Future<void> getDeliveryPrice(double price) async {
+    print(price);
     http.Response? response = await _marketService.getDeliveryPrice();
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       if (data['status'] == 'success') {
         data = data['data'];
-        print(data);
         data.forEach((element) {
           if (price >= double.parse(element['price_from']) &&
               price <= double.parse(element['price_to'])) {
@@ -81,15 +80,15 @@ class MarketProvider extends BaseProvider {
     setBusy(false);
   }
 
-  getPrice(List data) {}
-
-  Future<bool> getMarkets() async {
-    http.Response? response = await _marketService.getMarkets(_offset);
-    _offset = _offset + 5;
+  Future<bool> getMarkets(Address address, String store_id) async {
+    print(store_id);
+    if (_markets.isNotEmpty) _markets.clear();
+    http.Response? response = await _marketService.getStores(
+        lng: address.lng!, lat: address.lat!, store_type: store_id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      if (data['status'] != "error") {
-        setMarketFromJson(data['data']);
+      if (data.isNotEmpty) {
+        setMarketFromJson(data);
         return true;
       } else
         return false;
@@ -98,7 +97,7 @@ class MarketProvider extends BaseProvider {
     }
   }
 
-  Future<List<Market>> getSearchedMarkets(String name) async {
+  Future<List<Store>> getSearchedMarkets(String name) async {
     if (name.isEmpty || name == '') {
       return _markets;
     } else {
@@ -117,8 +116,8 @@ class MarketProvider extends BaseProvider {
     }
   }
 
-  Future<bool> getStoreType() async {
-    if (_storesTypes.isNotEmpty) return true;
+  Future<List<StoreType>> getStoreType() async {
+    if (_storesTypes.isNotEmpty) return _storesTypes;
     try {
       http.Response? response = await _marketService.getStoreType();
       if (response != null && response.statusCode == 200) {
@@ -127,102 +126,49 @@ class MarketProvider extends BaseProvider {
           data['data'][0].forEach(
               (element) => _storesTypes.add(StoreType.fromMap(element)));
           notifyListeners();
-          return true;
+          if (_storesTypes.isNotEmpty) return _storesTypes;
         }
         notifyListeners();
-        return false;
+        return List.empty(growable: true);
       }
       notifyListeners();
-      return false;
+      return List.empty(growable: true);
     } catch (error) {
       print(error);
     }
     notifyListeners();
-    return false;
+    return List.empty(growable: true);
   }
 
   clear() {
     _markets = [];
-    _offset = 0;
+    _storesTypes.clear();
+    
     _searchedMarkets = [];
   }
 
-  List<TypedStores> _typedStores = List.empty(growable: true);
-  List<TypedStores> get typedStores => _typedStores;
-
-  Future<List<TypedStores>> getTypedStores(Client client) async {
-    if (_storesTypes.isEmpty) {
+  Future<List<StoreType>> getStores(Address address) async {
+    if (_storesTypes.length == 0) {
       return List.empty(growable: true);
     } else {
-      print(_storesTypes.length);
-      for (var i = 0; i < _storesTypes.length; i++) {
-         http.Response? response = await _marketService.getTypedStores(
-            lat: client.address?.lat ?? '',
-            lng: client.address?.lng ?? '',
-            store_type: _storesTypes[i].id ?? '1');
-            print(response?.body);
-        if (response != null && response.statusCode == 200) {
-          var data = jsonDecode(response.body);
-          // print(data);
-          data.forEach((element){
-            if(element['store_type_id'].toString() == _storesTypes[i].id ){
-              TypedStores stores = TypedStores(store_type: _storesTypes[i].name??'Grecery');
-              stores.stores.add(Market.fromJson(element));
-              _typedStores.add(stores);
-            }
-          });
-         
-        } 
+      for (int i = 0; i < _storesTypes.length; i++) {
+        if (_storesTypes[i].stores.length == 0) {
+          http.Response? response = await _marketService.getStores(
+              lat: address.lat!,
+              lng: address.lng!,
+              store_type: _storesTypes[i].id);
+          if (response != null && response.statusCode == 200) {
+            var data = jsonDecode(response.body);
+            data.forEach((element) {
+              if (element['store_type_id'].toString() == _storesTypes[i].id) {
+                _storesTypes[i].stores.add(Store.fromJson(element));
+              }
+            });
+          }notifyListeners();
+        }
       }
+      
+      return _storesTypes;
     }
-    print( _typedStores.length);
-
-    return List.empty(growable: true);
   }
-}
-
-class TypedStores {
-  String store_type;
-  TypedStores({
-    required this.store_type,
-  });
-  List<Market> stores = List.empty(growable: true);
-
-  TypedStores copyWith({
-    String? store_type,
-  }) {
-    return TypedStores(
-      store_type: store_type ?? this.store_type,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'store_type': store_type,
-    };
-  }
-
-  factory TypedStores.fromMap(Map<String, dynamic> map) {
-    return TypedStores(
-      store_type: map['store_type'],
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory TypedStores.fromJson(String source) =>
-      TypedStores.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'TypedStores(store_type: $store_type)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TypedStores && other.store_type == store_type;
-  }
-
-  @override
-  int get hashCode => store_type.hashCode;
 }

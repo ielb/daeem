@@ -3,7 +3,7 @@
 import 'package:daeem/services/base_api.dart';
 import 'package:http/http.dart' as http;
 
-class MarketService extends BaseApi {
+class StoreService extends BaseApi {
   Future<http.Response?> getMarkets(int offset, {int limit = 5}) async {
     try {
       return await api.httpGet('stores/$offset/$limit');
@@ -129,7 +129,7 @@ class MarketService extends BaseApi {
       throw e;
     }
   }
- Future<http.Response?> getTypedStores({required String lng,required String lat,required String store_type}) async {
+ Future<http.Response?> getStores({required String lng,required String lat,required String store_type}) async {
     try {
       return await api.httpPost('stores_by_type',
           {

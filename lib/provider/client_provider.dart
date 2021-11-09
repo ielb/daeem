@@ -18,7 +18,6 @@ class ClientProvider extends BaseProvider {
   void setClient(Client val) {
     _client = val;
     setNotificationToken();
-    notifyListeners();
   }
 
   void setNotificationToken() async {
@@ -90,11 +89,8 @@ class ClientProvider extends BaseProvider {
 
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-                print(data);
-      if (data['status'] == "success") {
-        _client!.address = address;
-        notifyListeners();
-      }
+                print(data['data']);
+         setClientAddress(Address.fromMap(data['data']));
     }
   }
 
@@ -103,10 +99,9 @@ class ClientProvider extends BaseProvider {
     http.Response? response = await _service.getAddress(client.id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      print(data);
       if (data['status'] == "success") {
         _client!.address = Address.fromMap(data['data']);
-        setBusy(false);
+        notifyListeners();
       }
     }
   }

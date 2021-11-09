@@ -6,7 +6,7 @@ import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/client_service.dart';
-import 'package:daeem/services/market_service.dart';
+import 'package:daeem/services/store_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +15,7 @@ import 'package:daeem/models/client.dart' as cl;
 class CartProvider extends BaseProvider {
   List<Item> _basket = List.empty(growable: true);
   List<Item> get basket => _basket;
-  MarketService _marketService = MarketService();
+  StoreService _storeService = StoreService();
   ClientService _clientService = ClientService();
   Coupon? coupon;
 
@@ -27,7 +27,7 @@ class CartProvider extends BaseProvider {
   }
 
   Future<Coupon?> checkCoupon(String data) async {
-    Response? response = await _marketService.checkCoupon(data);
+    Response? response = await _storeService.checkCoupon(data);
     if (response != null) {
       var data = jsonDecode(response.body);
       if (data["status"] == "success") {
@@ -49,8 +49,8 @@ class CartProvider extends BaseProvider {
         price = (double.tryParse(element.product.price!)! * element.quantity) +
             price;
       });
-      var finalPrice = price -
-          Provider.of<MarketProvider>(context, listen: false).deliveryCost;
+      var finalPrice = price +
+          Provider.of<StoreProvider>(context, listen: false).deliveryCost;
       return finalPrice.toStringAsFixed(2);
     } else {
       price = 0;
@@ -58,9 +58,8 @@ class CartProvider extends BaseProvider {
         price = (double.tryParse(element.product.price!)! * element.quantity) +
             price;
       });
-
       var finalPrice = (price +
-              Provider.of<MarketProvider>(context, listen: false)
+              Provider.of<StoreProvider>(context, listen: false)
                   .deliveryCost) -
           double.parse(coupon!.discount_price!);
       return finalPrice.toStringAsFixed(2);
@@ -80,9 +79,9 @@ class CartProvider extends BaseProvider {
    _basket.forEach((element) {
      var data = {
        "id":element.product.id,
-        "price":element.product.price,
+        "price":double.parse(element.product.price??'0'),
         "quantity":element.quantity,
-        "variant":element.product.currentVariant?.id,
+        "variant":element.product.currentVariant?.id?? -1,
      };
      list.add(data);
    });
@@ -95,7 +94,7 @@ class CartProvider extends BaseProvider {
         'address_id': client.address!.id,
         'order_price': getFinalPrice(context),
         'delivery_price':
-            Provider.of<MarketProvider>(context, listen: false).deliveryCost,
+            Provider.of<StoreProvider>(context, listen: false).deliveryCost,
         'use_coupon': coupon != null ? 1 : 0,
         'price_after_coupon': getFinalPrice(context),
         'discount_price': coupon!=null ? coupon!.discount_price :0,
@@ -108,7 +107,7 @@ class CartProvider extends BaseProvider {
       Response? response = await _clientService.order(result);
       print("response : ${response?.body}");
       if (response != null && response.statusCode == 200) {
-        print(response.body);
+        _basket.clear();
         return true;
       } else
         return false;
@@ -192,4 +191,6 @@ class CartProvider extends BaseProvider {
     });
     return price.toStringAsFixed(2);
   }
+
+  
 }

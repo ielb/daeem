@@ -13,13 +13,16 @@ class _SetupState extends State<Setup> {
 
   @override
   void initState() {
-   
-    Timer(
-        Duration(milliseconds: 5),
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        Timer(
+        Duration(microseconds: 50),
         () => Navigator.pushReplacement(
             context, CupertinoPageRoute(builder: (context) => Splash())));
+    });
     super.initState();
   }
+
+ 
 
   @override
   void didChangeDependencies() {
@@ -53,6 +56,7 @@ class _SetupState extends State<Setup> {
           Config.auth_background,
         ),
         context);
+      
     super.didChangeDependencies();
   }
 

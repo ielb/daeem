@@ -20,7 +20,7 @@ class _SignUpState extends State<SignUp> {
   late AuthProvider _authProvider;
   late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
-  late MarketProvider _marketProvider;
+  late StoreProvider _marketProvider;
   bool _isVisible = true;
   bool _isValidate = true;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -37,7 +37,7 @@ class _SignUpState extends State<SignUp> {
     _authProvider = Provider.of<AuthProvider>(context);
     _clientProvider = Provider.of<ClientProvider>(context);
     _addressProvider = Provider.of<AddressProvider>(context);
-    _marketProvider = Provider.of<MarketProvider>(context);
+    _marketProvider = Provider.of<StoreProvider>(context);
     super.didChangeDependencies();
   }
 
@@ -85,8 +85,8 @@ class _SignUpState extends State<SignUp> {
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
     if (result) {
-      if(_marketProvider.storesType.isEmpty)
-      await _marketProvider.getStoreType();
+      if (_marketProvider.storesType.isEmpty)
+        await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
@@ -98,8 +98,8 @@ class _SignUpState extends State<SignUp> {
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
     if (result) {
-       if(_marketProvider.storesType.isEmpty)
-      await _marketProvider.getStoreType();
+      if (_marketProvider.storesType.isEmpty)
+        await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);

@@ -1,6 +1,7 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +20,7 @@ class _LoginState extends State<Login> {
   late AuthProvider _authProvider;
   late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
+  late StoreProvider _storeProvider;
   bool _isVisible = true;
   bool _isValidate = true;
   var isCheckout;
@@ -35,6 +37,7 @@ class _LoginState extends State<Login> {
     _authProvider = Provider.of<AuthProvider>(context);
     _clientProvider = Provider.of<ClientProvider>(context);
     _addressProvider = Provider.of<AddressProvider>(context);
+    _storeProvider = Provider.of<StoreProvider>(context);
     isCheckout = ModalRoute.of(context)!.settings.arguments;
 
     super.didChangeDependencies();
@@ -53,7 +56,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  ///validation
+  //? validation
   _validate() {
     if (_formkey.currentState!.validate()) {
       setState(() {
@@ -71,43 +74,48 @@ class _LoginState extends State<Login> {
     }
   }
 
-  ///Login
+  //? Login
   void _login(String email, String password) async {
     var result = await _authProvider.loginWithEmail(email, password);
-
-    if (result) {
-      _clientProvider.setClient(_authProvider.client!);
-      await _clientProvider.getClientAddress(_authProvider.client!);
-      Provider.of<AddressProvider>(context,listen: false)
-          .setAddress(_clientProvider.client?.address);
-      if (isCheckout != null && isCheckout) {
-        Navigator.pushReplacementNamed(context, CheckoutPage.id);
-      } else {
-        Navigator.pushReplacementNamed(context, Home.id);
-      }
-    } else
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context);
+    _navigate(result);
   }
 
-  ///google button
+  //? google button
   void signInWithGoogle() async {
     bool result = await _authProvider.socialLogin("google");
-    if (result) {
-      _clientProvider.setClient(_authProvider.client!);
-      
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
+    _navigate(result);
   }
 
-  ///facebook button
+  //? facebook button
   void signInWithFacebook() async {
     bool result = await _authProvider.socialLogin("facebook");
+    _navigate(result);
+  }
+
+  _navigate(bool result) async {
     if (result) {
       _clientProvider.setClient(_authProvider.client!);
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else
+
+      if (isCheckout != null && isCheckout) {
+        Navigator.pushReplacementNamed(context, CheckoutPage.id);
+        await _clientProvider.getClientAddress(_authProvider.client!);
+        _addressProvider.setAddress(_clientProvider.client?.address);
+        _clientProvider.setBusy(false);
+      } else {
+        Navigator.pushReplacementNamed(context, Home.id);
+        if (_clientProvider.client!.address != null) {
+          await _clientProvider.getClientAddress(_authProvider.client!);
+          _addressProvider.setAddress(_clientProvider.client?.address);
+          await _storeProvider.getStoreType();
+          await _storeProvider.getStores(_clientProvider.client!.address!);
+        }
+
+        _clientProvider.setBusy(false);
+      }
+    } else {
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
+      _clientProvider.setBusy(false);
+    }
   }
 
   @override

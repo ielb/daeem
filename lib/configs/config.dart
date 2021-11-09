@@ -18,6 +18,7 @@ class Config {
   static const arrived = "assets/order_arrived.png";
   static const auth_background = "assets/market.png";
   static const shopping_cart = "assets/shopping_cart.png";
+  static const confirmation = "assets/confirmation.png";
   static Widget google = SvgPicture.asset(
     "assets/Google.svg",
     height: 26,
@@ -97,61 +98,104 @@ class Config {
       return true;
     }
   }
+ static Map<String,dynamic>  getStatus(int id) {
+     List<Map<String,dynamic>> status =  [     
+      {'id':1,'name':"Just created",'color':"info"},
+      {'id':2,'name':"Accepted by admin",'color':"success"},
+      {'id':3,'name':"Assigned to driver",'color':"primary"},
+      {'id':4,'name':"Prepared",'color':"info"},
+      {'id':5,'name':"Delivered",'color':"success"},
+      {'id':6,'name':"Rejected by admin",'color':"danger"},
+      {'id':7,'name':"Rejected by driver",'color':"danger"},
+      {'id':8,'name':"Accepted by driver",'color':"success"},
+      {'id':9,'name':"Assigned to collector",'color':"primary"},
+      {'id':10,'name':"Refunded",'color':"danger"},
+      {'id':11,'name':"Canceled",'color':"danger"},
+      {'id':12,'name':"On the way",'color':"info"},
+      {'id':13,'name':"Arrived",'color':"success"},
+      {'id':14,'name':"Delivered",'color':"success"},
+      {'id':15,'name':"Rejected by collector",'color':"danger"},
+      {'id':16,'name':"Rejected by client",'color':"danger"},
+      {'id':17,'name':"On the way",'color':"info"},
+      {'id':18,'name':"Arrived",'color':"success"},
+      {'id':19,'name':"Delivered",'color':"success"},
+      {'id':20,'name':"Rejected by collector",'color':"danger"},
+      {'id':21,'name':"Rejected by client",'color':"danger"},
+      {'id':22,'name':"On the way",'color':"info"},
+      {'id':23,'name':"Arrived",'color':"success"},
+      {'id':24,'name':"Delivered",'color':"success"},
+      {'id':25,'name':"Rejected by collector",'color':"danger"},
+      {'id':26,'name':"Rejected by client",'color':"danger"},
+      {'id':27,'name':"On the way",'color':"info"},
+      {'id':28,'name':"Arrived",'color':"success"},
+      {'id':29,'name':"Delivered",'color':"success"},
+      {'id':30,'name':"Rejected by collector",'color':"danger"},
+      {'id':31,'name':"Rejected by client",'color':"danger"},
+      {'id':32,'name':"On the way",'color':"info"},
+     ];
+     return status.firstWhere((element) => element['id'] == id);
+   
+     
+  }
 
-  static bottomSheet(BuildContext context) {
-    return showDialog(
+  static bottomSheet(BuildContext context, ) {
+     showDialog(
+
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(15)),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              height: MediaQuery.of(context).size.height * .75,
-              width: MediaQuery.of(context).size.width * .8,
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(15)),
-              child: Column(
-                children: [
-                  FadeInImage(
-                      height: 250,
-                      width: 250,
-                      placeholder: AssetImage("assets/placeholder.png"),
-                      image: AssetImage(
-                        Config.delivery_address,
-                      )),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    "Please add an address to see all stores near you",
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    style:
-                        GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
-                  ),
-                  Spacer(),
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AddressPage.id);
-                    },
-                    height: 50,
-                    elevation: 0,
-                    splashColor: Config.color_1,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    color: Config.color_2,
-                    child: Center(
-                      child: Text(
-                        "Add address",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+              shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(15)),
+              child: Container(
+                padding: EdgeInsets.all(20),
+                height: MediaQuery.of(context).size.height * .75,
+                width: MediaQuery.of(context).size.width * .8,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15)),
+                child: Column(
+                  children: [
+                    FadeInImage(
+                        height: 250,
+                        width: 250,
+                        placeholder: AssetImage("assets/placeholder.png"),
+                        image: AssetImage(
+                          Config.delivery_address,
+                        )),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "Please add an address to see all stores near you",
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style:
+                          GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
+                    ),
+                    Spacer(),
+                    MaterialButton(
+                      onPressed: (){
+                         Navigator.pushNamed(context, AddressPage.id);
+                      },
+                      height: 50,
+                      elevation: 0,
+                      splashColor: Config.color_1,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Config.color_2,
+                      child: Center(
+                        child: Text(
+                          "Add address",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
+            );
+         
         });
   }
 }

@@ -1,9 +1,10 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:daeem/provider/address_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:daeem/models/market.dart' as model;
-import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/loading/market_shimmer.dart';
 import 'package:daeem/services/services.dart';
@@ -24,31 +25,40 @@ class _StoreState extends State<Store> {
   int itemCount = 5;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
   late Future dataResult;
-  late MarketProvider marketProvider;
-  // ignore: unused_field
-  late ClientProvider _clientProvider;
+  late StoreProvider marketProvider;
+
+  late AddressProvider _addressProvider;
   bool isSearching = false;
   String query = '';
+  late String store_id;
+  bool called = false;
 
   @override
   void initState() {
     _scrollController = ScrollController();
     _controller = TextEditingController();
+    _scrollController.addListener(_scrollListener);
 
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
+    if (!called) {
+      store_id = ModalRoute.of(context)!.settings.arguments as String;
+      marketProvider = Provider.of<StoreProvider>(context);
+      _addressProvider = Provider.of<AddressProvider>(context);
+
+      dataResult = _getMarkets();
+      setState(() {
+        called= !called;
+      });
+    }
     super.didChangeDependencies();
-    marketProvider = Provider.of<MarketProvider>(context, listen: false);
-    _clientProvider = Provider.of<ClientProvider>(context, listen: false);
-    dataResult = _getMarkets();
-    _scrollController.addListener(_scrollListener);
   }
 
   _getMarkets() async {
-    return await marketProvider.getMarkets();
+    return await marketProvider.getMarkets(_addressProvider.address!, store_id);
   }
 
   @override
@@ -61,9 +71,7 @@ class _StoreState extends State<Store> {
     if (!isSearching) if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
-      setState(() {
-        _getMarkets();
-      });
+      
     }
   }
 
@@ -90,61 +98,52 @@ class _StoreState extends State<Store> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => true,
-      child: RefreshIndicator(
-        displacement: 50,
-        color: Config.color_1,
-        strokeWidth: 3,
-        triggerMode: RefreshIndicatorTriggerMode.anywhere,
-        onRefresh: () async {
-          marketProvider.getMarkets();
-        },
-        child: Scaffold(
-          key: _key,
+      child: Scaffold(
+        key: _key,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            title: Text(
-              marketProvider.storeType ?? "Supermarches",
-              style: GoogleFonts.ubuntu(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                  color: Config.black),
-            ),
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                iconSize: 30,
-                color: Config.darkBlue,
-                icon: Icon(CupertinoIcons.back)),
-            automaticallyImplyLeading: false,
+          elevation: 0,
+          title: Text(
+            marketProvider.storeType ?? "Supermarches",
+            style: GoogleFonts.ubuntu(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+                color: Config.black),
           ),
-          body: CustomScrollView(
-            controller: _scrollController,
-            physics: BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Container(
-                  height:80,
-                  child: Column(children: [
-                    SearchInput(
-                      _controller,
-                      "Search for supermarket",
-                      screenSize(context).width * .91,
-                      CupertinoIcons.search,
-                      onChanged: onChange,
-                      onClose: onClose,
-                      onTap: onTap,
-                      searching: isSearching,
-                      isHavingShadow: true,
-                    ).paddingOnly(bottom: 10, top: 5),
-                  ]),
-                ),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              iconSize: 30,
+              color: Config.darkBlue,
+              icon: Icon(CupertinoIcons.back)),
+          automaticallyImplyLeading: false,
+        ),
+        body: CustomScrollView(
+          controller: _scrollController,
+          physics: BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                height: 80,
+                child: Column(children: [
+                  SearchInput(
+                    _controller,
+                    "Search for supermarket",
+                    screenSize(context).width * .91,
+                    CupertinoIcons.search,
+                    onChanged: onChange,
+                    onClose: onClose,
+                    onTap: onTap,
+                    searching: isSearching,
+                    isHavingShadow: true,
+                  ).paddingOnly(bottom: 10, top: 5),
+                ]),
               ),
-              isSearching ? _searchedContent() : _content()
-            ],
-          ),
+            ),
+            isSearching ? _searchedContent() : _content()
+          ],
         ),
       ),
     );
@@ -152,7 +151,7 @@ class _StoreState extends State<Store> {
 
   Widget _searchedContent() {
     return SliverToBoxAdapter(
-      child: FutureBuilder<List<model.Market>>(
+      child: FutureBuilder<List<model.Store>>(
           future: marketProvider.getSearchedMarkets(query),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -215,7 +214,8 @@ class _StoreState extends State<Store> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    marketProvider.setCurrentMarket(marketProvider.markets[index]);
+                    marketProvider
+                        .setCurrentMarket(marketProvider.markets[index]);
                     Navigator.pushNamed(context, MarketPage.id,
                         arguments: marketProvider.markets[index]);
                   },
