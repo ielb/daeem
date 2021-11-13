@@ -62,6 +62,14 @@ class _SetupState extends State<Setup> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Image.asset(
+          Config.logo,
+          width: MediaQuery.of(context).size.width * 0.5,
+      ),
+      ),
+    );
   }
 }

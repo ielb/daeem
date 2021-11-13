@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:daeem/models/market_category.dart';
 import 'package:daeem/models/product.dart';
-import 'package:daeem/models/product_variant.dart';
 import 'package:daeem/models/sub_category.dart';
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/store_service.dart';
@@ -97,33 +96,33 @@ class CategoryProvider extends BaseProvider {
 
   /// -----------------   Product Variant ............................ ///
 
-  Future<List<Variant>> getProductVariant(int id) async {
-    List<Variant> variants = List.empty(growable: true);
-    setBusy(true);
-    Response? response = await _service.getProductVariant(id);
-    if (response != null && response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      if (data['status'] != "error") {
-        print(data['data'][0]);
-        data['data'][0].forEach((variant) {
-          variants.add(Variant.fromMap(variant));
-        });
+  // Future<List<Variant>> getProductVariant(int id) async {
+  //   List<Variant> variants = List.empty(growable: true);
+  //   setBusy(true);
+  //   Response? response = await _service.getProductVariant(id);
+  //   if (response != null && response.statusCode == 200) {
+  //     var data = jsonDecode(response.body);
+  //     if (data['status'] != "error") {
+  //       print(data['data'][0]);
+  //       data['data'][0].forEach((variant) {
+  //         variants.add(Variant.fromMap(variant));
+  //       });
 
-        variants.forEach((vari) {
-          print(vari.toString());
-        });
+  //       variants.forEach((vari) {
+  //         print(vari.toString());
+  //       });
 
-        setBusy(false);
-        return variants;
-      } else {
-        setBusy(false);
-        return List.empty(growable: true);
-      }
-    } else {
-      setBusy(false);
-      return List.empty(growable: true);
-    }
-  }
+  //       setBusy(false);
+  //       return variants;
+  //     } else {
+  //       setBusy(false);
+  //       return List.empty(growable: true);
+  //     }
+  //   } else {
+  //     setBusy(false);
+  //     return List.empty(growable: true);
+  //   }
+  // }
 
   Future<List<Product>> searchForProduct(String name) async {
     if (name.isEmpty || name == '') {

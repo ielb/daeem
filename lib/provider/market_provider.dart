@@ -141,10 +141,9 @@ class StoreProvider extends BaseProvider {
   }
 
   clear() {
-    _markets = [];
-    _storesTypes.clear();
-    
-    _searchedMarkets = [];
+    _markets.clear();
+    _storesTypes.clear();    
+    _searchedMarkets.clear();
   }
 
   Future<List<StoreType>> getStores(Address address) async {

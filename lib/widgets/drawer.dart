@@ -6,6 +6,7 @@ import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:ionicons/ionicons.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     var _clientProvider = Provider.of<AuthProvider>(context);
     var _client = Provider.of<ClientProvider>(context);
-    var _store= Provider.of<StoreProvider>(context);
+    var _store = Provider.of<StoreProvider>(context);
     return Container(
       height: screenSize(context).height,
       width: screenSize(context).width * .8,
@@ -56,12 +57,12 @@ class CustomDrawer extends StatelessWidget {
                 ),
                 container(
                     label: "My orders",
-                    icon: Config.shoppingBag,
+                    icon:  Icon(Ionicons.bag_handle,size: 28,color: Config.darkBlue,),
                     onPressed: () =>
                         Navigator.of(context).pushNamed(OrdersPage.id)),
                 container(
                     label: "My information",
-                    icon: Config.user,
+                    icon:  Icon(Ionicons.person,size: 28,color: Config.darkBlue,),
                     onPressed: () {
                       print('TEST');
                       Navigator.of(context).pushNamed(Profile.id);
@@ -69,31 +70,52 @@ class CustomDrawer extends StatelessWidget {
                 Divider(),
                 container(
                     label: "Notifications",
-                    icon: Config.notification,
+                    icon: Icon(Ionicons.notifications,size: 28,color: Config.darkBlue,),
                     onPressed: () {
-                       Navigator.pushNamed(context, NotificationScreen.id);
+                      Navigator.pushNamed(context, NotificationScreen.id);
                     }),
                 container(
-                    label: "Rate us", icon: Config.rate, onPressed: () {}),
+                    label: "Rate us", icon: Icon(Ionicons.star,size: 28,color: Config.darkBlue,), onPressed: () {}),
                 container(
                     label: "Refer a friend",
-                    icon: Config.share,
+                    icon:  Icon(Ionicons.share_social,size: 28,color: Config.darkBlue,),
                     onPressed: () {}),
                 container(
-                    label: "Help", icon: Config.question, onPressed: () {}),
+                    label: "Help", icon: Icon(Ionicons.help_circle,size: 28,color: Config.darkBlue,), onPressed: () {}),
                 Spacer(),
                 container(
                     label: "Log out",
-                    icon: Config.logout,
-                    onPressed: () {
-                      _clientProvider.logOut().then((result) {
-                        _client.clear();
-                        _store.clear();
-                      
-                        if (result) {
-                          Navigator.of(context).pushReplacementNamed(Login.id);
-                        }
-                      });
+                    icon: Icon(Ionicons.log_out_outline,size: 28,color: Config.darkBlue,),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text("Log out",style: GoogleFonts.ubuntu(fontSize:22,color: Colors.black,fontWeight: FontWeight.bold),),
+                              content:
+                                  Text("Are you sure you want to log out?",style: GoogleFonts.ubuntu(fontSize:20,color: Colors.black,fontWeight: FontWeight.w500),),
+                              actions: [
+                                TextButton(
+                                  child: Text("Cancel",style: GoogleFonts.ubuntu(fontSize:20,color: Colors.black),),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text("Log out",style: GoogleFonts.ubuntu(fontSize:20,color: Colors.red),),
+                                  onPressed: () async {
+                                    var result = await _clientProvider.logOut();
+                                    if (result) {
+                                      Navigator.of(context).pushNamed(Login.id);
+                                      _client.clear();
+                                      _store.clear();
+                                    }
+                                  },
+                                )
+                              ],
+                            );
+                          });
                     }).paddingOnly(bottom: 20)
               ],
             )
@@ -133,20 +155,20 @@ class CustomDrawer extends StatelessWidget {
                 ),
                 container(
                     label: "Sign in",
-                    icon: Config.user,
+                    icon: Icon(Ionicons.log_in_outline,size: 28,color: Config.darkBlue,),
                     onPressed: () {
-                       _store.clear();
+                      _store.clear();
                       Navigator.of(context).pushReplacementNamed(Login.id);
                     }),
-                     Divider(),
+                Divider(),
                 container(
-                    label: "Rate us", icon: Config.rate, onPressed: () {}),
+                    label: "Rate us", icon: Icon(Ionicons.star,size: 28,color: Config.darkBlue,), onPressed: () {}),
                 container(
                     label: "Refer a friend",
-                    icon: Config.share,
+                    icon:Icon(Ionicons.share_social,size: 28,color: Config.darkBlue,),
                     onPressed: () {}),
                 container(
-                    label: "Help", icon: Config.question, onPressed: () {}),
+                    label: "Help", icon: Icon(Ionicons.help_circle,size: 28,color: Config.darkBlue,), onPressed: () {}),
                 Spacer(),
               ],
             ),

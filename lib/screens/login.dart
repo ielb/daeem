@@ -23,6 +23,7 @@ class _LoginState extends State<Login> {
   late StoreProvider _storeProvider;
   bool _isVisible = true;
   bool _isValidate = true;
+  bool called = false;
   var isCheckout;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   @override
@@ -34,12 +35,17 @@ class _LoginState extends State<Login> {
 
   @override
   void didChangeDependencies() {
+    if(!called){
+      if(mounted)
+        setState(() {
+          called = true;
+        });
     _authProvider = Provider.of<AuthProvider>(context);
     _clientProvider = Provider.of<ClientProvider>(context);
     _addressProvider = Provider.of<AddressProvider>(context);
     _storeProvider = Provider.of<StoreProvider>(context);
     isCheckout = ModalRoute.of(context)!.settings.arguments;
-
+    }
     super.didChangeDependencies();
   }
 
@@ -47,6 +53,7 @@ class _LoginState extends State<Login> {
   void dispose() {
     _emailController!.dispose();
     _passwordController!.dispose();
+    isCheckout = null;
     super.dispose();
   }
 
@@ -98,29 +105,30 @@ class _LoginState extends State<Login> {
 
       if (isCheckout != null && isCheckout) {
         Navigator.pushReplacementNamed(context, CheckoutPage.id);
-        await _clientProvider.getClientAddress(_authProvider.client!);
-        _addressProvider.setAddress(_clientProvider.client?.address);
+          _addressProvider.setAddress(_clientProvider.client?.address);
         _clientProvider.setBusy(false);
       } else {
+        if(mounted)
+         _clientProvider.setBusy(false);
         Navigator.pushReplacementNamed(context, Home.id);
+      
         if (_clientProvider.client!.address != null) {
-          await _clientProvider.getClientAddress(_authProvider.client!);
           _addressProvider.setAddress(_clientProvider.client?.address);
           await _storeProvider.getStoreType();
-          await _storeProvider.getStores(_clientProvider.client!.address!);
+           _storeProvider.getStores(_clientProvider.client!.address!);
         }
-
-        _clientProvider.setBusy(false);
       }
     } else {
+      print("error");
+      _authProvider.setBusy(false);
       Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
-      _clientProvider.setBusy(false);
+      
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<LocaleProvider>(context, listen: false);
+    var locale = Provider.of<LocaleProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: _authProvider.isLoading

@@ -16,7 +16,7 @@ class Product {
   bool? status;
   int? hasVariant;
   Variant? currentVariant;
-  List<Variant> variants = List.empty(growable: true);
+  List<Variant> variants = [];
  
 
   Product({
@@ -32,6 +32,7 @@ class Product {
     this.available,
     this.status,
     this.hasVariant,
+     this.variants = const [],
 
   });
 
@@ -98,7 +99,8 @@ class Product {
       subCategoryId : json[''],
       available : json['available'] == 0 ? false: true,
       status : json['status'] == 0 ? false :true,
-       hasVariant : int.parse(json['has_variants'].toString()),
+      hasVariant : int.parse(json['has_variants'].toString()),
+      variants : json['variants'].length!=0  ? List<Variant>.from(json['variants'].map((x) => Variant.fromMap(x))) : List<Variant>.empty(growable: true),
     );
   }
 

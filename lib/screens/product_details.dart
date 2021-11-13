@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
-import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,31 +19,14 @@ class _ProductDetailsState extends State<ProductDetails> {
   bool called = false;
   bool isAdded = false;
   late CartProvider cart;
-  late CategoryProvider _categoryProvider;
   int _selectedSize = 0;
   Item? pageProduct;
   @override
   void didChangeDependencies() {
     if (!called) {
       cart = Provider.of<CartProvider>(context);
-      _categoryProvider = Provider.of<CategoryProvider>(context);
       // widget.product.price = widget.product.variants[0].price;
-      WidgetsBinding.instance?.addPostFrameCallback((_) async {
-        showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => WillPopScope(
-                onWillPop: () async => false,
-                child: CircularProgressIndicator(
-                  color: Config.color_2,
-                ).center()));
-        if (widget.product.hasVariant != null &&
-            widget.product.hasVariant == 1) {
-          widget.product.variants =
-              await _categoryProvider.getProductVariant(widget.product.id ?? 1);
-        }
-        if (mounted) Navigator.pop(context);
-      });
+
       setState(() {
         called = true;
       });
@@ -86,9 +68,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        body: CustomScrollView(
-          physics: BouncingScrollPhysics(),
-          slivers: [
+        body: CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
           SliverAppBar(
             expandedHeight: MediaQuery.of(context).size.height * 0.6,
             elevation: 0,

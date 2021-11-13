@@ -19,51 +19,22 @@ class Config {
   static const auth_background = "assets/market.png";
   static const shopping_cart = "assets/shopping_cart.png";
   static const confirmation = "assets/confirmation.png";
-  static Widget google = SvgPicture.asset(
-    "assets/Google.svg",
-    height: 26,
-    width: 26,
+  static Widget google = Image.asset(
+    "assets/Google.png",
+    height: 30,
+    width: 30,
   );
-  static Widget facebook = SvgPicture.asset(
-    "assets/Facebook.svg",
-    height: 26,
-    width: 26,
+  static Widget facebook = Image.asset(
+    "assets/Facebook.png",
+    height: 30,
+    width: 30,
   );
-  static Widget user = SvgPicture.asset(
-    "assets/user.svg",
-    height: 26,
-    width: 26,
+    static Widget empty = Image.asset(
+    "assets/Empty.png",
+    height: 290,
+    
   );
-  static Widget shoppingBag = SvgPicture.asset(
-    "assets/shopping-bag.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget logout = SvgPicture.asset(
-    "assets/logout.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget rate = SvgPicture.asset(
-    "assets/rate.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget share = SvgPicture.asset(
-    "assets/share.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget notification = SvgPicture.asset(
-    "assets/notifications.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget question = SvgPicture.asset(
-    "assets/question.svg",
-    height: 26,
-    width: 26,
-  );
+
   static Widget closed = SvgPicture.asset(
     "assets/closed.svg",
     height: 35,
@@ -110,34 +81,41 @@ class Config {
       {'id':8,'name':"Accepted by driver",'color':"success"},
       {'id':9,'name':"Assigned to collector",'color':"primary"},
       {'id':10,'name':"Refunded",'color':"danger"},
-      {'id':11,'name':"Canceled",'color':"danger"},
-      {'id':12,'name':"On the way",'color':"info"},
-      {'id':13,'name':"Arrived",'color':"success"},
-      {'id':14,'name':"Delivered",'color':"success"},
-      {'id':15,'name':"Rejected by collector",'color':"danger"},
-      {'id':16,'name':"Rejected by client",'color':"danger"},
-      {'id':17,'name':"On the way",'color':"info"},
-      {'id':18,'name':"Arrived",'color':"success"},
-      {'id':19,'name':"Delivered",'color':"success"},
-      {'id':20,'name':"Rejected by collector",'color':"danger"},
-      {'id':21,'name':"Rejected by client",'color':"danger"},
-      {'id':22,'name':"On the way",'color':"info"},
-      {'id':23,'name':"Arrived",'color':"success"},
-      {'id':24,'name':"Delivered",'color':"success"},
-      {'id':25,'name':"Rejected by collector",'color':"danger"},
-      {'id':26,'name':"Rejected by client",'color':"danger"},
-      {'id':27,'name':"On the way",'color':"info"},
-      {'id':28,'name':"Arrived",'color':"success"},
-      {'id':29,'name':"Delivered",'color':"success"},
-      {'id':30,'name':"Rejected by collector",'color':"danger"},
-      {'id':31,'name':"Rejected by client",'color':"danger"},
-      {'id':32,'name':"On the way",'color':"info"},
      ];
      return status.firstWhere((element) => element['id'] == id);
    
      
   }
 
+ static Color getStatusColor(String color){
+     switch (color) {
+       case "info":
+         return  Colors.blue.shade700;
+       case "success":
+         return Color(0xff40AA45);
+      case "primary":
+         return color_2;
+      case "danger":
+         return Colors.red;
+       default:
+         return color_2;
+     }
+  }
+  
+ static Color getStatusSubColor(String color){
+     switch (color) {
+       case "info":
+         return  Colors.blue.shade50;
+       case "success":
+         return Color(0xffD6EDD7);
+      case "primary":
+         return Color(0xffEBF7FA);
+      case "danger":
+         return Colors.red.shade50;
+       default:
+         return  Color(0xffEBF7FA);
+     }
+  }
   static bottomSheet(BuildContext context, ) {
      showDialog(
 

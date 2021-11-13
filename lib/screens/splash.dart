@@ -24,27 +24,26 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   Timer? _timer;
   late PushNotificationService _notificationService;
-  
+
   StreamSubscription? subscription;
-  late AuthProvider auth ;
+  late AuthProvider auth;
   late ClientProvider client;
   late AddressProvider addressProvider;
   late StoreProvider _storeProvider;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) async { 
-      auth =  Provider.of<AuthProvider>(context, listen: false);
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      auth = Provider.of<AuthProvider>(context, listen: false);
       client = Provider.of<ClientProvider>(context, listen: false);
-      addressProvider =Provider.of<AddressProvider>(context,listen: false);
-      _storeProvider =Provider.of<StoreProvider>(context,listen: false);
-        notifyManager.setOnNotificationClick(onNotificationClick);
-        notifyManager.setOnNotificationReceive(onNotificationReceive);
-        _notificationService =
-            PushNotificationService(FirebaseMessaging.instance);
-        _notificationService.initialize();
+      addressProvider = Provider.of<AddressProvider>(context, listen: false);
+      _storeProvider = Provider.of<StoreProvider>(context, listen: false);
+      notifyManager.setOnNotificationClick(onNotificationClick);
+      notifyManager.setOnNotificationReceive(onNotificationReceive);
+      _notificationService =
+          PushNotificationService(FirebaseMessaging.instance);
+      _notificationService.initialize();
 
       _timer = new Timer(const Duration(milliseconds: 2000), () {
-     
         SimpleConnectionChecker _simpleConnectionChecker =
             SimpleConnectionChecker()
               ..setLookUpAddress(
@@ -73,22 +72,19 @@ class _SplashState extends State<Splash> {
 
   void _getAuthClient() async {
     String? id = await Prefs.instance.getClient();
-    bool? isAuth = await Prefs.instance.getAuth();
-
-    if (id != null && isAuth != null) {
+   
+    if (id != null && id != "") {
       bool result = await auth.getAuthenticatedClient(
         id,
       );
 
       if (result) {
         client.setClient(auth.client!);
-        await client.getClientAddress(auth.client!);
-       
         addressProvider.setAddress(client.client?.address);
         if (client.client!.address != null) {
-        await  _storeProvider.getStoreType();
-        await _storeProvider.getStores(client.client!.address!);
-      }
+          await _storeProvider.getStoreType();
+          await _storeProvider.getStores(client.client!.address!);
+        }
 
         Navigator.pushReplacementNamed(context, Home.id);
       } else {

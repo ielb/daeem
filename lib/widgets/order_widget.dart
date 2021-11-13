@@ -60,15 +60,15 @@ class OrderCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color:Config.getStatusSubColor(order.current_status.color),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
                       child: Text(
-                    "${order.current_status?.status['name']??''}",
+                    "${order.current_status.name}",
                     style: GoogleFonts.ubuntu(
                         fontSize: 16,
-                        color: Colors.blue,
+                        color:Config.getStatusColor(order.current_status.color),
                         fontWeight: FontWeight.w600),
                   )),
                 )
@@ -92,7 +92,7 @@ class OrderCard extends StatelessWidget {
                     right: 10,
                   ),
                   child: Text(
-                    "${DateFormat("EEE, d MMM yyyy").format(DateTime.parse(order.created_at!))}",
+                    "${DateFormat("EEE, d MMM yyyy").format(DateTime.parse(order.created_at))}",
                     style: GoogleFonts.ubuntu(
                         fontSize: 16,
                         color: Colors.grey,

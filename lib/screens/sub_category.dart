@@ -218,6 +218,37 @@ class _CategoryState extends State<Category> {
               },
             );
               }
+              if(_categoryProvider.subCategories.isEmpty){              
+              return Column(children: [
+                Config.empty,
+                SizedBox(height: screenSize(context).height * 0.1),
+                Text("There are no sub categories ",
+                    style: GoogleFonts.ubuntu(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600)),
+                SizedBox(height: screenSize(context).height * 0.1),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Home.id);
+                  },
+                  child: Text("Continue shopping",
+                     ),
+                  style: ElevatedButton.styleFrom(
+                    textStyle: GoogleFonts.ubuntu(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                      shadowColor: Config.color_2,
+                      primary: Config.color_2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(15),
+                      ),
+                      fixedSize: Size(270, 50)),
+                )
+              ]);
+              }
+
               return ListView.builder(
                 shrinkWrap: true,
                 primary: false,

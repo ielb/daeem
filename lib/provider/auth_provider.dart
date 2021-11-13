@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, unused_local_variable
+
 import 'dart:convert';
 
 import 'package:daeem/provider/base_provider.dart';
@@ -58,10 +60,11 @@ class AuthProvider extends BaseProvider {
           if (response != null) {
             var data = jsonDecode(response.body);
             if (data['status'] == "success") {
-              var json = data['data'][0];
-              setClient(Client.fromJson(json));
-              Prefs.instance.setClient(json['id'].toString());
-              Prefs.instance.setAuth(true);
+              var json = data['data'];
+              var client_data = json['client'];
+              var address_data = json['address'];
+              setClient(Client.fromJson(client_data, address_data));
+              Prefs.instance.setClient(_client!.id.toString());
               notifyListeners();
               return true;
             } else {
@@ -94,12 +97,15 @@ class AuthProvider extends BaseProvider {
             if (response != null) {
               var data = jsonDecode(response.body);
               if (data['status'] == "success") {
-                var json = data['data'][0];
-                setClient(Client.fromJson(json));
-                Prefs.instance.setClient(json['id'].toString());
+                var json = data['data'];
+                var client_data = json['client'];
+                var address_data = json['address'];
+
+                setClient(Client.fromJson(client_data, address_data));
+                Prefs.instance.setClient(_client!.id.toString());
 
                 notifyListeners();
-                Prefs.instance.setAuth(true);
+
                 return true;
               } else {
                 notifyListeners();
@@ -139,11 +145,14 @@ class AuthProvider extends BaseProvider {
               var data = jsonDecode(response.body);
               if (data['status'] == "success") {
                 var json = data['data'];
-                setClient(Client.fromJson(json));
-                Prefs.instance.setClient(json['id'].toString());
+                var client_data = json['client'];
+                var address_data = json['address'];
+
+                setClient(Client.fromJson(client_data, address_data));
+                Prefs.instance.setClient(_client!.id.toString());
 
                 notifyListeners();
-                Prefs.instance.setAuth(true);
+
                 return true;
               } else {
                 notifyListeners();
@@ -178,12 +187,14 @@ class AuthProvider extends BaseProvider {
               var data = jsonDecode(response.body);
               if (data['status'] == "success") {
                 var json = data['data'];
-                print(json);
-                setClient(Client.fromJson(json));
-                Prefs.instance.setClient(json['id'].toString());
-               
+                var client_data = json['client'];
+                var address_data = json['address'];
+
+                setClient(Client.fromJson(client_data, address_data));
+                Prefs.instance.setClient(_client!.id.toString());
+
                 notifyListeners();
-                Prefs.instance.setAuth(true);
+
                 return true;
               } else {
                 notifyListeners();
@@ -228,13 +239,15 @@ class AuthProvider extends BaseProvider {
     if (response != null) {
       var data = jsonDecode(response.body);
       if (data['status'] == "success") {
-        var json = data['data'][0];
+        var json = data['data'];
+        var client_data = json['client'];
+        var address_data = json['address'];
 
-        setClient(Client.fromJson(json));
-        Prefs.instance.setClient(json['id'].toString());
-       
+        setClient(Client.fromJson(client_data, address_data));
+        Prefs.instance.setClient(_client!.id.toString());
+
         notifyListeners();
-        Prefs.instance.setAuth(true);
+
         return true;
       } else {
         notifyListeners();
@@ -249,7 +262,8 @@ class AuthProvider extends BaseProvider {
     if (response != null) {
       var json = jsonDecode(response.body);
       if (response.statusCode == 200 && json['status'] == "success") {
-        setClient(Client.fromJson(json['data']));
+        setClient(
+            Client.fromJson(json['data']['client'], json['data']['address']));
         return true;
       }
       return false;
@@ -258,13 +272,14 @@ class AuthProvider extends BaseProvider {
   }
 
   Future<bool> logOut() async {
-    _client = null;
+    setBusy(false);
     var google = await GoogleSignIn().isSignedIn();
     var facebook = await FacebookAuth.instance.accessToken;
     if (facebook != null) FacebookAuth.instance.logOut();
     if (google) {
       await GoogleSignIn().signOut();
     }
+    _client = null;
     var prefs = await SharedPreferences.getInstance();
     prefs.clear();
     notifyListeners();

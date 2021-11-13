@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/orders_provider.dart';
 import 'package:daeem/services/services.dart';
@@ -17,6 +15,7 @@ class _OrdersPageState extends State<OrdersPage> {
   late OrdersProvider _ordersProvider;
   late ClientProvider _clientProvider;
   bool called = false;
+  bool isThereOrders = true;
 
   @override
   void didChangeDependencies() {
@@ -40,15 +39,12 @@ class _OrdersPageState extends State<OrdersPage> {
     showDialog(
         context: context,
         builder: (context) => CircularProgressIndicator().center());
-    var result =
-        await _ordersProvider.getOrders(clientId: _clientProvider.client!.id!);
-    Timer(Duration(milliseconds: 2500), () {
-      if (result) {
-        Navigator.pop(context);
 
-        setState(() {});
-      }
-    });
+    isThereOrders =
+        await _ordersProvider.getOrders(clientId: _clientProvider.client!.id!);
+
+    Navigator.pop(context);
+    setState(() {});
   }
 
   @override
@@ -76,16 +72,46 @@ class _OrdersPageState extends State<OrdersPage> {
         width: screenSize(context).width,
         child: Column(
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: _ordersProvider.orders.length,
-                itemBuilder: (context, index) {
-                  return OrderCard(
-                    order: _ordersProvider.orders[index],
-                  );
-                },
-              ),
-            ),
+            if (isThereOrders)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _ordersProvider.orders.length,
+                  itemBuilder: (context, index) {
+                    return OrderCard(
+                      order: _ordersProvider.orders[index],
+                    );
+                  },
+                ),
+              )
+            else
+              Column(children: [
+                Config.empty,
+                SizedBox(height: screenSize(context).height * 0.1),
+                Text("No orders yet",
+                    style: GoogleFonts.ubuntu(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600)),
+                SizedBox(height: screenSize(context).height * 0.1),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Home.id);
+                  },
+                  child: Text("Continue shopping",
+                     ),
+                  style: ElevatedButton.styleFrom(
+                    textStyle: GoogleFonts.ubuntu(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                      shadowColor: Config.color_2,
+                      primary: Config.color_2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(15),
+                      ),
+                      fixedSize: Size(270, 50)),
+                )
+              ])
           ],
         ),
       ),

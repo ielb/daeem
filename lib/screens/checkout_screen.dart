@@ -30,6 +30,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   bool called = false;
   late StoreProvider market;
   late CartProvider cart;
+  late ClientProvider client;
 
   DateTime? deleveryDate;
   @override
@@ -37,6 +38,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (!called) {
       cart = Provider.of<CartProvider>(context);
       market = Provider.of<StoreProvider>(context);
+      client = Provider.of<ClientProvider>(context);
 
       setState(() {
         called = true;
@@ -82,7 +84,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    var client = Provider.of<ClientProvider>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -142,7 +143,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                     horizontalTitleGap: 0,
                                     title: Text(
-                                      "Address",
+                                      "Add Address",
                                       style: GoogleFonts.ubuntu(
                                         fontSize: 20,
                                         color: Colors.black,
@@ -246,7 +247,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           horizontalTitleGap: 0,
                           title: Text(
-                            client.client?.phone ?? '',
+                            client.client?.phone ?? 'Add phone number',
                             style: GoogleFonts.ubuntu(
                               fontSize: 18,
                               color: Colors.black,
@@ -261,7 +262,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
             ),
-      bottomNavigationBar: client.client!.address != null ||
+      bottomNavigationBar: client.client!.address != null &&
               client.client!.phone != null
           ? Container(
               height: 100,
@@ -272,7 +273,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       context: context,
                       builder: (context) => Dialog(
                           child: Container(
-                              padding: EdgeInsets.only(top:20,bottom: 10,left: 20,right: 20),
+                              padding: EdgeInsets.only(
+                                  top: 20, bottom: 10, left: 20, right: 20),
                               height: screenSize(context).height * .5,
                               child: Column(children: [
                                 Image(
@@ -330,16 +332,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                             Navigator.pop(context);
                                           }
                                         },
-                                        child: Text("Confirm", style: GoogleFonts.ubuntu(
-                                              fontSize: 18, color: Config.color_2),),
+                                        child: Text(
+                                          "Confirm",
+                                          style: GoogleFonts.ubuntu(
+                                              fontSize: 18,
+                                              color: Config.color_2),
+                                        ),
                                       )
-                                    ]
-                                ),
-                              ]
-                            )
-                          )
-                      )
-                  );
+                                    ]),
+                              ]))));
                 },
                 child: Text(
                   "Checkout ( ${double.parse(cart.getFinalPrice(context))} MAD )",
@@ -347,36 +348,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 style: ElevatedButton.styleFrom(
-                    shadowColor: Config.color_1,
-                    primary: Config.color_1,
+                    shadowColor: Colors.transparent,
+                    primary: Config.color_2,
                     shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15),
                     ),
                     fixedSize: Size(screenSize(context).width * .9, 50)),
               )
                   .align(alignment: Alignment.bottomCenter)
-                  .paddingOnly(top: 20, bottom: 20),
+                  .paddingOnly(bottom: 10),
             )
           : Container(
               height: 100,
               color: Colors.transparent,
-              child: ElevatedButton(
-                onPressed: () {},
+              child: Container(
                 child: Text(
                   "Checkout ( ${double.parse(cart.getFinalPrice(context))} MAD )",
-                  style: GoogleFonts.ubuntu(fontSize: 18, color: Colors.grey),
+                  style: GoogleFonts.ubuntu(fontSize: 18, color: Colors.white),
                   overflow: TextOverflow.ellipsis,
+                ).center(),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                style: ElevatedButton.styleFrom(
-                    shadowColor: Colors.grey.shade400,
-                    primary: Colors.grey.shade400,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(15),
-                    ),
-                    fixedSize: Size(screenSize(context).width * .9, 50)),
+                width: screenSize(context).width * .9,
+                height: 50,
               )
                   .align(alignment: Alignment.bottomCenter)
-                  .paddingOnly(top: 20, bottom: 20),
+                  .paddingOnly(bottom: 10),
             ),
     );
   }

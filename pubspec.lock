@@ -113,13 +113,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  custom_info_window:
-    dependency: "direct main"
-    description:
-      name: custom_info_window
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   dots_indicator:
     dependency: transitive
     description:
@@ -817,6 +810,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.2"
+  timelines:
+    dependency: "direct main"
+    description:
+      name: timelines
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   timezone:
     dependency: transitive
     description:

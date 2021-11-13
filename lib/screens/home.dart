@@ -12,7 +12,9 @@ import 'package:daeem/widgets/store_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:ionicons/ionicons.dart';
 
 class Home extends StatefulWidget {
   static const id = "home";
@@ -53,28 +55,13 @@ class _HomeState extends State<Home> {
       _clientProvider = Provider.of<ClientProvider>(context);
       _addressProvider = Provider.of<AddressProvider>(context);
       marketProvider = Provider.of<StoreProvider>(context);
-
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
         if (_clientProvider.client?.address == null &&
             _addressProvider.address == null) {
           Config.bottomSheet(context);
         }
       });
-
-      if (_addressProvider.address != null) {
-        categorisedStores = _getStores();
-      }
-
-      dataResult = _getMarkets();
     }
-  }
-
-  _getMarkets() async {
-    return await marketProvider.getStoreType();
-  }
-
-  _getStores() async {
-    return await marketProvider.getStores(_addressProvider.address!);
   }
 
   @override
@@ -99,11 +86,30 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Future<bool> _requiestPop() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Are you sure you want to exit?',style: GoogleFonts.ubuntu(),),
+        actions: <Widget>[
+          TextButton(
+            child: Text('No',style: GoogleFonts.ubuntu(color: Colors.black),),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          TextButton(
+            child: Text('Yes',style: GoogleFonts.ubuntu(color: Colors.red),),
+            onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+          ),
+        ],
+      ),
+    );
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-   
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: _requiestPop,
       child: Scaffold(
         key: _key,
         drawer: CustomDrawer(),
@@ -157,9 +163,8 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 _key.currentState!.openDrawer();
               },
-              iconSize: 30,
-              color: Config.darkBlue,
-              icon: Icon(CupertinoIcons.bars)),
+             
+              icon: Icon(Ionicons.menu,size: 28,color: Config.darkBlue,)),
           automaticallyImplyLeading: false,
           actions: [
             Stack(children: <Widget>[
@@ -167,9 +172,7 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     Navigator.pushNamed(context, NotificationScreen.id);
                   },
-                  iconSize: 26,
-                  color: Config.darkBlue,
-                  icon: Icon(CupertinoIcons.bell_fill)),
+                  icon: Icon(Ionicons.notifications,size: 28,color: Config.darkBlue,)),
               counter != 0
                   ? Positioned(
                       right: 3,
@@ -255,7 +258,6 @@ class _HomeState extends State<Home> {
                     );
                   }
                   if (marketProvider.storesType.length == 0) {
-                    marketProvider.getStoreType();
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,
@@ -303,8 +305,6 @@ class _HomeState extends State<Home> {
                     .paddingOnly(top: 100)
                     .center();
               if (marketProvider.storesType.length == 0) {
-                if (_addressProvider.address != null)
-                  marketProvider.getStores(_addressProvider.address!);
                 return Text("No data").paddingOnly(top: 100).center();
               } else
                 return ListView.builder(
@@ -312,7 +312,6 @@ class _HomeState extends State<Home> {
                     primary: false,
                     itemCount: marketProvider.storesType.length,
                     itemBuilder: (context, index) {
-                     
                       return marketProvider.storesType[index].stores.isNotEmpty
                           ? Container(
                               margin: EdgeInsets.only(bottom: 30),

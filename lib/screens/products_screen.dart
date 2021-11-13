@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/product.dart';
@@ -9,7 +8,6 @@ import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/product_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:ionicons/ionicons.dart';
 
 class ProductsPage extends StatefulWidget {
   static const id = "products";
@@ -217,24 +215,25 @@ class _ProductsPageState extends State<ProductsPage> {
                       .paddingOnly(left: 20, right: 20, bottom: 20);
                 },
               );
-            }else
-            return snapshot.data?.length == 0
-                ? Text("This product out of stock").paddingAll(50).center()
-                : ListView.builder(
-                    shrinkWrap: true,
-                    primary: false,
-                    itemExtent: 80,
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) {
-                      return snapshot.hasData
-                          ? ProductWidget(
-                              product: snapshot.data![index], onTap: (){
-                                 _productPressed(snapshot.data![index]);
-                              } )
-                          : Text("This product out of stock")
-                              .paddingAll(50)
-                              .center();
-                    });
+            } else
+              return snapshot.data?.length == 0
+                  ? Text("This product out of stock").paddingAll(50).center()
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemExtent: 80,
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (context, index) {
+                        return snapshot.hasData
+                            ? ProductWidget(
+                                product: snapshot.data![index],
+                                onTap: () {
+                                  _productPressed(snapshot.data![index]);
+                                })
+                            : Text("This product out of stock")
+                                .paddingAll(50)
+                                .center();
+                      });
           }),
     );
   }
@@ -255,6 +254,36 @@ class _ProductsPageState extends State<ProductsPage> {
                   },
                 );
               }
+              if (_categoryProvider.products.isEmpty) {
+                return Column(children: [
+                  Config.empty,
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  Text("No orders yet",
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, Home.id);
+                      },
+                      child: Text(
+                        "Continue shopping",
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          textStyle: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                          shadowColor: Config.color_2,
+                          primary: Config.color_2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(15),
+                          ),
+                          fixedSize: Size(270, 50)))
+                ]);
+              }
               return ListView.builder(
                   shrinkWrap: true,
                   primary: false,
@@ -269,6 +298,4 @@ class _ProductsPageState extends State<ProductsPage> {
                   }).paddingOnly(bottom: 50);
             }),
       );
-
- 
 }
