@@ -14,7 +14,7 @@ class ClientProvider extends BaseProvider {
 
   Client? _client;
   Client? get client => _client;
-  String? sms;
+  String? _sms;
   void setClient(Client val) {
     _client = val;
     setNotificationToken();
@@ -64,7 +64,7 @@ class ClientProvider extends BaseProvider {
   }
 
   changePhone({required String smsCode, required String phone}) async {
-    if (smsCode == sms) {
+    if (smsCode == _sms) {
       http.Response? response = await _service.updatePhone(_client!.id, phone);
       if (response != null && response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -113,17 +113,18 @@ class ClientProvider extends BaseProvider {
 
   verifyClientPhoneNumber(String phone) {
     FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phone,
+        phoneNumber: "+212${phone.length==9 ?  phone :phone.substring(1)}",
         verificationCompleted: (phoneAuthCredential) {
-          sms = phoneAuthCredential.smsCode;
+          _sms = phoneAuthCredential.smsCode;
           notifyListeners();
         },
         verificationFailed: (error) {},
         codeSent: (text, _) {},
         codeAutoRetrievalTimeout: (code) {});
+  
   }
-
   clear() {
+
     _client = null;
     notifyListeners();
   }

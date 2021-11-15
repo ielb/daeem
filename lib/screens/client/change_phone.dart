@@ -3,8 +3,6 @@ import 'package:daeem/screens/client/phone_verification.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ChangePhone extends StatefulWidget {
   static const id = "phone";
@@ -16,8 +14,6 @@ class ChangePhone extends StatefulWidget {
 class _ChangePhoneState extends State<ChangePhone> {
   late TextEditingController _phoneController;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  String initialCountry = 'MA';
   bool enter = false;
   int from = 0;
 
@@ -38,7 +34,9 @@ class _ChangePhoneState extends State<ChangePhone> {
     if (!enter) {
       from = ModalRoute.of(context)?.settings.arguments as int;
       client = Provider.of<ClientProvider>(context);
-      _phoneController.text = client.client?.phone?.substring(4,(client.client?.phone?.length??2-1)) ?? '';
+      _phoneController.text = client.client?.phone
+              ?.substring(4, (client.client?.phone?.length ?? 2 - 1)) ??
+          '';
       setState(() {
         enter = true;
       });
@@ -57,24 +55,26 @@ class _ChangePhoneState extends State<ChangePhone> {
     if (_phoneController.text.startsWith("05") ||
         _phoneController.text.startsWith("07") ||
         _phoneController.text.startsWith("06") &&
-            _phoneController.text.length == 10)
+            _phoneController.text.length == 10 ||
+        _phoneController.text.length == 9)
       return true;
     else
       return false;
   }
 
-  _change() {
+  _change() async {
     bool result = formKey.currentState?.validate() ?? false;
 
     if (_phoneController.text != '' && isNumber() && result) {
-      formKey.currentState?.save();
-     
-      Navigator.pushNamed(context, Verification.id,arguments: { 'phoneNumber':phoneNumber ?? _phoneController.text,'from':from});
-    } else
-      showTopSnackBar(
-          context,
-          CustomSnackBar.error(
-              message: "The format of  provided number is wrong! "));
+      await client
+          .verifyClientPhoneNumber(phoneNumber ?? _phoneController.text);
+
+      Navigator.pushNamed(context, Verification.id, arguments: {
+        'phoneNumber':
+            "+212${_phoneController.text.length == 9 ? _phoneController.text : _phoneController.text.substring(1)}",
+        'from': from
+      });
+    }
   }
 
   @override
@@ -109,52 +109,116 @@ class _ChangePhoneState extends State<ChangePhone> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                 
-                    Container(
-                      child: InternationalPhoneNumberInput(
-                        hintText: "please add phone number",
-                        maxLength: 10,
-                        onInputChanged: (PhoneNumber number) {},
-                        selectorConfig: SelectorConfig(
-                          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                    SizedBox(
+                      height: screenSize(context).height * 0.05,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "Enter your new phone number",
+                        style: GoogleFonts.ubuntu(
+                            color: Config.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    SizedBox(
+                      height: screenSize(context).height * 0.05,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextFormField(
+                        controller: _phoneController,
+                        toolbarOptions: ToolbarOptions(
+                          copy: true,
+                          paste: true,
+                          selectAll: true,
                         ),
-                        ignoreBlank: false,
-                        autoValidateMode: AutovalidateMode.disabled,
-                        selectorTextStyle: TextStyle(color: Colors.black),
-                        initialValue: number,
-                        textFieldController: _phoneController,
-                        formatInput: false,
-                        keyboardType: TextInputType.numberWithOptions(
-                            signed: true, decimal: true),
-                        onSaved: (PhoneNumber number) {
+                        textInputAction: TextInputAction.done,
+                        validator: (number) {
+                          if (number != null && number.isEmpty) {
+                            return "Please enter your phone number";
+                          } else if (!isNumber()) {
+                            return "Please enter a valid phone number";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onSaved: (value) {
                           setState(() {
-                            phoneNumber = number.phoneNumber;
+                            phoneNumber = value;
+                            _change();
                           });
                         },
+                        onFieldSubmitted: (value) {
+                          setState(() {
+                            phoneNumber = value;
+                            _change();
+                          });
+                        },
+                        style: GoogleFonts.ubuntu(
+                            color: Config.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500),
+                        decoration: InputDecoration(
+                          prefixIcon: SizedBox(
+                              width: 0,
+                              child: Text(
+                                "+212",
+                                style: GoogleFonts.ubuntu(
+                                    color: Config.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ).paddingOnly(bottom: 1).center()),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Config.color_2),
+                              borderRadius: BorderRadius.circular(15)),
+                          enabled: true,
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.red),
+                              borderRadius: BorderRadius.circular(15)),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Config.color_2),
+                              borderRadius: BorderRadius.circular(15)),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: Config.color_2),
+                              borderRadius: BorderRadius.circular(15)),
+                          labelText: 'Phone number',
+                          labelStyle: GoogleFonts.ubuntu(
+                              color: Config.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        keyboardType: TextInputType.phone,
                       ),
-                    ).paddingAll(30),
+                    ),
                   ],
                 ),
               ),
             ),
-            TextButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                elevation: MaterialStateProperty.all(35),
-                shadowColor: MaterialStateProperty.all(Colors.black),
-                fixedSize: MaterialStateProperty.all(
-                    Size(screenSize(context).width, 50)),
-              ),
-              child: Text("Submit",
-                  style: GoogleFonts.ubuntu(
-                      fontSize: 24,
-                      color: Config.color_1,
-                      fontWeight: FontWeight.w600)),
-              onPressed: () {
-                _change();
-              },
-            ).align(alignment: Alignment.bottomCenter),
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 100,
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _change();
+          },
+          child: Container(
+            child: Text(
+              "Next",
+              style: GoogleFonts.ubuntu(fontSize: 20, color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ).center(),
+            decoration: BoxDecoration(
+              color: Config.color_1,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            width: screenSize(context).width * .9,
+            height: 50,
+          ).align(alignment: Alignment.bottomCenter).paddingOnly(bottom: 10),
         ),
       ),
     );

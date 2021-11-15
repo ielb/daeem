@@ -36,7 +36,6 @@ class _VerificationState extends State<Verification> {
       _isResendAgain = true;
     });
     client.verifyClientPhoneNumber(phoneNumber);
-
     const oneSec = Duration(seconds: 1);
     _timer = new Timer.periodic(oneSec, (timer) {
       setState(() {
@@ -57,7 +56,6 @@ class _VerificationState extends State<Verification> {
     if (!called) {
       client = Provider.of<ClientProvider>(context);
       from = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      client.verifyClientPhoneNumber(from['phoneNumber']);
       setState(() {
        phoneNumber = from['phoneNumber'];
         called = !called;
@@ -66,6 +64,7 @@ class _VerificationState extends State<Verification> {
   }
 
   verify() async {
+    showDialog(context: context, builder: (context) => Center(child: CircularProgressIndicator(color: Config.color_2,)));
     var result = await client.changePhone(smsCode: _code, phone: phoneNumber);
     if (result) {
       showTopSnackBar(
@@ -73,7 +72,7 @@ class _VerificationState extends State<Verification> {
           CustomSnackBar.success(
               message: "Phone number has been successfuly changed"));
       if (from['from'] == 0)
-        Navigator.pushReplacementNamed(context, Home.id);
+        Navigator.pushReplacementNamed(context, Profile.id);
       else
         Navigator.pushReplacementNamed(context, CheckoutPage.id);
     } else {
@@ -93,22 +92,21 @@ class _VerificationState extends State<Verification> {
               icon: Icon(Ionicons.chevron_back),
               color: Colors.black,
               onPressed: () => Navigator.pop(context)),
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           elevation: 0,
         ),
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 30),
               height: MediaQuery.of(context).size.height,
-              width: double.infinity,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Image(
                     image: AssetImage(
                       'assets/sms.gif',
                     ),
-                    height: 300,
+                    height: 280,
                   ),
                   Text(
                     "Verification",

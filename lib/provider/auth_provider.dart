@@ -1,7 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, unused_local_variable
 
 import 'dart:convert';
-
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/auth_service.dart';
 import 'package:daeem/services/services.dart';
@@ -51,26 +50,36 @@ class AuthProvider extends BaseProvider {
       if (result.status == LoginStatus.success) {
         final OAuthCredential credential =
             FacebookAuthProvider.credential(result.accessToken!.token);
+
         UserCredential clientCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
-        var emailResult = await checkEmail(clientCredential.user!.email!);
-        if (emailResult == true) {
-          var response = await _authService.socialLogin(
-              1, clientCredential.user!.email!, clientCredential.user!.uid);
-          if (response != null) {
-            var data = jsonDecode(response.body);
-            if (data['status'] == "success") {
-              var json = data['data'];
-              var client_data = json['client'];
-              var address_data = json['address'];
-              setClient(Client.fromJson(client_data, address_data));
-              Prefs.instance.setClient(_client!.id.toString());
-              notifyListeners();
-              return true;
-            } else {
-              return false;
+        var email = clientCredential.additionalUserInfo?.profile?['email'];
+        print(email);
+        if (email == null)
+          return false;
+        else {
+          var emailResult = await checkEmail(email);
+          print(emailResult);
+          if (emailResult == true) {
+            var response = await _authService.socialLogin(
+                1, email, clientCredential.user!.uid);
+            if (response != null) {
+              var data = jsonDecode(response.body);
+              print(data);
+              if (data['status'] == "success") {
+                var json = data['data'];
+                var client_data = json['client'];
+                var address_data = json['address'];
+                setClient(Client.fromJson(client_data, address_data));
+                Prefs.instance.setClient(_client!.id.toString());
+                notifyListeners();
+                return true;
+              } else {
+                return false;
+              }
             }
-          }
+          } else
+            return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
         }
       } else {
         notifyListeners();
@@ -90,27 +99,36 @@ class AuthProvider extends BaseProvider {
           );
           UserCredential clientCredential =
               await FirebaseAuth.instance.signInWithCredential(credential);
-          var emailResult = await checkEmail(clientCredential.user!.email!);
-          if (emailResult == true) {
-            var response = await _authService.socialLogin(
-                0, clientCredential.user!.email!, clientCredential.user!.uid);
-            if (response != null) {
-              var data = jsonDecode(response.body);
-              if (data['status'] == "success") {
-                var json = data['data'];
-                var client_data = json['client'];
-                var address_data = json['address'];
+          var email = clientCredential.additionalUserInfo?.profile?['email'];
+          print(" email : $email");
+          if (email == null)
+            return false;
+          else {
+            var emailResult = await checkEmail(email);
 
-                setClient(Client.fromJson(client_data, address_data));
-                Prefs.instance.setClient(_client!.id.toString());
+            if (emailResult == true) {
+              var response = await _authService.socialLogin(
+                  0, email, clientCredential.user!.uid);
+              if (response != null) {
+                var data = jsonDecode(response.body);
+                if (data['status'] == "success") {
+                  var json = data['data'];
+                  var client_data = json['client'];
+                  var address_data = json['address'];
 
-                notifyListeners();
+                  setClient(Client.fromJson(client_data, address_data));
+                  Prefs.instance.setClient(_client!.id.toString());
 
-                return true;
-              } else {
-                notifyListeners();
-                return false;
+                  notifyListeners();
+
+                  return true;
+                } else {
+                  notifyListeners();
+                  return false;
+                }
               }
+            } else {
+              return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
             }
           }
         }
@@ -120,6 +138,50 @@ class AuthProvider extends BaseProvider {
         print(error);
       }
       notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> socialMediaSignUp(String email,String uid,String displayName ,String provider) async {
+    if (provider == "facebook") {
+      var response = await _authService.socialRegister(
+          1,
+          email,
+          uid,
+          displayName);
+      if (response != null) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var json = data['data'];
+          setClient(Client.fromJson(json, null));
+          Prefs.instance.setClient(json['id'].toString());
+          notifyListeners();
+          return true;
+        } else {
+          notifyListeners();
+          return false;
+        }
+      }
+      return false;
+    } else {
+      var response = await _authService.socialRegister(
+          0,
+          email,
+          uid,
+          displayName);
+      if (response != null) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var json = data['data'];
+          setClient(Client.fromJson(json, null));
+          Prefs.instance.setClient(json['id'].toString());
+          notifyListeners();
+          return true;
+        } else {
+          notifyListeners();
+          return false;
+        }
+      }
       return false;
     }
   }
@@ -136,36 +198,13 @@ class AuthProvider extends BaseProvider {
               await FirebaseAuth.instance.signInWithCredential(credential);
           var emailResult = await checkEmail(clientCredential.user!.email!);
           if (emailResult == false) {
-            var response = await _authService.socialRegister(
-                1,
-                clientCredential.user!.email!,
-                clientCredential.user!.uid,
-                clientCredential.user!.displayName!);
-            if (response != null) {
-              var data = jsonDecode(response.body);
-              if (data['status'] == "success") {
-                var json = data['data'];
-                var client_data = json['client'];
-                var address_data = json['address'];
-
-                setClient(Client.fromJson(client_data, address_data));
-                Prefs.instance.setClient(_client!.id.toString());
-
-                notifyListeners();
-
-                return true;
-              } else {
-                notifyListeners();
-                return false;
-              }
-            }
+            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'facebook');
           }
         }
         return false;
       } else {
         setBusy(true);
         final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-        print("google user");
         if (googleUser != null) {
           final GoogleSignInAuthentication googleAuth =
               await googleUser.authentication;
@@ -178,30 +217,7 @@ class AuthProvider extends BaseProvider {
 
           var emailResult = await checkEmail(clientCredential.user!.email!);
           if (emailResult == false) {
-            var response = await _authService.socialRegister(
-                0,
-                clientCredential.user!.email!,
-                clientCredential.user!.uid,
-                clientCredential.user!.displayName!);
-            if (response != null) {
-              var data = jsonDecode(response.body);
-              if (data['status'] == "success") {
-                var json = data['data'];
-                var client_data = json['client'];
-                var address_data = json['address'];
-
-                setClient(Client.fromJson(client_data, address_data));
-                Prefs.instance.setClient(_client!.id.toString());
-
-                notifyListeners();
-
-                return true;
-              } else {
-                notifyListeners();
-                return false;
-              }
-            }
-            return false;
+            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'google');
           }
         }
       }
@@ -216,7 +232,6 @@ class AuthProvider extends BaseProvider {
     setBusy(true);
     http.Response? response = await _authService.register(
         name.trim(), email.toLowerCase().trim(), password.trim());
-
     if (response != null) {
       var data = jsonDecode(response.body);
 
@@ -224,7 +239,7 @@ class AuthProvider extends BaseProvider {
         notifyListeners();
         return true;
       } else {
-        notifyListeners();
+        setError(data['message']);
         return false;
       }
     }
@@ -273,10 +288,16 @@ class AuthProvider extends BaseProvider {
 
   Future<bool> logOut() async {
     setBusy(false);
+
+    FirebaseAuth.instance.signOut();
     var google = await GoogleSignIn().isSignedIn();
     var facebook = await FacebookAuth.instance.accessToken;
-    if (facebook != null) FacebookAuth.instance.logOut();
+    if (facebook != null) {
+      FirebaseAuth.instance.signOut();
+      FacebookAuth.instance.logOut();
+    }
     if (google) {
+      FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
     }
     _client = null;

@@ -6,6 +6,7 @@ import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/provider/notifiation_provider.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -41,7 +42,7 @@ class _SplashState extends State<Splash> {
       notifyManager.setOnNotificationReceive(onNotificationReceive);
       _notificationService =
           PushNotificationService(FirebaseMessaging.instance);
-      _notificationService.initialize();
+      _notificationService.initialize(context);
 
       _timer = new Timer(const Duration(milliseconds: 2000), () {
         SimpleConnectionChecker _simpleConnectionChecker =
@@ -79,6 +80,7 @@ class _SplashState extends State<Splash> {
       );
 
       if (result) {
+        Provider.of<NotificationProvider>(context, listen: false).getNotifications();
         client.setClient(auth.client!);
         addressProvider.setAddress(client.client?.address);
         if (client.client!.address != null) {

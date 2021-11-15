@@ -19,6 +19,11 @@ class Config {
   static const auth_background = "assets/market.png";
   static const shopping_cart = "assets/shopping_cart.png";
   static const confirmation = "assets/confirmation.png";
+  static const notification = "assets/notification.png";
+
+
+  static const appStoreUrl = "";
+  static const playStoreUrl = ""; 
   static Widget google = Image.asset(
     "assets/Google.png",
     height: 30,

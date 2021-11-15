@@ -7,6 +7,7 @@ import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/provider/notifiation_provider.dart';
 import 'package:daeem/provider/orders_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
@@ -27,14 +28,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'screens/email/verify_email.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
 import 'package:daeem/screens/sub_category.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print(" data ${message.data['title']}");
   notifyManager.showNotification(
       5, message.notification?.title??message.data['title'], message.notification?.body ?? message.data['body']);
   notifyManager.setOnNotificationClick(onNotificationClick);
@@ -66,6 +65,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => ClientProvider()),
     ChangeNotifierProvider(create: (context) => AddressProvider()),
     ChangeNotifierProvider(create: (context) => OrdersProvider()),
+    ChangeNotifierProvider(create: (context) => NotificationProvider()),
   ], child: MyApp()));
 }
 
@@ -145,10 +145,6 @@ Route<dynamic> routes(RouteSettings settings) {
     /// Profile
     case Profile.id:
       return CupertinoPageRoute(builder: (_) => Profile(), settings: settings);
-
-    case VerifyEmail.id:
-      return CupertinoPageRoute(
-          builder: (_) => VerifyEmail(), settings: settings);
 
     /// Settings
     case Setting.id:

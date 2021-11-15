@@ -1,4 +1,5 @@
-import 'package:daeem/models/notification.dart' as notif;
+
+import 'package:daeem/provider/notifiation_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/notification_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,20 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  late NotificationProvider _notificationProvider;
+  bool called = false;
+  @override
+  void didChangeDependencies() {
+    if (!called) {
+      _notificationProvider = Provider.of<NotificationProvider>(context);
+      setState(() {
+        called = true;
+      });
+    }
+
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +43,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
+        actions: [
+          if(_notificationProvider.notifications.isNotEmpty)
+          TextButton(onPressed: (){
+            _notificationProvider.clearNotifications();
+          },
+            child: Text("Clear All",style: GoogleFonts.ubuntu(fontSize: 16,color: Colors.red),).paddingOnly(right: 5),
+          )
+          
+        ],
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -37,18 +61,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
           height: screenSize(context).height,
           child: Column(
             children: [
+               _notificationProvider.notifications.length!=0 ? 
               ListView.builder(
-                
                   shrinkWrap: true,
                   primary: false,
-                  itemCount: 5,
+                  itemCount: _notificationProvider.notifications.length,
                   itemBuilder: (context, index) {
                     return NotificationWidget(
-                        notification: notif.Notification(
-                            id: '1',
-                            title: "Discout %",
-                            body: "-15% for the new users"));
+                        notification: _notificationProvider.notifications.reversed.toList()[index]);
                   })
+
+                  : Column(
+                    children: [
+                     
+                      Image.asset(Config.notification ,height: screenSize(context).height*0.5,),
+                      SizedBox(height:screenSize(context).height*.1,),
+                      Center(
+                        child: Text("No Notifications",style: GoogleFonts.ubuntu(fontSize: 20,color: Colors.black),),
+                      )
+                    ],
+                  )
             ],
           ),
         ),

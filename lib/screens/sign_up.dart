@@ -5,6 +5,8 @@ import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SignUp extends StatefulWidget {
   static const id = "signup";
@@ -66,14 +68,7 @@ class _SignUpState extends State<SignUp> {
             _nameController!.text,
             _emailController!.text,
             _passwordController!.text);
-        if (result) {
-          Toast.show(
-              "Registration completed successfully,please login", context);
-          Navigator.pushReplacementNamed(context, Login.id);
-        } else {
-          Toast.show(AppLocalizations.of(context)!.wentWrong, context,
-              duration: 4);
-        }
+       checkErrors(result);
       } else {}
     } else {
       setState(() {
@@ -81,30 +76,27 @@ class _SignUpState extends State<SignUp> {
       });
     }
   }
+  
 
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
-    if (result) {
-      if (_marketProvider.storesType.isEmpty)
-        await _marketProvider.getStoreType();
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else {
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
-    }
+   checkErrors(result);
   }
 
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
-    if (result) {
-      if (_marketProvider.storesType.isEmpty)
+    checkErrors(result);
+  }
+  checkErrors(bool result)async {
+   if (result) {
         await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
+       _authProvider.setBusy(false);
     } else {
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
+       _authProvider.setBusy(false);
+       showTopSnackBar(context, CustomSnackBar.info(message: "The given credentials are exist please\n sign in"));
     }
   }
 

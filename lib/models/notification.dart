@@ -3,11 +3,11 @@ import 'dart:convert';
 
 
 class Notification {
-  String id;
+  String? id;
   String title;
   String body;
   Notification({
-    required this.id,
+    this.id,
     required this.title,
     required this.body,
   });
@@ -26,7 +26,6 @@ class Notification {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'title': title,
       'body': body,
     };
@@ -34,7 +33,6 @@ class Notification {
 
   factory Notification.fromMap(Map<String, dynamic> map) {
     return Notification(
-      id: map['id'],
       title: map['title'],
       body: map['body'],
     );

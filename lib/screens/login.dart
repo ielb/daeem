@@ -6,6 +6,8 @@ import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Login extends StatefulWidget {
   static const id = "/login";
@@ -35,16 +37,16 @@ class _LoginState extends State<Login> {
 
   @override
   void didChangeDependencies() {
-    if(!called){
-      if(mounted)
+    if (!called) {
+      if (mounted)
         setState(() {
           called = true;
         });
-    _authProvider = Provider.of<AuthProvider>(context);
-    _clientProvider = Provider.of<ClientProvider>(context);
-    _addressProvider = Provider.of<AddressProvider>(context);
-    _storeProvider = Provider.of<StoreProvider>(context);
-    isCheckout = ModalRoute.of(context)!.settings.arguments;
+      _authProvider = Provider.of<AuthProvider>(context);
+      _clientProvider = Provider.of<ClientProvider>(context);
+      _addressProvider = Provider.of<AddressProvider>(context);
+      _storeProvider = Provider.of<StoreProvider>(context);
+      isCheckout = ModalRoute.of(context)!.settings.arguments;
     }
     super.didChangeDependencies();
   }
@@ -105,24 +107,24 @@ class _LoginState extends State<Login> {
 
       if (isCheckout != null && isCheckout) {
         Navigator.pushReplacementNamed(context, CheckoutPage.id);
-          _addressProvider.setAddress(_clientProvider.client?.address);
+        _addressProvider.setAddress(_clientProvider.client?.address);
         _clientProvider.setBusy(false);
       } else {
-        if(mounted)
-         _clientProvider.setBusy(false);
+        if (mounted) _clientProvider.setBusy(false);
         Navigator.pushReplacementNamed(context, Home.id);
-      
+
         if (_clientProvider.client!.address != null) {
           _addressProvider.setAddress(_clientProvider.client?.address);
           await _storeProvider.getStoreType();
-           _storeProvider.getStores(_clientProvider.client!.address!);
+          _storeProvider.getStores(_clientProvider.client!.address!);
         }
       }
     } else {
-      print("error");
       _authProvider.setBusy(false);
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
-      
+      showTopSnackBar(
+          context,
+          CustomSnackBar.info(
+              message: "Something went wrong with your credentails please try again or try another methode"));
     }
   }
 
