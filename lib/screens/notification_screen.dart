@@ -78,7 +78,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       children: [
                         Image.asset(
                           Config.notification,
-                          height: screenSize(context).height * 0.5,
+                          height: screenSize(context).height * 0.49
                         ),
                         SizedBox(
                           height: screenSize(context).height * .1,
