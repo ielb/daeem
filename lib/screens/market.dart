@@ -123,18 +123,10 @@ class _MarketPageState extends State<MarketPage> {
                           TextButton(
                               onPressed: () {
                                 cart.clearCart();
-                                Navigator.of(context).pop(context);
+                                Navigator.of(context).pushReplacementNamed(Home.id);
                               },
                               child: Text("Cancel anyway",style: GoogleFonts.ubuntu(fontSize: 14,color: Colors.red.shade500),),
-                              style: OutlinedButton.styleFrom(
-                                primary: Colors.red.shade400,
-                                side: BorderSide(
-                                    color: Colors.red.shade400, width: 1.5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(6),
-                                ),
-                                textStyle: GoogleFonts.ubuntu(fontSize: 14),
-                              )),
+                             ),
                           Spacer(),
                           TextButton(
                             onPressed: () {
@@ -151,7 +143,6 @@ class _MarketPageState extends State<MarketPage> {
         );
       } else {
         cart.clearCart();
-        print('test');
       }
     }
 

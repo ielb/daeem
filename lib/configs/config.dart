@@ -1,7 +1,6 @@
 import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class Config {
   static const background = "assets/background.png";
@@ -40,13 +39,13 @@ class Config {
     
   );
 
-  static Widget closed = SvgPicture.asset(
-    "assets/closed.svg",
+  static Widget closed = Image.asset(
+    "assets/closed.png",
     height: 35,
     width: 35,
   );
-  static Widget emailSent = SvgPicture.asset(
-    "assets/email_sent.svg",
+  static Widget emailSent = Image.asset(
+    "assets/email_sent.png",
     height: 130,
     width: 130,
   );

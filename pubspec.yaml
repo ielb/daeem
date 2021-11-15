@@ -38,21 +38,18 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  flutter_rating_stars: ^1.0.3+4
-  flutter_svg: ^0.22.0
+
   flutter_verification_code: ^1.1.0
   google_fonts: ^2.1.0
   google_maps_flutter: ^2.0.10
   google_sign_in: ^5.1.0
   http: ^0.13.3
-  internet_connection_checker: ^0.0.1+2
   intl: ^0.17.0
   introduction_screen: ^2.1.0
   provider: ^6.0.0
   shared_preferences: ^2.0.6
   shimmer: ^2.0.0
   simple_connection_checker: ^0.2.1
-  intl_phone_number_input: ^0.7.0+2
   ionicons: ^0.1.2
   geolocator: 7.6.2
   geocoding: ^2.0.1
@@ -83,7 +80,6 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/flags/
     - assets/background.png
     - assets/logo.png
     - assets/shopping_cart.png
@@ -94,8 +90,8 @@ flutter:
     - assets/Facebook.png
     - assets/Google.png 
     - assets/logo_v.png  
-    - assets/closed.svg
-    - assets/email_sent.svg
+    - assets/closed.png
+    - assets/email_sent.png
     - assets/cart.png
     - assets/confirmed.png
     - assets/offline.png

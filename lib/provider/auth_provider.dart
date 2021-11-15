@@ -234,7 +234,6 @@ class AuthProvider extends BaseProvider {
         name.trim(), email.toLowerCase().trim(), password.trim());
     if (response != null) {
       var data = jsonDecode(response.body);
-
       if (data['status'] == "success") {
         notifyListeners();
         return true;
