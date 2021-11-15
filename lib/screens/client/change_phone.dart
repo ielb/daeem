@@ -2,7 +2,6 @@ import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/client/phone_verification.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class ChangePhone extends StatefulWidget {
   static const id = "phone";
@@ -17,7 +16,6 @@ class _ChangePhoneState extends State<ChangePhone> {
   bool enter = false;
   int from = 0;
 
-  PhoneNumber number = PhoneNumber(isoCode: 'MA');
   late ClientProvider client;
 
   @override

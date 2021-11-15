@@ -21,9 +21,7 @@ class CategoryWidget extends StatelessWidget {
                 filterQuality: FilterQuality.high,
                 fit: BoxFit.cover,
                 colorBlendMode: BlendMode.darken,
-                color: Colors.black.withOpacity(0.3),
-                
-              
+                color: Colors.black.withOpacity(0.3),              
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     CircularProgressIndicator(value: downloadProgress.progress)
                         .center(),

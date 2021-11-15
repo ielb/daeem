@@ -68,7 +68,20 @@ class _SignUpState extends State<SignUp> {
             _nameController!.text,
             _emailController!.text,
             _passwordController!.text);
-       checkErrors(result);
+        if (result) {
+          showTopSnackBar(
+              context,
+              CustomSnackBar.success(
+                  message: "Registration has been completed please sign in !"));
+          Navigator.pushReplacementNamed(context, Login.id);
+          _authProvider.setBusy(false);
+        } else {
+          _authProvider.setBusy(false);
+          showTopSnackBar(
+              context,
+              CustomSnackBar.info(
+                  message: "The given credentials are exist please\n sign in"));
+        }
       } else {}
     } else {
       setState(() {
@@ -76,27 +89,30 @@ class _SignUpState extends State<SignUp> {
       });
     }
   }
-  
 
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
-   checkErrors(result);
+    checkErrors(result);
   }
 
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
     checkErrors(result);
   }
-  checkErrors(bool result)async {
-   if (result) {
-        await _marketProvider.getStoreType();
+
+  checkErrors(bool result) async {
+    if (result) {
+      await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
-       _authProvider.setBusy(false);
+      _authProvider.setBusy(false);
     } else {
-       _authProvider.setBusy(false);
-       showTopSnackBar(context, CustomSnackBar.info(message: "The given credentials are exist please\n sign in"));
+      _authProvider.setBusy(false);
+      showTopSnackBar(
+          context,
+          CustomSnackBar.info(
+              message: "The given credentials are exist please\n sign in"));
     }
   }
 
