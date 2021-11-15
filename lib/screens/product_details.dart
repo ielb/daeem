@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:ionicons/ionicons.dart';
@@ -15,26 +16,27 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  List<String> size = [
-    "S",
-    "M",
-    "L",
-    "XL",
-  ];
   bool called = false;
   bool isAdded = false;
   late CartProvider cart;
-  int _selectedSize = 1;
+  int _selectedSize = 0;
   Item? pageProduct;
   @override
   void didChangeDependencies() {
     if (!called) {
-      cart = Provider.of<CartProvider>(context, listen: false);
+      cart = Provider.of<CartProvider>(context);
+      // widget.product.price = widget.product.variants[0].price;
+
       setState(() {
         called = true;
       });
     }
     super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   addToCart(Product product, BuildContext context) {
@@ -48,16 +50,15 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
     setState(() {});
   }
-    removeFromCart(Product product, BuildContext context) {
+
+  removeFromCart(Product product, BuildContext context) {
     var cart = Provider.of<CartProvider>(context, listen: false);
     Item item = Item(product: product);
     cart.removeFromBasket(item);
     setState(() {});
   }
 
-
   int? getItemCount(int id, BuildContext context) {
-   
     Item data = cart.basket.singleWhere((element) => id == element.product.id,
         orElse: () => Item(product: Product()));
     return data.quantity;
@@ -67,18 +68,56 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        body: CustomScrollView(slivers: [
+        body: CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
           SliverAppBar(
             expandedHeight: MediaQuery.of(context).size.height * 0.6,
             elevation: 0,
             leading: IconButton(
               icon: Icon(Ionicons.close_outline),
               color: Colors.black,
-              iconSize: 26,
+              iconSize: 30,
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
             ),
+            actions: [
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, CartPage.id);
+                },
+                child: Stack(children: <Widget>[
+                  Icon(Ionicons.bag_handle, size: 26, color: Config.black)
+                      .paddingOnly(top: 10, right: 10),
+                  cart.basket.length != 0
+                      ? Positioned(
+                          right: 2,
+                          top: 5,
+                          child: Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 20,
+                              minHeight: 20,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${cart.basket.length}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ]),
+              ),
+            ],
             snap: true,
             floating: true,
             stretch: true,
@@ -90,7 +129,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               background: CachedNetworkImage(
                   imageUrl: widget.product.image!,
                   filterQuality: FilterQuality.high,
-                  fit: BoxFit.scaleDown,
+                  fit: BoxFit.cover,
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       CircularProgressIndicator(
                               value: downloadProgress.progress)
@@ -102,7 +141,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       )),
             ),
             bottom: PreferredSize(
-                preferredSize: Size.fromHeight(45),
+                preferredSize: Size.fromHeight(50),
                 child: Transform.translate(
                   offset: Offset(0, 1),
                   child: Container(
@@ -114,15 +153,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                         topRight: Radius.circular(30),
                       ),
                     ),
-                    child: Center(
-                        child: Container(
-                      width: 50,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    )),
                   ),
                 )),
           ),
@@ -143,7 +173,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: screenSize(context).width*.7,
+                                width: screenSize(context).width * .7,
                                 child: Text(
                                   widget.product.name!,
                                   overflow: TextOverflow.ellipsis,
@@ -159,12 +189,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 height: 15,
                               ),
                               Text(
-                            "${widget.product.price} MAD",
-                            style: TextStyle(color: Config.color_1, fontSize: 18,fontWeight: FontWeight.w700),
-                          ),
+                                "${widget.product.price} MAD",
+                                style: TextStyle(
+                                    color: Config.color_1,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700),
+                              ),
                             ],
                           ),
-                         
                         ],
                       ),
                       SizedBox(
@@ -197,12 +229,16 @@ class _ProductDetailsState extends State<ProductDetails> {
                               height: 60,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: size.length,
+                                itemCount: widget.product.variants.length,
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
                                       setState(() {
                                         _selectedSize = index;
+                                        widget.product.price = widget
+                                            .product.variants[index].price;
+                                        widget.product.currentVariant =
+                                            widget.product.variants[index];
                                       });
                                     },
                                     child: AnimatedContainer(
@@ -217,12 +253,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       height: 40,
                                       child: Center(
                                         child: Text(
-                                          size[index],
+                                          widget.product.variants[index].option
+                                                  ?.toLowerCase() ??
+                                              "",
                                           style: TextStyle(
                                               color: _selectedSize == index
                                                   ? Colors.white
                                                   : Colors.black,
-                                              fontSize: 15),
+                                              fontSize: 14),
                                         ),
                                       ),
                                     ),
@@ -238,9 +276,10 @@ class _ProductDetailsState extends State<ProductDetails> {
           ])),
         ]),
         bottomNavigationBar: Container(
+          color: Colors.transparent,
           height: 60,
           padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-          child: getItemCount(widget.product.id!, context)==0
+          child: getItemCount(widget.product.id!, context) == 0
               ? MaterialButton(
                   onPressed: () {
                     addToCart(widget.product, context);
@@ -269,21 +308,22 @@ class _ProductDetailsState extends State<ProductDetails> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       InkWell(
+                        onTap: () {
+                          removeFromCart(widget.product, context);
+                        },
                         child: Icon(
-                          Ionicons.add_outline,
+                          Ionicons.remove_outline,
                           color: Config.color_2,
                           size: 28,
                         ),
-                        onTap: () {
-                          addToCart(widget.product, context);
-                        },
                       ),
                       Spacer(),
                       RichText(
                           text:
                               //!count the product
                               TextSpan(
-                                  text: "${getItemCount(widget.product.id!, context)} ",
+                                  text:
+                                      "${getItemCount(widget.product.id!, context)} ",
                                   style: GoogleFonts.ubuntu(
                                       color: Config.color_1,
                                       fontSize: 20,
@@ -298,14 +338,14 @@ class _ProductDetailsState extends State<ProductDetails> {
                           ])),
                       Spacer(),
                       InkWell(
-                        onTap: () {
-                          removeFromCart(widget.product, context);
-                        },
                         child: Icon(
-                          Ionicons.remove_outline,
+                          Ionicons.add_outline,
                           color: Config.color_2,
                           size: 28,
                         ),
+                        onTap: () {
+                          addToCart(widget.product, context);
+                        },
                       ),
                     ],
                   ),

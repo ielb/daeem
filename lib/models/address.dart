@@ -1,6 +1,7 @@
 
 
 class Address {
+  String? id;
   String? clientId;
   String? address;
   String? lat;
@@ -27,6 +28,7 @@ class Address {
 
   Map<String, dynamic> toMap() {
     return {
+      'id':this.id,
       'client_id': this.clientId,
       'address': this.address??'',
       'lat': this.lat??'',
@@ -41,6 +43,7 @@ class Address {
   }
 
   Address.fromMap(Map<String, dynamic> map) {
+    id = map['id'].toString();
     clientId = map['client_id'];
     address = map['address'];
     lat = map['lat'];

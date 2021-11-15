@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/services/services.dart';
 
 class StoreWidget extends StatelessWidget {
@@ -7,21 +8,28 @@ class StoreWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left:10,right: 10,top:5,),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.asset(Config.margane,height: 80,width: 80, fit: BoxFit.cover,),
+          CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.cover,
+            height: 70,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+              CircularProgressIndicator(
+                value: downloadProgress.progress).paddingOnly(bottom: 10).center(),
+                errorWidget: (context, url, error) => Image.asset(
+                  "assets/placeholder.png",
+                  fit: BoxFit.cover,
+                )
           ),
           Text(
-            title,
+            title.toString().replaceAll(r' ', '\n'),
             overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+            textAlign:TextAlign.center,
             softWrap: true,
             style: GoogleFonts.ubuntu(
                 fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-          ).align(alignment: Alignment.center).paddingOnly(top:5,),
+          ).align(alignment: Alignment.center).paddingOnly(top:4,),
         ],
       ),
     );

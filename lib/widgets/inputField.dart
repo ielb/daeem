@@ -6,7 +6,11 @@ import 'package:flutter/services.dart';
 
 class Input extends StatelessWidget {
   Input(this._controller, this._hint, this._icon,
-      {this.isName=false,this.isPassword = false, this.showPassword,this.isNumber=false, this.obscureText = false});
+      {this.isName = false,
+      this.isPassword = false,
+      this.showPassword,
+      this.isNumber = false,
+      this.obscureText = false});
 
   final String _hint;
   final IconData _icon;
@@ -22,30 +26,30 @@ class Input extends StatelessWidget {
     return Container(
       width: 270,
       child: TextFormField(
-        validator: (content){
-          if(!isName){
-
-          if(isPassword==false&&!isNumber){
-           bool result  =  Config.isEmail(_controller.text.trim());
-             if(!result){
-              return "Please provide a valid email";}
-          }else{
-            if(isPassword) {
-              bool result = _controller.text.length>=8 ? true : false;
+        validator: (content) {
+          if (!isName) {
+            if (isPassword == false && !isNumber) {
+              bool result = Config.isEmail(_controller.text.trim());
               if (!result) {
-                return "Please provide a valid password >= 8";
+                return "Please provide a valid email";
               }
-            }else{
-              return "Please provide a valid phone number";
+            } else {
+              if (isPassword) {
+                bool result = _controller.text.length >= 8 ? true : false;
+                if (!result) {
+                  return "Please provide a valid password >= 8";
+                }
+              } else {
+                return "Please provide a valid phone number";
+              }
             }
-          }
           }
         },
         controller: _controller,
         obscureText: obscureText,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
-          errorStyle:     GoogleFonts.ubuntu(color: Colors.red, fontSize: 12),
+            errorStyle: GoogleFonts.ubuntu(color: Colors.red, fontSize: 12),
             contentPadding: EdgeInsets.all(1),
             filled: true,
             fillColor: Config.lightGray,
@@ -90,8 +94,9 @@ class Input extends StatelessWidget {
             ),
             suffixIcon: isPassword
                 ? IconButton(
-                    icon: Icon(
-                        obscureText ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye_solid),
+                    icon: Icon(obscureText
+                        ? CupertinoIcons.eye_slash_fill
+                        : CupertinoIcons.eye_solid),
                     onPressed: showPassword,
                     iconSize: 20,
                     color: Config.color_1,

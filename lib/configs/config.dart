@@ -18,51 +18,28 @@ class Config {
   static const arrived = "assets/order_arrived.png";
   static const auth_background = "assets/market.png";
   static const shopping_cart = "assets/shopping_cart.png";
-  static Widget google = SvgPicture.asset(
-    "assets/Google.svg",
-    height: 26,
-    width: 26,
+  static const confirmation = "assets/confirmation.png";
+  static const notification = "assets/notification.png";
+
+
+  static const appStoreUrl = "";
+  static const playStoreUrl = ""; 
+  static Widget google = Image.asset(
+    "assets/Google.png",
+    height: 30,
+    width: 30,
   );
-  static Widget facebook = SvgPicture.asset(
-    "assets/Facebook.svg",
-    height: 26,
-    width: 26,
+  static Widget facebook = Image.asset(
+    "assets/Facebook.png",
+    height: 30,
+    width: 30,
   );
-  static Widget user = SvgPicture.asset(
-    "assets/user.svg",
-    height: 26,
-    width: 26,
+    static Widget empty = Image.asset(
+    "assets/Empty.png",
+    height: 290,
+    
   );
-  static Widget shoppingBag = SvgPicture.asset(
-    "assets/shopping-bag.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget logout = SvgPicture.asset(
-    "assets/logout.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget rate = SvgPicture.asset(
-    "assets/rate.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget share = SvgPicture.asset(
-    "assets/share.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget notification = SvgPicture.asset(
-    "assets/notifications.svg",
-    height: 26,
-    width: 26,
-  );
-  static Widget question = SvgPicture.asset(
-    "assets/question.svg",
-    height: 26,
-    width: 26,
-  );
+
   static Widget closed = SvgPicture.asset(
     "assets/closed.svg",
     height: 35,
@@ -97,61 +74,111 @@ class Config {
       return true;
     }
   }
+ static Map<String,dynamic>  getStatus(int id) {
+     List<Map<String,dynamic>> status =  [     
+      {'id':1,'name':"Just created",'color':"info"},
+      {'id':2,'name':"Accepted by admin",'color':"success"},
+      {'id':3,'name':"Assigned to driver",'color':"primary"},
+      {'id':4,'name':"Prepared",'color':"info"},
+      {'id':5,'name':"Delivered",'color':"success"},
+      {'id':6,'name':"Rejected by admin",'color':"danger"},
+      {'id':7,'name':"Rejected by driver",'color':"danger"},
+      {'id':8,'name':"Accepted by driver",'color':"success"},
+      {'id':9,'name':"Assigned to collector",'color':"primary"},
+      {'id':10,'name':"Refunded",'color':"danger"},
+     ];
+     return status.firstWhere((element) => element['id'] == id);
+   
+     
+  }
 
-  static bottomSheet(BuildContext context) {
-    return showDialog(
+ static Color getStatusColor(String color){
+     switch (color) {
+       case "info":
+         return  Colors.blue.shade700;
+       case "success":
+         return Color(0xff40AA45);
+      case "primary":
+         return color_2;
+      case "danger":
+         return Colors.red;
+       default:
+         return color_2;
+     }
+  }
+  
+ static Color getStatusSubColor(String color){
+     switch (color) {
+       case "info":
+         return  Colors.blue.shade50;
+       case "success":
+         return Color(0xffD6EDD7);
+      case "primary":
+         return Color(0xffEBF7FA);
+      case "danger":
+         return Colors.red.shade50;
+       default:
+         return  Color(0xffEBF7FA);
+     }
+  }
+  static bottomSheet(BuildContext context, ) {
+     showDialog(
+
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(15)),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              height: MediaQuery.of(context).size.height * .75,
-              width: MediaQuery.of(context).size.width * .8,
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(15)),
-              child: Column(
-                children: [
-                  FadeInImage(
-                      height: 250,
-                      width: 250,
-                      placeholder: AssetImage("assets/placeholder.png"),
-                      image: AssetImage(
-                        Config.delivery_address,
-                      )),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    "Please add an address to see all stores near you",
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    style:
-                        GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
-                  ),
-                  Spacer(),
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AddressPage.id);
-                    },
-                    height: 50,
-                    elevation: 0,
-                    splashColor: Config.color_1,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    color: Config.color_2,
-                    child: Center(
-                      child: Text(
-                        "Add address",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+              shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(15)),
+              child: Container(
+                padding: EdgeInsets.all(20),
+                height: MediaQuery.of(context).size.height * .75,
+                width: MediaQuery.of(context).size.width * .8,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15)),
+                child: Column(
+                  children: [
+                    FadeInImage(
+                        height: 250,
+                        width: 250,
+                        placeholder: AssetImage("assets/placeholder.png"),
+                        image: AssetImage(
+                          Config.delivery_address,
+                        )),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "Please add an address to see all stores near you",
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style:
+                          GoogleFonts.ubuntu(fontSize: 20, color: Colors.black),
+                    ),
+                    Spacer(),
+                    MaterialButton(
+                      onPressed: (){
+                         Navigator.pushNamed(context, AddressPage.id);
+                      },
+                      height: 50,
+                      elevation: 0,
+                      splashColor: Config.color_1,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Config.color_2,
+                      child: Center(
+                        child: Text(
+                          "Add address",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
+            );
+         
         });
   }
 }

@@ -23,7 +23,7 @@ class ClientService extends BaseApi {
   }
 
   Future<http.Response?> updateAddress(Address address) async {
-    print(address.address);
+   
     try {
       return await api.httpPost('client/address',{
         
@@ -58,6 +58,16 @@ class ClientService extends BaseApi {
         'client_id': id,
         'old_password': oldP,
         'new_password': newP,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+   Future<http.Response?> order(data) async {
+    try {
+      return await api.httpPost('order', {
+        'data': data,
       });
     } catch (e) {
       print(e);

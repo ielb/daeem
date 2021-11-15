@@ -1,10 +1,13 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Login extends StatefulWidget {
   static const id = "/login";
@@ -16,11 +19,13 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController? _emailController;
   TextEditingController? _passwordController;
-  AuthProvider _authProvider = AuthProvider();
-  ClientProvider _clientProvider = ClientProvider();
-  AddressProvider _addressProvider = AddressProvider();
+  late AuthProvider _authProvider;
+  late ClientProvider _clientProvider;
+  late AddressProvider _addressProvider;
+  late StoreProvider _storeProvider;
   bool _isVisible = true;
   bool _isValidate = true;
+  bool called = false;
   var isCheckout;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   @override
@@ -32,11 +37,17 @@ class _LoginState extends State<Login> {
 
   @override
   void didChangeDependencies() {
-    _authProvider = Provider.of<AuthProvider>(context);
-    _clientProvider = Provider.of<ClientProvider>(context);
-    _addressProvider = Provider.of<AddressProvider>(context);
-    isCheckout = ModalRoute.of(context)!.settings.arguments;
-
+    if (!called) {
+      if (mounted)
+        setState(() {
+          called = true;
+        });
+      _authProvider = Provider.of<AuthProvider>(context);
+      _clientProvider = Provider.of<ClientProvider>(context);
+      _addressProvider = Provider.of<AddressProvider>(context);
+      _storeProvider = Provider.of<StoreProvider>(context);
+      isCheckout = ModalRoute.of(context)!.settings.arguments;
+    }
     super.didChangeDependencies();
   }
 
@@ -44,6 +55,7 @@ class _LoginState extends State<Login> {
   void dispose() {
     _emailController!.dispose();
     _passwordController!.dispose();
+    isCheckout = null;
     super.dispose();
   }
 
@@ -53,7 +65,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  ///validation
+  //? validation
   _validate() {
     if (_formkey.currentState!.validate()) {
       setState(() {
@@ -71,46 +83,54 @@ class _LoginState extends State<Login> {
     }
   }
 
-  ///Login
+  //? Login
   void _login(String email, String password) async {
     var result = await _authProvider.loginWithEmail(email, password);
-
-    if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
-      if (isCheckout != null && isCheckout) {
-        Navigator.pushReplacementNamed(context, CheckoutPage.id);
-      } else
-        Navigator.pushReplacementNamed(context, Home.id);
-    } else
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context);
+    _navigate(result);
   }
 
-  ///google button
+  //? google button
   void signInWithGoogle() async {
     bool result = await _authProvider.socialLogin("google");
-    if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
+    _navigate(result);
   }
 
-  ///facebook button
+  //? facebook button
   void signInWithFacebook() async {
     bool result = await _authProvider.socialLogin("facebook");
+    _navigate(result);
+  }
+
+  _navigate(bool result) async {
     if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 2);
+      _clientProvider.setClient(_authProvider.client!);
+
+      if (isCheckout != null && isCheckout) {
+        Navigator.pushReplacementNamed(context, CheckoutPage.id);
+        _addressProvider.setAddress(_clientProvider.client?.address);
+        _clientProvider.setBusy(false);
+      } else {
+        if (mounted) _clientProvider.setBusy(false);
+        Navigator.pushReplacementNamed(context, Home.id);
+
+        if (_clientProvider.client!.address != null) {
+          _addressProvider.setAddress(_clientProvider.client?.address);
+          await _storeProvider.getStoreType();
+          _storeProvider.getStores(_clientProvider.client!.address!);
+        }
+      }
+    } else {
+      _authProvider.setBusy(false);
+      showTopSnackBar(
+          context,
+          CustomSnackBar.info(
+              message: "Something went wrong with your credentails please try again or try another methode"));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<LocaleProvider>(context, listen: false);
+    var locale = Provider.of<LocaleProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: _authProvider.isLoading
@@ -242,7 +262,7 @@ class _LoginState extends State<Login> {
                               onPressed: () {
                                 if (_clientProvider.client == null ||
                                     _addressProvider.address == null) {
-                                   Config.bottomSheet(context);
+                                  Config.bottomSheet(context);
                                 } else {
                                   Prefs.instance.setAuth(false);
                                   Navigator.pushReplacementNamed(

@@ -1,6 +1,8 @@
 import 'package:daeem/models/market.dart';
+import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/widgets/rating.dart';
@@ -11,9 +13,9 @@ import '/extensions/extensions.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
-  final Market market;
+  final Store market;
   final bool isMarket;
-  
+
   final bool isSub;
   const CustomSliverAppBarDelegate(this.market, this.expandedHeight,
       {this.isMarket = false, this.isSub = false});
@@ -44,9 +46,18 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double disappear(double shrinkOffset) => 1 - shrinkOffset / expandedHeight;
 
   Widget buildAppBar(double shrinkOffset, context) {
-    var _categoryProvider =
-        Provider.of<CategoryProvider>(context, );
-    var cart = Provider.of<CartProvider>(context, );
+    var _categoryProvider = Provider.of<CategoryProvider>(
+      context,
+    );
+    var cart = Provider.of<CartProvider>(
+      context,
+    );
+    var _marketProvider = Provider.of<StoreProvider>(
+      context,
+    );
+     var auth = Provider.of<AuthProvider>(
+      context,
+    );
     return Opacity(
       opacity: appear(shrinkOffset),
       child: AppBar(
@@ -55,173 +66,10 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         title: Text(
           "${market.name}",
           style: GoogleFonts.ubuntu(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: Config.black),
+              fontSize: 24, fontWeight: FontWeight.w500, color: Config.black),
         ),
         leading: IconButton(
             onPressed: () {
-              if (!isMarket) {
-                _categoryProvider.closeProducts();
-                if (!isSub) _categoryProvider.closeSub();
-                Navigator.pop(context);
-              } else {
-                _categoryProvider.close();
-                _categoryProvider.closeSub();
-                if (cart.isCartEmpty()) {
-                  _categoryProvider.closeProducts();
-                  Navigator.pop(context);
-                } else
-                  showDialog(
-                    context: context, // <<----
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          child: Container(
-                            height: 400,
-                            width: 400,
-                            child: Column(
-                              children: [
-                                Image.asset("assets/cart.png").paddingAll(25),
-                                Text("Your cart will be deleted",
-                                    style: GoogleFonts.ubuntu(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black)),
-                                Text("Please complete your order",
-                                        style: GoogleFonts.ubuntu(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.grey))
-                                    .paddingAll(20),
-                                Spacer(),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    OutlinedButton(
-                                        onPressed: () {
-                                          cart.clearCart();
-                                          Navigator.pushReplacementNamed(context,Home.id);
-                                        },
-                                        child: Text("Cancel anyway"),
-                                        style: OutlinedButton.styleFrom(
-                                          primary: Colors.red.shade400,
-                                          side: BorderSide(
-                                              color: Colors.red.shade400,
-                                              width: 1.5),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                new BorderRadius.circular(6),
-                                          ),
-                                          textStyle:
-                                              GoogleFonts.ubuntu(fontSize: 14),
-                                        )),
-                                    Spacer(),
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, CheckoutPage.id);
-                                        },
-                                        child: Text("Go to checkout"),
-                                        style: ElevatedButton.styleFrom(
-                                            shadowColor: Config.color_1,
-                                            primary: Config.color_1,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(5),
-                                            ),
-                                            textStyle: GoogleFonts.ubuntu(
-                                                fontSize: 14,
-                                                color: Colors.white))),
-                                  ],
-                                ).paddingOnly(left: 20, right: 20, bottom: 20)
-                              ],
-                            ),
-                          ));
-                    },
-                  );
-              }
-            },
-            iconSize: 30,
-            color: Config.black,
-            icon: Icon(CupertinoIcons.back)),
-            centerTitle: true,
-        automaticallyImplyLeading: false,
-        actions: [
-          Stack(children: <Widget>[
-                IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, CartPage.id);
-                    },
-                    iconSize: 26,
-              color: Config.black,
-              icon: Icon(Ionicons.bag_handle)).paddingOnly(top:5),
-                cart.basket.length != 0
-                    ? Positioned(
-                        right: 3,
-                        top: 10,
-                        child: Container(
-                          padding: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          constraints: BoxConstraints(
-                            minWidth: 20,
-                            minHeight: 20,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${cart.basket.length}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(),
-              ]),
-          
-        ],
-      ),
-    );
-  }
-
-  Widget buildBackground(double shrinkOffset, context) {
-    var _categoryProvider =
-        Provider.of<CategoryProvider>(context, );
-    var cart = Provider.of<CartProvider>(context, );
-    return Opacity(
-        opacity: disappear(shrinkOffset),
-        child: Container(
-            decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.8), BlendMode.darken),
-                  image: new NetworkImage(market.cover!),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(15),
-                    bottomLeft: Radius.circular(15))),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: Text(
-                "Supermarket",
-                style: GoogleFonts.ubuntu(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: Config.white),
-              ),
-               centerTitle: true,
-              leading: IconButton(
-                  onPressed: () {
                     if (!isMarket) {
                       _categoryProvider.closeProducts();
                       if (!isSub) _categoryProvider.closeSub();
@@ -229,12 +77,14 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                     } else {
                       _categoryProvider.close();
                       _categoryProvider.closeSub();
+                      _marketProvider.unSetCurrentMarket();
                       if (cart.isCartEmpty()) {
                         _categoryProvider.closeProducts();
                         Navigator.of(context).pop(context);
-                      } else
+                      } else{
+                        if(auth.isAuth()){
                         showDialog(
-                          context: context, // <<----
+                          context: context,
                           barrierDismissible: false,
                           builder: (BuildContext context) {
                             return Dialog(
@@ -263,12 +113,18 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          OutlinedButton(
+                                          TextButton(
                                               onPressed: () {
                                                 cart.clearCart();
-                                                Navigator.pushReplacementNamed(context,Home.id);
+                                                Navigator.of(context)
+                                                    .pop(context);
                                               },
-                                              child: Text("Cancel anyway"),
+                                              child: Text(
+                                                "Cancel anyway",
+                                                style: GoogleFonts.ubuntu(
+                                                    fontSize: 14,
+                                                    color: Colors.red.shade500),
+                                              ),
                                               style: OutlinedButton.styleFrom(
                                                 primary: Colors.red.shade400,
                                                 side: BorderSide(
@@ -283,23 +139,18 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                                     fontSize: 14),
                                               )),
                                           Spacer(),
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.pushNamed(
-                                                    context, CheckoutPage.id);
-                                              },
-                                              child: Text("Go to checkout"),
-                                              style: ElevatedButton.styleFrom(
-                                                  shadowColor: Config.color_1,
-                                                  primary: Config.color_1,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        new BorderRadius
-                                                            .circular(5),
-                                                  ),
-                                                  textStyle: GoogleFonts.ubuntu(
-                                                      fontSize: 14,
-                                                      color: Colors.white))),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, CheckoutPage.id);
+                                            },
+                                            child: Text(
+                                              "Checkout",
+                                              style: GoogleFonts.ubuntu(
+                                                  fontSize: 14,
+                                                  color: Config.color_2),
+                                            ),
+                                          ),
                                         ],
                                       ).paddingOnly(
                                           left: 20, right: 20, bottom: 20)
@@ -308,6 +159,194 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                 ));
                           },
                         );
+                        }else{
+                          cart.clearCart();
+                          Navigator.of(context).pop(context);
+                        }
+                      }
+                    }
+                  },
+            iconSize: 30,
+            color: Config.black,
+            icon: Icon(CupertinoIcons.back)),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          InkWell(
+            onTap: (){
+               Navigator.pushNamed(context, CartPage.id);
+            },
+            child: Stack(
+              children: <Widget>[
+              Icon(Ionicons.bag_handle, size: 26, color: Config.black)
+                  .paddingOnly(top: 10, right: 10),
+              cart.basket.length != 0
+                  ? Positioned(
+                      right: 2,
+                      top: 5,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${cart.basket.length}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildBackground(double shrinkOffset, context) {
+    var _categoryProvider = Provider.of<CategoryProvider>(
+      context,
+    );
+    var __marketProvider = Provider.of<StoreProvider>(
+      context,
+    );
+    var cart = Provider.of<CartProvider>(
+      context,
+    );
+      var auth = Provider.of<AuthProvider>(
+      context,
+    );
+    return Opacity(
+        opacity: disappear(shrinkOffset),
+        child: Container(
+            decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.8), BlendMode.darken),
+                  image: new NetworkImage(market.cover!),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(15),
+                    bottomLeft: Radius.circular(15))),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                "Supermarket",
+                style: GoogleFonts.ubuntu(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    color: Config.white),
+              ),
+              centerTitle: true,
+              leading: IconButton(
+                  onPressed: () {
+                    if (!isMarket) {
+                      _categoryProvider.closeProducts();
+                      if (!isSub) _categoryProvider.closeSub();
+                      Navigator.of(context).pop(context);
+                    } else {
+                      _categoryProvider.close();
+                      _categoryProvider.closeSub();
+                      __marketProvider.unSetCurrentMarket();
+                      if (cart.isCartEmpty()) {
+                        _categoryProvider.closeProducts();
+                        Navigator.of(context).pop(context);
+                      } else{
+                        if(auth.isAuth()){
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: Container(
+                                  height: 400,
+                                  width: 400,
+                                  child: Column(
+                                    children: [
+                                      Image.asset("assets/cart.png")
+                                          .paddingAll(25),
+                                      Text("Your cart will be deleted",
+                                          style: GoogleFonts.ubuntu(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black)),
+                                      Text("Please complete your order",
+                                              style: GoogleFonts.ubuntu(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.grey))
+                                          .paddingAll(20),
+                                      Spacer(),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          TextButton(
+                                              onPressed: () {
+                                                cart.clearCart();
+                                                Navigator.of(context)
+                                                    .pop(context);
+                                              },
+                                              child: Text(
+                                                "Cancel anyway",
+                                                style: GoogleFonts.ubuntu(
+                                                    fontSize: 14,
+                                                    color: Colors.red.shade500),
+                                              ),
+                                              style: OutlinedButton.styleFrom(
+                                                primary: Colors.red.shade400,
+                                                side: BorderSide(
+                                                    color: Colors.red.shade400,
+                                                    width: 1.5),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      new BorderRadius.circular(
+                                                          6),
+                                                ),
+                                                textStyle: GoogleFonts.ubuntu(
+                                                    fontSize: 14),
+                                              )),
+                                          Spacer(),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, CheckoutPage.id);
+                                            },
+                                            child: Text(
+                                              "Checkout",
+                                              style: GoogleFonts.ubuntu(
+                                                  fontSize: 14,
+                                                  color: Config.color_2),
+                                            ),
+                                          ),
+                                        ],
+                                      ).paddingOnly(
+                                          left: 20, right: 20, bottom: 20)
+                                    ],
+                                  ),
+                                ));
+                          },
+                        );
+                        }else{
+                          cart.clearCart();
+                          Navigator.of(context).pop(context);
+                        }
+                      }
                     }
                   },
                   iconSize: 30,
@@ -315,44 +354,43 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                   icon: Icon(CupertinoIcons.back)),
               automaticallyImplyLeading: false,
               actions: [
-               
-          Stack(children: <Widget>[
-                IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, CartPage.id);
-                    },
-                    iconSize: 26,
-              color: Config.white,
-              icon: Icon(Ionicons.bag_handle)).paddingOnly(top:5),
-                cart.basket.length != 0
-                    ? Positioned(
-                        right: 3,
-                        top: 10,
-                        child: Container(
-                          padding: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          constraints: BoxConstraints(
-                            minWidth: 20,
-                            minHeight: 20,
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${cart.basket.length}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                              ),
-                              textAlign: TextAlign.center,
+                 InkWell(
+            onTap: (){
+               Navigator.pushNamed(context, CartPage.id);
+            },
+            child: Stack(
+              children: <Widget>[
+              Icon(Ionicons.bag_handle, size: 26, color: Config.white)
+                  .paddingOnly(top: 10, right: 10),
+              cart.basket.length != 0
+                  ? Positioned(
+                      right: 2,
+                      top: 5,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${cart.basket.length}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      )
-                    : Container(),
-              ]),
-          
+                      ),
+                    )
+                  : Container(),
+            ]),
+          ),
               ],
             )));
   }

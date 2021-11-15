@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:location/location.dart' as loc;
 
 class LocationService {
   Future<Position?> getLoc() async {
@@ -8,8 +9,9 @@ class LocationService {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     // Test if location services are enabled.
     if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
+     await loc.Location.instance.requestService();
+     // await Geolocator.openLocationSettings();
+     
     }
 
     permission = await Geolocator.checkPermission();

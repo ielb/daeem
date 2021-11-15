@@ -1,5 +1,6 @@
-import 'dart:convert';
+// ignore_for_file: non_constant_identifier_names, unused_local_variable
 
+import 'dart:convert';
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/auth_service.dart';
 import 'package:daeem/services/services.dart';
@@ -41,65 +42,144 @@ class AuthProvider extends BaseProvider {
   }
 
   Future<bool> socialLogin(String provider) async {
+    Prefs.instance.setPlatform(true);
     if (provider == "facebook") {
       setBusy(true);
       final LoginResult result = await FacebookAuth.instance.login();
-      print(result.message);
+
       if (result.status == LoginStatus.success) {
-        print("Success");
         final OAuthCredential credential =
             FacebookAuthProvider.credential(result.accessToken!.token);
+
         UserCredential clientCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
-        var response = await _authService.socialLogin(
-            1, clientCredential.user!.email!, clientCredential.user!.uid);
-        if (response != null) {
-          var data = jsonDecode(response.body);
-          if (data['status'] == "success") {
-            var json = data['data'][0];
-            setClient(Client.fromJson(json));
-            await Prefs.instance.setClient(json['id'].toString());
-            setBusy(false);
-            await Prefs.instance.setAuth(true);
-            return true;
-          } else {
-            setBusy(false);
-            return false;
-          }
+        var email = clientCredential.additionalUserInfo?.profile?['email'];
+        print(email);
+        if (email == null)
+          return false;
+        else {
+          var emailResult = await checkEmail(email);
+          print(emailResult);
+          if (emailResult == true) {
+            var response = await _authService.socialLogin(
+                1, email, clientCredential.user!.uid);
+            if (response != null) {
+              var data = jsonDecode(response.body);
+              print(data);
+              if (data['status'] == "success") {
+                var json = data['data'];
+                var client_data = json['client'];
+                var address_data = json['address'];
+                setClient(Client.fromJson(client_data, address_data));
+                Prefs.instance.setClient(_client!.id.toString());
+                notifyListeners();
+                return true;
+              } else {
+                return false;
+              }
+            }
+          } else
+            return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
         }
       } else {
-        setBusy(false);
+        notifyListeners();
         return false;
       }
       return false;
     } else {
-      setBusy(true);
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        UserCredential clientCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        var response = await _authService.socialLogin(
-            0, clientCredential.user!.email!, clientCredential.user!.uid);
-        if (response != null) {
-          var data = jsonDecode(response.body);
-          if (data['status'] == "success") {
-            var json = data['data'][0];
-            setClient(Client.fromJson(json));
-            await Prefs.instance.setClient(json['id'].toString());
-            print(client);
-            setBusy(false);
-            await Prefs.instance.setAuth(true);
-            return true;
-          } else {
-            setBusy(false);
+      try {
+        setBusy(true);
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser != null) {
+          final GoogleSignInAuthentication googleAuth =
+              await googleUser.authentication;
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          UserCredential clientCredential =
+              await FirebaseAuth.instance.signInWithCredential(credential);
+          var email = clientCredential.additionalUserInfo?.profile?['email'];
+          print(" email : $email");
+          if (email == null)
             return false;
+          else {
+            var emailResult = await checkEmail(email);
+
+            if (emailResult == true) {
+              var response = await _authService.socialLogin(
+                  0, email, clientCredential.user!.uid);
+              if (response != null) {
+                var data = jsonDecode(response.body);
+                if (data['status'] == "success") {
+                  var json = data['data'];
+                  var client_data = json['client'];
+                  var address_data = json['address'];
+
+                  setClient(Client.fromJson(client_data, address_data));
+                  Prefs.instance.setClient(_client!.id.toString());
+
+                  notifyListeners();
+
+                  return true;
+                } else {
+                  notifyListeners();
+                  return false;
+                }
+              }
+            } else {
+              return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
+            }
           }
+        }
+        notifyListeners();
+        return false;
+      } catch (error) {
+        print(error);
+      }
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> socialMediaSignUp(String email,String uid,String displayName ,String provider) async {
+    if (provider == "facebook") {
+      var response = await _authService.socialRegister(
+          1,
+          email,
+          uid,
+          displayName);
+      if (response != null) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var json = data['data'];
+          setClient(Client.fromJson(json, null));
+          Prefs.instance.setClient(json['id'].toString());
+          notifyListeners();
+          return true;
+        } else {
+          notifyListeners();
+          return false;
+        }
+      }
+      return false;
+    } else {
+      var response = await _authService.socialRegister(
+          0,
+          email,
+          uid,
+          displayName);
+      if (response != null) {
+        var data = jsonDecode(response.body);
+        if (data['status'] == "success") {
+          var json = data['data'];
+          setClient(Client.fromJson(json, null));
+          Prefs.instance.setClient(json['id'].toString());
+          notifyListeners();
+          return true;
+        } else {
+          notifyListeners();
+          return false;
         }
       }
       return false;
@@ -107,73 +187,44 @@ class AuthProvider extends BaseProvider {
   }
 
   socialSignUp(String provider) async {
-    if (provider == "facebook") {
-      setBusy(true);
-      final LoginResult result = await FacebookAuth.instance.login();
-      if (result.status == LoginStatus.success) {
-        print("Success");
-        final OAuthCredential credential =
-            FacebookAuthProvider.credential(result.accessToken!.token);
-        UserCredential clientCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        var response = await _authService.socialRegister(
-            1,
-            clientCredential.user!.email!,
-            clientCredential.user!.uid,
-            clientCredential.user!.displayName!);
-        if (response != null) {
-          var data = jsonDecode(response.body);
-          if (data['status'] == "success") {
-            var json = data['data'];
-            setClient(Client.fromJson(json));
-            await Prefs.instance.setClient(json['id'].toString());
-            print(client);
-            setBusy(false);
-            await Prefs.instance.setAuth(true);
-            return true;
-          } else {
-            setBusy(false);
-            return false;
-          }
-        }
-      }
-      return false;
-    } else {
-      setBusy(true);
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      print("google user");
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        UserCredential clientCredential =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        var response = await _authService.socialRegister(
-            0,
-            clientCredential.user!.email!,
-            clientCredential.user!.uid,
-            clientCredential.user!.displayName!);
-        if (response != null) {
-          var data = jsonDecode(response.body);
-          if (data['status'] == "success") {
-            var json = data['data'];
-            setClient(Client.fromJson(json));
-            await Prefs.instance.setClient(json['id'].toString());
-            print(client);
-            setBusy(false);
-            await Prefs.instance.setAuth(true);
-            return true;
-          } else {
-            setBusy(false);
-            return false;
+    try {
+      if (provider == "facebook") {
+        setBusy(true);
+        final LoginResult result = await FacebookAuth.instance.login();
+        if (result.status == LoginStatus.success) {
+          final OAuthCredential credential =
+              FacebookAuthProvider.credential(result.accessToken!.token);
+          UserCredential clientCredential =
+              await FirebaseAuth.instance.signInWithCredential(credential);
+          var emailResult = await checkEmail(clientCredential.user!.email!);
+          if (emailResult == false) {
+            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'facebook');
           }
         }
         return false;
+      } else {
+        setBusy(true);
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser != null) {
+          final GoogleSignInAuthentication googleAuth =
+              await googleUser.authentication;
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          UserCredential clientCredential =
+              await FirebaseAuth.instance.signInWithCredential(credential);
+
+          var emailResult = await checkEmail(clientCredential.user!.email!);
+          if (emailResult == false) {
+            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'google');
+          }
+        }
       }
+    } catch (error) {
+      print(error);
     }
+    return false;
   }
 
   Future<bool> registerWithEmail(
@@ -181,15 +232,14 @@ class AuthProvider extends BaseProvider {
     setBusy(true);
     http.Response? response = await _authService.register(
         name.trim(), email.toLowerCase().trim(), password.trim());
-    print(response?.body);
     if (response != null) {
       var data = jsonDecode(response.body);
-      print(data);
+
       if (data['status'] == "success") {
-        setBusy(false);
+        notifyListeners();
         return true;
       } else {
-        setBusy(false);
+        setError(data['message']);
         return false;
       }
     }
@@ -203,18 +253,19 @@ class AuthProvider extends BaseProvider {
         await _authService.login(email.toLowerCase().trim(), password.trim());
     if (response != null) {
       var data = jsonDecode(response.body);
-       print(data);
       if (data['status'] == "success") {
-        var json = data['data'][0];
-        print(data);
-        setClient(Client.fromJson(json));
-        await Prefs.instance.setClient(json['id'].toString());
-        print(client);
-        setBusy(false);
-        await Prefs.instance.setAuth(true);
+        var json = data['data'];
+        var client_data = json['client'];
+        var address_data = json['address'];
+
+        setClient(Client.fromJson(client_data, address_data));
+        Prefs.instance.setClient(_client!.id.toString());
+
+        notifyListeners();
+
         return true;
       } else {
-        setBusy(false);
+        notifyListeners();
         return false;
       }
     }
@@ -225,9 +276,9 @@ class AuthProvider extends BaseProvider {
     http.Response? response = await _authService.getClient(id);
     if (response != null) {
       var json = jsonDecode(response.body);
-      print(json);
       if (response.statusCode == 200 && json['status'] == "success") {
-        setClient(Client.fromJson(json['data']));
+        setClient(
+            Client.fromJson(json['data']['client'], json['data']['address']));
         return true;
       }
       return false;
@@ -236,18 +287,34 @@ class AuthProvider extends BaseProvider {
   }
 
   Future<bool> logOut() async {
-    _client = null;
-    notifyListeners();
-    print("test");
+    setBusy(false);
+
+    FirebaseAuth.instance.signOut();
     var google = await GoogleSignIn().isSignedIn();
     var facebook = await FacebookAuth.instance.accessToken;
-    if (facebook != null) FacebookAuth.instance.logOut();
+    if (facebook != null) {
+      FirebaseAuth.instance.signOut();
+      FacebookAuth.instance.logOut();
+    }
     if (google) {
+      FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
     }
+    _client = null;
     var prefs = await SharedPreferences.getInstance();
     prefs.clear();
     notifyListeners();
     return true;
+  }
+
+  checkEmail(String email) async {
+    http.Response? response = await _authService.checkEmail(email);
+    if (response != null) {
+      var json = jsonDecode(response.body);
+      if (response.statusCode == 200 && json['status'] == "success") {
+        return true;
+      }
+      return false;
+    }
   }
 }

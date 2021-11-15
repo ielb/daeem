@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/item.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/product.dart';
@@ -7,8 +6,8 @@ import 'package:daeem/provider/category_provider.dart';
 import 'package:daeem/screens/loading/product_shimmer.dart';
 import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/services/services.dart';
+import 'package:daeem/widgets/product_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:ionicons/ionicons.dart';
 
 class ProductsPage extends StatefulWidget {
   static const id = "products";
@@ -23,10 +22,10 @@ class _ProductsPageState extends State<ProductsPage> {
   bool isSearching = false;
   bool _called = false;
   String query = '';
-  Market market = Market();
+  Store market = Store();
   Future<bool> dataResult = Future(() => false);
-  late CategoryProvider _categoryProvider ;
-  late CartProvider cart ;
+  late CategoryProvider _categoryProvider;
+  late CartProvider cart;
   int itemCount = 1;
   @override
   void initState() {
@@ -36,14 +35,11 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   void didChangeDependencies() {
-    setState(() {
-      
-    });
     if (!_called) {
-      _categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-        cart = Provider.of<CartProvider>(context, listen: false);
+      cart = Provider.of<CartProvider>(context);
+      _categoryProvider = Provider.of<CategoryProvider>(context);
       var list = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
-      market = list[0] as Market;
+      market = list[0] as Store;
       int id = list[1] as int;
       dataResult = _getProducts(id);
       setState(() {
@@ -87,30 +83,25 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   addToCart(Product product, BuildContext context) {
-   
     Item item = Item(product: product, quantity: 1);
     cart.addToBasket(item);
     setState(() {});
   }
 
   removeFromCart(Product product, BuildContext context) {
-   
     Item item = Item(product: product);
     cart.removeFromBasket(item);
     setState(() {});
   }
 
-
   Future<bool> _backPressed() async {
-  
     _categoryProvider.closeProducts();
     Navigator.of(context).pop(context);
     return true;
   }
 
-  _productPressed(Product product) {
-    Navigator.of(context).push(CupertinoPageRoute(
-        builder: (context) => ProductDetails(product: product))); 
+  _productPressed(Product product) async {
+    Navigator.of(context).pushNamed(ProductDetails.id, arguments: product);
   }
 
   @override
@@ -187,7 +178,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   SliverToBoxAdapter(
                       child: SearchInput(
                     _searchController,
-                    "Search for supermarket",
+                    "Search for product",
                     screenSize(context).width * .81,
                     CupertinoIcons.search,
                     onChanged: onChange,
@@ -198,8 +189,10 @@ class _ProductsPageState extends State<ProductsPage> {
                   ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
                   //*content
                   isSearching ? _searchedContent(context) : _content(context),
-                   SliverToBoxAdapter(
-                      child: SizedBox(height: 50,)),
+                  SliverToBoxAdapter(
+                      child: SizedBox(
+                    height: 50,
+                  )),
                 ],
               ),
               mcontext: context)),
@@ -222,22 +215,25 @@ class _ProductsPageState extends State<ProductsPage> {
                       .paddingOnly(left: 20, right: 20, bottom: 20);
                 },
               );
-            }
-            return snapshot.data?.length == 0
-                ? Text("This product out of stock").paddingAll(50).center()
-                : ListView.builder(
-                    shrinkWrap: true,
-                    primary: false,
-                    itemExtent: 80,
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) {
-                      return snapshot.hasData
-                          ? content(
-                              product: snapshot.data![index], context: context)
-                          : Text("This product out of stock")
-                              .paddingAll(50)
-                              .center();
-                    });
+            } else
+              return snapshot.data?.length == 0
+                  ? Text("This product out of stock").paddingAll(50).center()
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemExtent: 80,
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (context, index) {
+                        return snapshot.hasData
+                            ? ProductWidget(
+                                product: snapshot.data![index],
+                                onTap: () {
+                                  _productPressed(snapshot.data![index]);
+                                })
+                            : Text("This product out of stock")
+                                .paddingAll(50)
+                                .center();
+                      });
           }),
     );
   }
@@ -258,59 +254,48 @@ class _ProductsPageState extends State<ProductsPage> {
                   },
                 );
               }
+              if (_categoryProvider.products.isEmpty) {
+                return Column(children: [
+                  Config.empty,
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  Text("No orders yet",
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, Home.id);
+                      },
+                      child: Text(
+                        "Continue shopping",
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          textStyle: GoogleFonts.ubuntu(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                          shadowColor: Config.color_2,
+                          primary: Config.color_2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(15),
+                          ),
+                          fixedSize: Size(270, 50)))
+                ]);
+              }
               return ListView.builder(
                   shrinkWrap: true,
                   primary: false,
                   itemCount: _categoryProvider.products.length,
                   itemExtent: 80,
                   itemBuilder: (context, index) {
-                    return content(
+                    return ProductWidget(
                         product: _categoryProvider.products[index],
-                        context: context,
                         onTap: () {
                           _productPressed(_categoryProvider.products[index]);
                         });
                   }).paddingOnly(bottom: 50);
             }),
       );
-
-  Widget content(
-      {required Product product,
-      required BuildContext context,
-      Function()? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ListTile(
-          minVerticalPadding: 5,
-          leading: Container(
-            height: 60,
-            width: 60,
-            padding: EdgeInsets.all(5),
-            child: CachedNetworkImage(
-              imageUrl: product.image ?? '',
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.high,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  CircularProgressIndicator(value: downloadProgress.progress)
-                      .center(),
-              errorWidget: (context, url, error) =>
-                  Image.asset("assets/placeholder.png"),
-            ),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    spreadRadius: 2,
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  )
-                ]),
-          ),
-          title: Text(product.name!),
-          subtitle: Text(product.price! + " MAD"),
-          trailing: Icon(Ionicons.chevron_forward)),
-    );
-  }
 }

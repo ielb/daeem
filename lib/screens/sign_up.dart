@@ -1,9 +1,12 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
+import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/widgets/inputField.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SignUp extends StatefulWidget {
   static const id = "signup";
@@ -16,10 +19,10 @@ class _SignUpState extends State<SignUp> {
   TextEditingController? _emailController;
   TextEditingController? _passwordController;
   TextEditingController? _nameController;
-  AuthProvider _authProvider = AuthProvider();
-
-  ClientProvider _clientProvider = ClientProvider();
-  AddressProvider _addressProvider = AddressProvider();
+  late AuthProvider _authProvider;
+  late ClientProvider _clientProvider;
+  late AddressProvider _addressProvider;
+  late StoreProvider _marketProvider;
   bool _isVisible = true;
   bool _isValidate = true;
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -34,8 +37,9 @@ class _SignUpState extends State<SignUp> {
   @override
   void didChangeDependencies() {
     _authProvider = Provider.of<AuthProvider>(context);
-    _clientProvider =  Provider.of<ClientProvider>(context);
+    _clientProvider = Provider.of<ClientProvider>(context);
     _addressProvider = Provider.of<AddressProvider>(context);
+    _marketProvider = Provider.of<StoreProvider>(context);
     super.didChangeDependencies();
   }
 
@@ -64,14 +68,7 @@ class _SignUpState extends State<SignUp> {
             _nameController!.text,
             _emailController!.text,
             _passwordController!.text);
-        if (result) {
-          Toast.show(
-              "Registration completed successfully,please login", context);
-          Navigator.pushReplacementNamed(context, Login.id);
-        } else {
-          Toast.show(AppLocalizations.of(context)!.wentWrong, context,
-              duration: 4);
-        }
+       checkErrors(result);
       } else {}
     } else {
       setState(() {
@@ -79,26 +76,27 @@ class _SignUpState extends State<SignUp> {
       });
     }
   }
+  
 
   _googleSignUp() async {
     var result = await _authProvider.socialSignUp("google");
-    if (result) {
-      Provider.of<ClientProvider>(context, listen: false)
-          .setClient(_authProvider.client!);
-      Navigator.pushReplacementNamed(context, Home.id);
-    } else {
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
-    }
+   checkErrors(result);
   }
 
   _facebookSignUp() async {
     var result = await _authProvider.socialSignUp("facebook");
-    if (result) {
+    checkErrors(result);
+  }
+  checkErrors(bool result)async {
+   if (result) {
+        await _marketProvider.getStoreType();
       Provider.of<ClientProvider>(context, listen: false)
           .setClient(_authProvider.client!);
       Navigator.pushReplacementNamed(context, Home.id);
+       _authProvider.setBusy(false);
     } else {
-      Toast.show(AppLocalizations.of(context)!.wentWrong, context, duration: 4);
+       _authProvider.setBusy(false);
+       showTopSnackBar(context, CustomSnackBar.info(message: "The given credentials are exist please\n sign in"));
     }
   }
 
@@ -227,7 +225,6 @@ class _SignUpState extends State<SignUp> {
                                 Navigator.pushReplacementNamed(
                                     context, Home.id);
                               }
-                              
                             },
                             child: Text(AppLocalizations.of(context)!.skip),
                             style: OutlinedButton.styleFrom(

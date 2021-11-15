@@ -8,9 +8,10 @@ import io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingBackgroundS
 public class Application extends FlutterApplication implements PluginRegistry.PluginRegistrantCallback {
     // ...
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public void onCreate() {  
         FlutterFirebaseMessagingBackgroundService.setPluginRegistrant(this);
+        super.onCreate();
+     
     }
 
     @Override

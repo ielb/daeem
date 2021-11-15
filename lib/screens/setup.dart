@@ -13,13 +13,16 @@ class _SetupState extends State<Setup> {
 
   @override
   void initState() {
-   
-    Timer(
-        Duration(milliseconds: 20),
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        Timer(
+        Duration(microseconds: 50),
         () => Navigator.pushReplacement(
             context, CupertinoPageRoute(builder: (context) => Splash())));
+    });
     super.initState();
   }
+
+ 
 
   @override
   void didChangeDependencies() {
@@ -53,11 +56,20 @@ class _SetupState extends State<Setup> {
           Config.auth_background,
         ),
         context);
+      
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Image.asset(
+          Config.logo,
+          width: MediaQuery.of(context).size.width * 0.5,
+      ),
+      ),
+    );
   }
 }

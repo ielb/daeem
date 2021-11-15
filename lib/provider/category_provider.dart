@@ -4,11 +4,11 @@ import 'package:daeem/models/market_category.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/models/sub_category.dart';
 import 'package:daeem/provider/base_provider.dart';
-import 'package:daeem/services/market_service.dart';
+import 'package:daeem/services/store_service.dart';
 import 'package:http/http.dart';
 
 class CategoryProvider extends BaseProvider {
-  MarketService _service = MarketService();
+  StoreService _service = StoreService();
   //*Market Category
   List<MarketCategory> _categories = List.empty(growable: true);
   List<MarketCategory> get categories => _categories;
@@ -67,14 +67,14 @@ class CategoryProvider extends BaseProvider {
 
   _setProductsFormJson(List data) {
     data.forEach((element) {
-      _addProducts(Product.fromJson(element));
+      _addProducts(Product.fromMap(element));
     });
     notifyListeners();
   }
 
   _setSearchedProducts(List data) {
     data.forEach((element) {
-      _searchedProducts.add(Product.fromJson(element));
+      _searchedProducts.add(Product.fromMap(element));
     });
     notifyListeners();
   }
@@ -93,6 +93,36 @@ class CategoryProvider extends BaseProvider {
     } else
       return false;
   }
+
+  /// -----------------   Product Variant ............................ ///
+
+  // Future<List<Variant>> getProductVariant(int id) async {
+  //   List<Variant> variants = List.empty(growable: true);
+  //   setBusy(true);
+  //   Response? response = await _service.getProductVariant(id);
+  //   if (response != null && response.statusCode == 200) {
+  //     var data = jsonDecode(response.body);
+  //     if (data['status'] != "error") {
+  //       print(data['data'][0]);
+  //       data['data'][0].forEach((variant) {
+  //         variants.add(Variant.fromMap(variant));
+  //       });
+
+  //       variants.forEach((vari) {
+  //         print(vari.toString());
+  //       });
+
+  //       setBusy(false);
+  //       return variants;
+  //     } else {
+  //       setBusy(false);
+  //       return List.empty(growable: true);
+  //     }
+  //   } else {
+  //     setBusy(false);
+  //     return List.empty(growable: true);
+  //   }
+  // }
 
   Future<List<Product>> searchForProduct(String name) async {
     if (name.isEmpty || name == '') {
@@ -120,9 +150,11 @@ class CategoryProvider extends BaseProvider {
   }
 
   Future<bool> getCategories(int id) async {
+    if (_categories.isNotEmpty) _categories.clear();
     Response? response = await _service.getMarketsCategory(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
+      print(data);
       if (data['status'] != "error") {
         _setCategoryFromJson(data['data']);
         notifyListeners();
@@ -147,11 +179,11 @@ class CategoryProvider extends BaseProvider {
           notifyListeners();
           return _searchedCategories;
         } else
-        notifyListeners();
-          return List.empty();
-      } else
-      notifyListeners();
+          notifyListeners();
         return List.empty();
+      } else
+        notifyListeners();
+      return List.empty();
     }
   }
 
@@ -167,16 +199,15 @@ class CategoryProvider extends BaseProvider {
 
   closeProducts() {
     _products.clear();
-    notifyListeners();
   }
 
   close() {
     _categories.clear();
-    notifyListeners();
   }
   // * Subcategories
 
   Future<bool> getSubCategories(int id) async {
+    _subCategories.clear();
     Response? response = await _service.getMarketsSubCategory(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
@@ -204,17 +235,15 @@ class CategoryProvider extends BaseProvider {
           setBusy(false);
           return _searchedSubCategories;
         } else
-        setBusy(false);
-          return List.empty();
-      } else
-      setBusy(false);
+          setBusy(false);
         return List.empty();
-
+      } else
+        setBusy(false);
+      return List.empty();
     }
   }
 
   closeSub() {
     _subCategories.clear();
-    notifyListeners();
   }
 }

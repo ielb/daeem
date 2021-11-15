@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "754880333308",
+    "firebase_url": "https://daeem-10b87-default-rtdb.firebaseio.com",
     "project_id": "daeem-10b87",
     "storage_bucket": "daeem-10b87.appspot.com"
   },
@@ -14,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "754880333308-ghqopvkolhgici92nh70nboudtqb755q.apps.googleusercontent.com",
+          "client_id": "754880333308-lt683on44db7s3c7cikpoaephg999d6t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ielb.daeem",

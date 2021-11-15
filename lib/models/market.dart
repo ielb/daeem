@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:daeem/services/market_service.dart';
+import 'package:daeem/services/store_service.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
-class Market {
+class Store {
   int? id;
   String? name;
   String? logo;
@@ -20,7 +20,7 @@ class Market {
   int? rating = 5;
   String hours = "07:00 - 22:00";
 
-  Market(
+  Store(
       {this.id,
       this.name,
       this.logo,
@@ -36,7 +36,7 @@ class Market {
       this.rating,
       this.hours = "07:00 - 22:00"});
 
-  Market.fromJson(Map<String, dynamic> json) {
+  Store.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
     this.name = json['name'];
     this.logo =
@@ -55,7 +55,7 @@ class Market {
   }
 
  Future<String> getHours(int id) async {
-    MarketService service = MarketService();
+    StoreService service = StoreService();
     Response? response = await service.getMarketsHours(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
