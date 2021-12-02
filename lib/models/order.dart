@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:daeem/configs/config.dart';
+import 'package:daeem/models/OrderProduct.dart';
 import 'package:daeem/models/status.dart';
 import 'package:flutter/foundation.dart';
 
@@ -26,6 +27,7 @@ class Order {
   String? invoice_images;
   String created_at;
   Status current_status;
+  List<OrderdProduct> products;
   List<Status> status_history;
   Order({
     required this.id,
@@ -46,6 +48,7 @@ class Order {
     required this.created_at,
     required this.current_status,
     required this.status_history,
+    required this.products,
   });
 
 
@@ -88,12 +91,14 @@ class Order {
       created_at: created_at ?? this.created_at,
       current_status: current_status ?? this.current_status,
       status_history: status_history ?? this.status_history,
+      products:  this.products,
     );
   }
 
  
 
   factory Order.fromMap(Map<String, dynamic> map) {
+    print(map['products_']);
     return Order(
       id: map['id'],
       address_id: map['address_id'],
@@ -111,8 +116,11 @@ class Order {
       seen_by_driver: map['seen_by_driver']=="1" ? true : false,
       invoice_images: map['invoice_images'] != null ? map['invoice_images'] : null,
       created_at: map['created_at'],
+      products: (map['products_'] as List)
+          .map((e) => OrderdProduct.fromMap(e as Map<String, dynamic>))
+          .toList(),
       current_status: Status.fromMap( Config.getStatus(int.parse(map['status_id'].toString()))),
-      status_history: (map['statuses'] as List<dynamic>).map((e) => Status.fromMap(Config.getStatus(int.parse(e.toString())))).toList(),
+      status_history: (map['statuses'] as List<dynamic>).map((e) => Status.fromMap(Config.getStatus(int.parse(e['status_id'].toString()),date:e['created_at']))).toList(),
     );
   }
 

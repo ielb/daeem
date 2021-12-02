@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:daeem/provider/address_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -51,7 +52,7 @@ class _StoreState extends State<Store> {
 
       dataResult = _getMarkets();
       setState(() {
-        called= !called;
+        called = !called;
       });
     }
     super.didChangeDependencies();
@@ -70,9 +71,7 @@ class _StoreState extends State<Store> {
   _scrollListener() {
     if (!isSearching) if (_scrollController.offset >=
             _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      
-    }
+        !_scrollController.position.outOfRange) {}
   }
 
   onChange(String value) {
@@ -107,9 +106,7 @@ class _StoreState extends State<Store> {
           title: Text(
             marketProvider.storeType ?? "Supermarches",
             style: GoogleFonts.ubuntu(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                color: Config.black),
+                fontSize: 24, fontWeight: FontWeight.w500, color: Config.black),
           ),
           leading: IconButton(
               onPressed: () {
@@ -174,13 +171,15 @@ class _StoreState extends State<Store> {
                     itemCount: snapshot.data?.length,
                     itemBuilder: (context, index) {
                       return MarketWidget(
-                              snapshot.data![index].name!,
-                              snapshot.data![index].cover,
-                              snapshot.data![index].address!,
-                              snapshot.data![index].hours,
-                              5,
-                              (rate) {})
-                          .paddingOnly(left: 20, right: 20, bottom: 20);
+                          store: snapshot.data![index],
+                          onRate: (rate) {
+                            marketProvider.rate(
+                                snapshot.data![index].id!,
+                                int.parse(Provider.of<ClientProvider>(context)
+                                    .client!
+                                    .id!),
+                                rate);
+                          }).paddingOnly(left: 20, right: 20, bottom: 20);
                     })
                 : Text("We didn't find what are you searching about")
                     .paddingAll(50)
@@ -206,11 +205,11 @@ class _StoreState extends State<Store> {
                 },
               );
             }
-            if(marketProvider.markets.isEmpty){              
+            if (marketProvider.markets.isEmpty) {
               return Column(children: [
                 Config.empty,
                 SizedBox(height: screenSize(context).height * 0.1),
-                Text("No orders yet",
+                Text("No stores right now",
                     style: GoogleFonts.ubuntu(
                         fontSize: 20,
                         color: Colors.black,
@@ -220,10 +219,11 @@ class _StoreState extends State<Store> {
                   onPressed: () {
                     Navigator.pushNamed(context, Home.id);
                   },
-                  child: Text("Continue shopping",
-                     ),
+                  child: Text(
+                    "Back home",
+                  ),
                   style: ElevatedButton.styleFrom(
-                    textStyle: GoogleFonts.ubuntu(
+                      textStyle: GoogleFonts.ubuntu(
                           fontSize: 20,
                           color: Colors.white,
                           fontWeight: FontWeight.w600),
@@ -235,7 +235,7 @@ class _StoreState extends State<Store> {
                       fixedSize: Size(270, 50)),
                 )
               ]);
-              }
+            }
             return ListView.builder(
               shrinkWrap: true,
               primary: false,
@@ -250,13 +250,15 @@ class _StoreState extends State<Store> {
                         arguments: marketProvider.markets[index]);
                   },
                   child: MarketWidget(
-                          marketProvider.markets[index].name!,
-                          marketProvider.markets[index].cover,
-                          marketProvider.markets[index].address!,
-                          marketProvider.markets[index].hours,
-                          5,
-                          (rate) {})
-                      .paddingOnly(left: 20, right: 20, bottom: 20),
+                      store: marketProvider.markets[index],
+                      onRate: (rate) {
+                        marketProvider.rate(
+                            marketProvider.markets[index].id!,
+                            int.parse(Provider.of<ClientProvider>(context,listen: false)
+                                .client!
+                                .id!),
+                            rate);
+                      }).paddingOnly(left: 20, right: 20, bottom: 20),
                 );
               },
             );

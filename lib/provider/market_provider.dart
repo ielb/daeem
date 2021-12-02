@@ -170,4 +170,15 @@ class StoreProvider extends BaseProvider {
       return _storesTypes;
     }
   }
+
+
+  Future<void> rate(int id, int clientId ,int rate) async {
+    http.Response? response = await _marketService.updateMarketsRating(id, clientId, rate);
+    if (response != null && response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        notifyListeners();
+      }
+    }
+    }
 }

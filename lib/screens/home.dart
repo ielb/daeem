@@ -1,6 +1,9 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/provider/notifiation_provider.dart';
 import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/store/home_store_shimmer.dart';
@@ -24,25 +27,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String userName = "John";
-  double value = 3.5;
-  int itemCount = 5;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  late StoreProvider marketProvider;
   late ClientProvider _clientProvider;
   late AddressProvider _addressProvider;
-  bool isSearching = false;
-  String query = '';
-  int counter = 0;
   bool called = false;
-  Future dataResult = Future(() => false);
-  Future categorisedStores = Future(() => false);
-
-  @override
-  void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {});
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -54,7 +42,7 @@ class _HomeState extends State<Home> {
         });
       _clientProvider = Provider.of<ClientProvider>(context);
       _addressProvider = Provider.of<AddressProvider>(context);
-      marketProvider = Provider.of<StoreProvider>(context);
+
       WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
         if (_clientProvider.client?.address == null &&
             _addressProvider.address == null) {
@@ -69,36 +57,29 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
-  onChange(String value) {
-    query = value;
-  }
-
-  onClose() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      isSearching = !isSearching;
-    });
-  }
-
-  onTap() {
-    setState(() {
-      isSearching = !isSearching;
-    });
-  }
-
   Future<bool> _requiestPop() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Are you sure you want to exit?',style: GoogleFonts.ubuntu(),),
+        title: Text(
+          'Are you sure you want to exit?',
+          style: GoogleFonts.ubuntu(),
+        ),
         actions: <Widget>[
           TextButton(
-            child: Text('No',style: GoogleFonts.ubuntu(color: Colors.black),),
+            child: Text(
+              'No',
+              style: GoogleFonts.ubuntu(color: Colors.black),
+            ),
             onPressed: () => Navigator.pop(context, false),
           ),
           TextButton(
-            child: Text('Yes',style: GoogleFonts.ubuntu(color: Colors.red),),
-            onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+            child: Text(
+              'Yes',
+              style: GoogleFonts.ubuntu(color: Colors.red),
+            ),
+            onPressed: () =>
+                SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
           ),
         ],
       ),
@@ -121,8 +102,8 @@ class _HomeState extends State<Home> {
             onTap: () {
               Navigator.pushNamed(context, AddressPage.id);
             },
-            child: Container(
-              width: 300,
+            child: SizedBox(
+              width: screenSize(context).width*.5,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -135,18 +116,22 @@ class _HomeState extends State<Home> {
                   ).align(alignment: Alignment.topLeft),
                   Row(
                     children: [
-                      Container(
-                        width: screenSize(context).width * 0.3,
-                        child: Text(
-                          "${_addressProvider.address?.address ?? 'current Location'}",
-                          maxLines: 1,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.ubuntu(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300,
-                              color: Config.darkBlue),
-                        ),
+                      SizedBox(
+                        width: screenSize(context).width*.35,
+                        child: Consumer<ClientProvider>(
+                            builder: (context, _provider, child) {
+                              
+                          return Text(
+                            "${_provider.client?.address?.address ?? 'current Location'}",
+                            maxLines: 1,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.ubuntu(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                                color: Config.darkBlue),
+                          );
+                        }),
                       ),
                       Icon(
                         CupertinoIcons.chevron_down,
@@ -163,73 +148,93 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 _key.currentState!.openDrawer();
               },
-             
-              icon: Icon(Ionicons.menu,size: 28,color: Config.darkBlue,)),
+              icon: Icon(
+                Ionicons.menu,
+                size: 28,
+                color: Config.darkBlue,
+              )),
           automaticallyImplyLeading: false,
           actions: [
-            Stack(children: <Widget>[
-              IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, NotificationScreen.id);
-                  },
-                  icon: Icon(Ionicons.notifications,size: 28,color: Config.darkBlue,)),
-              counter != 0
-                  ? Positioned(
-                      right: 3,
-                      top: 2,
-                      child: Container(
-                        padding: EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        constraints: BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$counter',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                            textAlign: TextAlign.center,
+            Consumer<NotificationProvider>(builder: (contex, _notif, child) {
+              return Stack(children: <Widget>[
+                IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, NotificationScreen.id);
+                    },
+                    icon: Icon(
+                      Ionicons.notifications,
+                      size: 28,
+                      color: Config.darkBlue,
+                    )),
+                Visibility(
+                  visible: _notif.notifications.length != 0,
+                  child: Positioned(
+                    right: 3,
+                    top: 2,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${_notif.notifications.length}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    )
-                  : Container(),
-            ]),
-          ],
-        ),
-        body: CustomScrollView(
-          physics: BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Container(
-                child: Text(
-                  "Ahlan, ${_clientProvider.client?.name ?? 'Visitor'} !",
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.ubuntu(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
+                    ),
+                  ),
                 )
-                    .paddingOnly(top: 10, left: 15)
-                    .align(alignment: Alignment.topLeft),
-              ),
-            ),
-            _content(),
-            _sections()
+              ]);
+            }),
           ],
         ),
+        body: Consumer<StoreProvider>(builder: (context, _provider, child) {
+          return CustomScrollView(
+            physics: BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Consumer<ClientProvider>(
+                    builder: (context, _client, child) {
+                  return Text(
+                    "Ahlan, ${_client.client?.name ?? 'Visitor'} !",
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.ubuntu(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  )
+                      .paddingOnly(top: 10, left: 15)
+                      .align(alignment: Alignment.topLeft);
+                }),
+              ),
+              _Content(provider: _provider),
+              _Section(
+                provider: _provider,
+              )
+            ],
+          );
+        }),
       ),
     );
   }
+}
 
-  Widget _content() {
+class _Content extends StatelessWidget {
+  _Content({required this.provider, Key? key}) : super(key: key);
+  StoreProvider provider;
+  @override
+  Widget build(BuildContext context) {
     return SliverToBoxAdapter(
         child: Container(
       height: 165,
@@ -244,7 +249,7 @@ class _HomeState extends State<Home> {
           Container(
             height: 120,
             child: FutureBuilder(
-                future: dataResult,
+                future: Future(() => false),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return ListView.builder(
@@ -257,7 +262,7 @@ class _HomeState extends State<Home> {
                       },
                     );
                   }
-                  if (marketProvider.storesType.length == 0) {
+                  if (provider.storesType.length == 0) {
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,
@@ -274,18 +279,17 @@ class _HomeState extends State<Home> {
                     primary: false,
                     itemExtent: 100,
                     scrollDirection: Axis.horizontal,
-                    itemCount: marketProvider.storesType.length,
+                    itemCount: provider.storesType.length,
                     itemBuilder: (context, i) {
                       return InkWell(
                           onTap: () {
-                            marketProvider.setStoreType(
-                                marketProvider.storesType[i].name);
+                            provider.setStoreType(provider.storesType[i].name);
                             Navigator.pushNamed(context, Store.id,
-                                arguments: marketProvider.storesType[i].id);
+                                arguments: provider.storesType[i].id);
                           },
                           child: StoreWidget(
-                              title: "${marketProvider.storesType[i].name}",
-                              imageUrl: marketProvider.storesType[i].image));
+                              title: "${provider.storesType[i].name}",
+                              imageUrl: provider.storesType[i].image));
                     },
                   ).paddingOnly(left: 10);
                 }),
@@ -294,32 +298,39 @@ class _HomeState extends State<Home> {
       ),
     ));
   }
+}
 
-  Widget _sections() {
+class _Section extends StatelessWidget {
+  _Section({required this.provider, Key? key}) : super(key: key);
+  StoreProvider provider;
+  @override
+  Widget build(BuildContext context) {
     return SliverToBoxAdapter(
         child: FutureBuilder(
-            future: categorisedStores,
+            future: Future(() => false),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting)
-                return CircularProgressIndicator()
-                    .paddingOnly(top: 100)
-                    .center();
-              if (marketProvider.storesType.length == 0) {
-                return Text("No data").paddingOnly(top: 100).center();
+                return CircularProgressIndicator(
+                  color: Config.color_2,
+                ).paddingOnly(top: 100).center();
+              if (provider.storesType.length == 0) {
+                return CircularProgressIndicator(
+                  color: Config.color_2,
+                ).paddingOnly(top: 100).center();
               } else
                 return ListView.builder(
                     shrinkWrap: true,
                     primary: false,
-                    itemCount: marketProvider.storesType.length,
+                    itemCount: provider.storesType.length,
                     itemBuilder: (context, index) {
-                      return marketProvider.storesType[index].stores.isNotEmpty
+                      return provider.storesType[index].stores.isNotEmpty
                           ? Container(
-                              margin: EdgeInsets.only(bottom: 30),
+                              margin: EdgeInsets.only(bottom: 10),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${marketProvider.storesType[index].name}",
+                                    "${provider.storesType[index].name}",
                                     style: GoogleFonts.ubuntu(
                                         fontSize: 20,
                                         color: Colors.black,
@@ -328,23 +339,27 @@ class _HomeState extends State<Home> {
                                   ListView.builder(
                                       shrinkWrap: true,
                                       primary: false,
-                                      itemCount: marketProvider
-                                                  .storesType[index]
-                                                  .stores
-                                                  .length >=
+                                      itemCount: provider.storesType[index]
+                                                  .stores.length >=
                                               3
                                           ? 3
-                                          : marketProvider
+                                          : provider
                                               .storesType[index].stores.length,
                                       itemBuilder: (context, i) {
                                         return HomeCategory(
-                                            store: marketProvider
+                                            store: provider
                                                 .storesType[index].stores[i]);
                                       }),
-                                  if (marketProvider
-                                          .storesType[index].stores.length >
+                                  if (provider.storesType[index].stores.length >
                                       3)
                                     InkWell(
+                                      onTap: () {
+                                        provider.setStoreType(
+                                            provider.storesType[index].name);
+                                        Navigator.pushNamed(context, Store.id,
+                                            arguments:
+                                                provider.storesType[index].id);
+                                      },
                                       child: Container(
                                         height: 40,
                                         width: screenSize(context).width * .75,
@@ -355,7 +370,7 @@ class _HomeState extends State<Home> {
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Text(
-                                              "View all stores (${marketProvider.storesType[index].stores.length - 3})",
+                                              "View more (${provider.storesType[index].stores.length - 3})",
                                               softWrap: true,
                                               overflow: TextOverflow.ellipsis,
                                               style: GoogleFonts.ubuntu(
@@ -371,7 +386,7 @@ class _HomeState extends State<Home> {
                               ),
                             )
                           : Container(
-                              height: 50,
+                              height: 0,
                               width: 0,
                             );
                     });

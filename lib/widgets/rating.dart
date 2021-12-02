@@ -19,9 +19,9 @@ class _Rating extends State<Rating> {
 
   Widget _buildRatingStar(int index) {
     if (index < _currentRating) {
-      return Icon(CupertinoIcons.star_fill, size: 18,color: Colors.orange);
+      return Icon(CupertinoIcons.star_fill, size: 20,color: Colors.orange);
     } else {
-      return Icon(CupertinoIcons.star_fill,size: 18,color: Colors.grey,);
+      return Icon(CupertinoIcons.star_fill,size:20,color: Colors.grey,);
     }
   }
 

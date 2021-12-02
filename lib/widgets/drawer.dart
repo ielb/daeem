@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
@@ -168,6 +169,7 @@ class CustomDrawer extends StatelessWidget {
                                   onPressed: () async {
                                     _notificationProvider.clearNotifications();
                                     var result = await _clientProvider.logOut();
+                                    Provider.of<AddressProvider>(context,listen:false).setAddress(null);
                                     if (result) {
                                       Navigator.of(context).pushNamed(Login.id);
                                       _client.clear();

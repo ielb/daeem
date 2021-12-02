@@ -23,6 +23,15 @@ class AuthService extends BaseApi {
       print(e);
     }
   }
+   Future<http.Response?> resetPassword(String email) async {
+    try {
+      return await api.httpPost('reset_password_request', {
+        'email': email.trim().toLowerCase(),
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<http.Response?> checkEmail(String email) async {
     try {

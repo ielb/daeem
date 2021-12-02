@@ -19,7 +19,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   bool called = false;
   bool isAdded = false;
   late CartProvider cart;
-  int _selectedSize = 0;
+  int _selectedSize = -1;
   Item? pageProduct;
   @override
   void didChangeDependencies() {
@@ -186,7 +186,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 ),
                               ),
                               SizedBox(
-                                height: 15,
+                                height: 10,
                               ),
                               Text(
                                 "${widget.product.price} MAD",
@@ -200,7 +200,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ],
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       Text(
                         "${widget.product.description}",
@@ -211,7 +211,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       if (widget.product.hasVariant != 0)
                         Column(
@@ -221,9 +221,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                               'Size',
                               style: TextStyle(
                                   color: Colors.grey.shade400, fontSize: 18),
-                            ),
-                            SizedBox(
-                              height: 10,
                             ),
                             Container(
                               height: 60,

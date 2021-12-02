@@ -1,4 +1,5 @@
 import 'package:daeem/screens/home.dart';
+import 'package:daeem/screens/order_screen.dart';
 import 'package:daeem/services/services.dart';
 
 class ConfirmedPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _ConfirmedPageState extends State<ConfirmedPage> {
              ElevatedButton(
                       onPressed: () {
                         ///Todo:add track
-                        Navigator.pushReplacementNamed(context, Home.id);
+                        Navigator.pushReplacementNamed(context, OrdersPage.id);
                       },
                       child: Text(
                         "Track order",

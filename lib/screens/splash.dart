@@ -54,7 +54,7 @@ class _SplashState extends State<Splash> {
           if (connected) {
             _getAuthClient();
           } else {
-            Navigator.pushReplacementNamed(context, LostConnection.id);
+            Navigator.pushNamed(context, LostConnection.id);
           }
         });
       });

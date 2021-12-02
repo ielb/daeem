@@ -27,24 +27,24 @@ class OrdersProvider extends BaseProvider {
   }
 
   Future<bool> getOrders({required String clientId}) async {
-    if(_orders.isNotEmpty) _orders.clear();
+    if (_orders.isNotEmpty) _orders.clear();
     http.Response? response = await _orderService.getClientOrders(clientId);
+    print(response?.body);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-
       if (data['status'] == "success") {
-        data = data['data'].first; 
+
+        data = data['data'].first;
+
         _orders = (data as List).map((i) => Order.fromMap(i)).toList();
-       _orders = _orders.reversed.toList();
-       notifyListeners();
-       return true;
-      }else 
-      notifyListeners();
-        return false;
-       
-    }
-    else
-     notifyListeners();
+        _orders = _orders.reversed.toList();
+        notifyListeners();
+        return true;
+      } else
+        notifyListeners();
       return false;
+    } else
+      notifyListeners();
+    return false;
   }
 }

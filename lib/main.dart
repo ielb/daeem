@@ -21,6 +21,7 @@ import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/order_details_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
+import 'package:daeem/screens/password/password_reset.dart';
 import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
@@ -28,6 +29,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
 import 'package:daeem/screens/sub_category.dart';
@@ -48,14 +50,15 @@ onNotificationReceive(notification) {}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   await Firebase.initializeApp(
       options: FirebaseOptions(
-          apiKey: 'AIzaSyD06NHrE7Q0bvZKU4bbb_iCu_JbwuIhp7U',
-          appId: "1:754880333308:android:24877d09b33939c6749e79",
-          messagingSenderId: '754880333308',
-          projectId: 'daeem-10b87'));
+          apiKey: dotenv.env['firebase_api_key']!,
+          appId: dotenv.env['firebase_app_id']!,
+          messagingSenderId: dotenv.env['firebase_messaging_sender_id']!,
+          projectId:dotenv.env['firebase_project_id']!));
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
@@ -113,11 +116,13 @@ Route<dynamic> routes(RouteSettings settings) {
     /// Home screen
     case Home.id:
       return CupertinoPageRoute(builder: (_) => Home(), settings: settings);
+    case ResetPasswordPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => ResetPasswordPage(), settings: settings);
 
     case OrdersPage.id:
       return CupertinoPageRoute(
           builder: (_) => OrdersPage(), settings: settings);
-
     /// On boarding
     case OnBoardering.id:
       return CupertinoPageRoute(
@@ -152,7 +157,7 @@ Route<dynamic> routes(RouteSettings settings) {
 
 
     case Category.id:
-      return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
+      return CupertinoPageRoute(builder: (_) => Category(category: settings.arguments as String,), settings: settings);
     case CheckoutPage.id:
       return CupertinoPageRoute(
           builder: (_) => CheckoutPage(), settings: settings);

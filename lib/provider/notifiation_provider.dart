@@ -21,6 +21,7 @@ class NotificationProvider extends BaseProvider {
 
    var result = await _db.addNotification(notification);
    if(result){
+     if(!_notifications.contains((element) => notification==element))
       _notifications.add(notification);
       notifyListeners();
    }

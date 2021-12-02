@@ -1,3 +1,6 @@
+
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -7,13 +10,13 @@ class Api {
     return _api;
   }
   Api._internal();
-  String url = "https://app.daeem.ma/api/";
+  String url = dotenv.env['server_url']!;
 
   // ignore: todo
   //TODO:HERE YOU CHANGE THE BEARER TOKEN
   var headers = {
     'Accept': 'application/json',
-    'Authorization': 'Bearer 7aMhMdMcmLvLDxfVl4HhlRvKzM4mXfh35Ob7ISuc',
+    'Authorization': 'Bearer ${dotenv.env['server_api_key']!}',
     'Content-Type': 'application/x-www-form-urlencoded'
   };
 
@@ -38,3 +41,5 @@ class Api {
 
 
 }
+
+

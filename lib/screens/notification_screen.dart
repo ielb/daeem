@@ -50,7 +50,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               },
               child: Text(
                 "Clear All",
-                style: GoogleFonts.ubuntu(fontSize: 16, color: Colors.red),
+                style: GoogleFonts.ubuntu(fontSize: 14, color: Colors.red),
               ).paddingOnly(right: 5),
             )
         ],
@@ -68,6 +68,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       shrinkWrap: true,
                       primary: false,
                       itemCount: _notificationProvider.notifications.length,
+                      itemExtent: 85,
                       itemBuilder: (context, index) {
                         return NotificationWidget(
                             notification: _notificationProvider

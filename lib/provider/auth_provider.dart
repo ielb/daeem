@@ -41,6 +41,20 @@ class AuthProvider extends BaseProvider {
     return await Prefs.instance.getOnBoardingSkipped();
   }
 
+  Future<dynamic> resetPassword(String email) async {
+    http.Response? response =  await _authService.resetPassword(email);
+    if(response != null&&response.statusCode == 200) {
+      var data= json.decode(response.body);
+      if(data['status'] == 'success') {
+         
+        return data['data'];
+      }else
+      return null;
+    }else {
+      return null;
+    }
+  }
+
   Future<bool> socialLogin(String provider) async {
     Prefs.instance.setPlatform(true);
     if (provider == "facebook") {

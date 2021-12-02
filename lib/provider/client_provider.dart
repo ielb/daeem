@@ -32,6 +32,26 @@ class ClientProvider extends BaseProvider {
     notifyListeners();
   }
 
+  refundOrder(int orderId, String reason) async {
+    print(reason);
+    http.Response? response =
+        await _service.refund(_client!.id!, orderId, reason);
+        print(response?.body);
+    if (response != null && response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      print(data);
+      if (data['status'] == "success") {
+        return true;
+      
+      }
+      else {
+        return false;
+      }
+    }else {
+      return false;
+    }
+  }
+
   Future<void> updateInfo(String name, String email) async {
     _client!.name = name;
     _client!.email = email;
@@ -46,21 +66,37 @@ class ClientProvider extends BaseProvider {
     notifyListeners();
   }
 
-  Future<String?> changePassword(String oldPassword, String newPassword) async {
+  Future<bool> resetPassword(Client currentClient, String password) async {
     http.Response? response =
-        await _service.changePassword(_client!.id, oldPassword, newPassword);
+        await _service.resetPassword(currentClient.id, password);
 
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
 
       if (data['status'] == "success") {
-        return "The password has been changed";
+        return true;
       } else {
-        return "Your current password is incorrect. Please try again";
+        return false;
       }
     }
-
     notifyListeners();
+    return false;
+  }
+
+  Future<bool?> changePassword(String oldPassword, String newPassword) async {
+    http.Response? response =
+        await _service.changePassword(_client?.id, oldPassword, newPassword);
+
+    if (response != null && response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      if (data['status'] == "success") {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return null;
   }
 
   changePhone({required String smsCode, required String phone}) async {
@@ -77,11 +113,11 @@ class ClientProvider extends BaseProvider {
         } else
           return false;
       }
-       notifyListeners();
+      notifyListeners();
       return false;
     } else
-       notifyListeners();
-      return false;
+      notifyListeners();
+    return false;
   }
 
   updateAddress(Address address) async {
@@ -89,8 +125,10 @@ class ClientProvider extends BaseProvider {
 
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
-                print(data['data']);
-         setClientAddress(Address.fromMap(data['data']));
+      print(data['data']);
+      setClientAddress(Address.fromMap(data['data']));
+      print(_client!.address?.id);
+      notifyListeners();
     }
   }
 
@@ -100,6 +138,7 @@ class ClientProvider extends BaseProvider {
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       if (data['status'] == "success") {
+        _client!.address = null;
         _client!.address = Address.fromMap(data['data']);
         notifyListeners();
       }
@@ -107,13 +146,14 @@ class ClientProvider extends BaseProvider {
   }
 
   setClientAddress(Address address) {
+    _client!.address = null;
     _client!.address = address;
     notifyListeners();
   }
 
   verifyClientPhoneNumber(String phone) {
     FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: "+212${phone.length==9 ?  phone :phone.substring(1)}",
+        phoneNumber: "+212${phone.length == 9 ? phone : phone.substring(1)}",
         verificationCompleted: (phoneAuthCredential) {
           _sms = phoneAuthCredential.smsCode;
           notifyListeners();
@@ -121,10 +161,9 @@ class ClientProvider extends BaseProvider {
         verificationFailed: (error) {},
         codeSent: (text, _) {},
         codeAutoRetrievalTimeout: (code) {});
-  
   }
-  clear() {
 
+  clear() {
     _client = null;
     notifyListeners();
   }

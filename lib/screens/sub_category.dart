@@ -11,6 +11,9 @@ import 'package:flutter/cupertino.dart';
 
 class Category extends StatefulWidget {
   static const id = "category";
+  Category({required this.category});
+  final String category;
+
 
   @override
   _CategoryState createState() => _CategoryState();
@@ -158,6 +161,8 @@ class _CategoryState extends State<Category> {
                 searching: isSearching,
                 isHavingShadow: true,
               ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
+                SliverToBoxAdapter(
+                  child:Text("{}",style: GoogleFonts.ubuntu(fontSize: 22,color: Colors.black,fontWeight: FontWeight.bold)).paddingOnly(left: 20,top: 20),),
               isSearching ? _searchedContent() : _content()
             ],
 

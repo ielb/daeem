@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomeCategory extends StatelessWidget {
-  const HomeCategory({required this.store,key}) : super(key: key);
+  const HomeCategory({required this.store, key}) : super(key: key);
   final Store store;
   @override
   Widget build(BuildContext context) {
@@ -12,20 +13,29 @@ class HomeCategory extends StatelessWidget {
       children: [
         ListTile(
           onTap: () {
-            Provider.of<StoreProvider>(context,listen: false).setCurrentMarket(store);
-            Navigator.pushNamed(context, MarketPage.id,arguments: store);
+            Provider.of<StoreProvider>(context, listen: false)
+                .setCurrentMarket(store);
+            Navigator.pushNamed(context, MarketPage.id, arguments: store);
           },
           dense: true,
           isThreeLine: true,
-          leading: Image.network(
-            store.logo??'',
+          leading: CachedNetworkImage(
+            imageUrl: store.logo ?? '',
             height: 50,
             width: 50,
-            filterQuality: FilterQuality.high,
+            memCacheHeight: 55,
             fit: BoxFit.contain,
+            errorWidget: (context, url, error) =>
+                Image.asset(Config.placeHolder),
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircularProgressIndicator(
+              value: downloadProgress.progress,
+              color: Config.color_2,
+              strokeWidth: 2,
+            ).center(),
           ),
           title: Text(
-            "${store.name??''}",
+            "${store.name ?? ''}",
             style: GoogleFonts.ubuntu(
                 fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500),
           ).paddingOnly(top: 5),
@@ -33,7 +43,7 @@ class HomeCategory extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${store.address??''}",
+                "${store.address ?? ''}",
                 style: GoogleFonts.ubuntu(
                     fontSize: 16,
                     color: Colors.grey,

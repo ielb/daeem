@@ -259,6 +259,20 @@ class _MarketPageState extends State<MarketPage> {
                 },
               );
             }
+            
+            if(!market.status!){
+                return Column(
+                  children: [
+                    Image.asset(
+                      "assets/closed_stores.gif",
+                      height: screenSize(context).height * .4,
+                    ),
+                    Text("This store is currently closed",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 20, fontWeight: FontWeight.w500))
+                  ],
+                );
+              }else
             return snapshot.data?.length != 0
                 ? ListView.builder(
                     shrinkWrap: true,
@@ -307,7 +321,19 @@ class _MarketPageState extends State<MarketPage> {
                   ],
                 );
               }
-
+              if(!market.status!){
+                return Column(
+                  children: [
+                    Image.asset(
+                      "assets/closed_stores.gif",
+                      height: screenSize(context).height * .4,
+                    ),
+                    Text("This store is currently closed",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 20, fontWeight: FontWeight.w500))
+                  ],
+                );
+              }else
               return ListView.builder(
                 shrinkWrap: true,
                 primary: false,

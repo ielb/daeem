@@ -137,7 +137,6 @@ class _AddressPageState extends State<AddressPage> {
           city: address.first.locality);
 
       if (_clientProvider.client != null) {
-        print(_address.clientId);
         _addressProvider.setAddress(_address);
         _clientProvider.setClientAddress(_address);
         await _clientProvider.updateAddress(_address);

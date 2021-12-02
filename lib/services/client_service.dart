@@ -23,27 +23,25 @@ class ClientService extends BaseApi {
   }
 
   Future<http.Response?> updateAddress(Address address) async {
-   
     try {
-      return await api.httpPost('client/address',{
-        
-      'client_id': address.clientId,
-      'address': address.address,
-      'lat': address.lat??'',
-      'lng': address.lng??'',
-      'street_name': address.streetName,
-      'house_number': address.houseNumber??'',
-      'building_name': address.buildingName??'',
-      'floor_door_number': address.floorDoorNumber??'',
-      'code_postal': address.codePostal??'',
-      'city': address.codePostal??''
-    
+      return await api.httpPost('client/address', {
+        'client_id': address.clientId,
+        'address': address.address,
+        'lat': address.lat ?? '',
+        'lng': address.lng ?? '',
+        'street_name': address.streetName,
+        'house_number': address.houseNumber ?? '',
+        'building_name': address.buildingName ?? '',
+        'floor_door_number': address.floorDoorNumber ?? '',
+        'code_postal': address.codePostal ?? '',
+        'city': address.codePostal ?? ''
       });
     } catch (e) {
       print(e);
     }
   }
-    Future<http.Response?> getAddress(id) async {
+
+  Future<http.Response?> getAddress(id) async {
     try {
       return await api.httpGet('client/$id/address');
     } catch (e) {
@@ -51,6 +49,14 @@ class ClientService extends BaseApi {
     }
   }
 
+  Future<http.Response?> resetPassword(id, password) async {
+    try {
+      return await api
+          .httpPost('reset_password', {'client_id': id, 'password': password});
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<http.Response?> changePassword(id, oldP, newP) async {
     try {
@@ -64,7 +70,7 @@ class ClientService extends BaseApi {
     }
   }
 
-   Future<http.Response?> order(data) async {
+  Future<http.Response?> order(data) async {
     try {
       return await api.httpPost('order', {
         'data': data,
@@ -82,6 +88,21 @@ class ClientService extends BaseApi {
       });
     } catch (e) {
       print(e);
+    }
+  }
+
+    Future<http.Response?> refund(String id,int orderId,String reason) async {
+    try {
+      print(id);
+      print(orderId); 
+      print(reason);
+      return await api.httpPost('order/refund', {
+        'client_id': id.toString(),
+        'order_id': orderId.toString(),
+        'reason': reason.toString(),
+      });
+    } catch (e) {
+     print(e);
     }
   }
 }

@@ -262,8 +262,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
             ),
-      bottomNavigationBar: client.client!.address != null &&
-              client.client!.phone != null
+      bottomNavigationBar: client.client?.address != null &&
+              client.client?.phone != null
           ? Container(
               height: 100,
               color: Colors.transparent,
