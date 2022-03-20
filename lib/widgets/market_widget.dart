@@ -1,18 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:daeem/models/market.dart';
 import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
 
 class MarketWidget extends StatelessWidget {
-  const MarketWidget(this._marketTitle, this._marketImageUrl,
-      this._marketAddress, this._marketTime, this._marketRating,this._rate);
-  final String _marketTitle;
-  final String? _marketImageUrl;
-  final int _marketRating;
-  final String _marketAddress;
-  final String _marketTime;
-  final bool _isAvailable = true;
-  final Function(int) _rate;
+  const MarketWidget({required this.store,required this.onRate});
+  final Store store;
+  final Function(int) onRate;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +33,11 @@ class MarketWidget extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: CachedNetworkImage(
-                    imageUrl: _marketImageUrl!,
+                    imageUrl: store.cover!,
                     filterQuality: FilterQuality.high,
                     fit: BoxFit.cover,
+                    memCacheHeight: 80,
+                    
                     
                     progressIndicatorBuilder: (context, url, downloadProgress) =>
                         CircularProgressIndicator(
@@ -59,7 +56,7 @@ class MarketWidget extends StatelessWidget {
                 child: new Container(
                   margin: EdgeInsets.only(left: 10),
                   child: Text(
-                    _marketTitle,
+                    store.name!,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     softWrap: true,
@@ -70,7 +67,7 @@ class MarketWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Rating(_rate, _marketRating).paddingOnly(right: 10),
+              Rating(onRate, store.isFakeRating! ? 5 : store.rating!).paddingOnly(right: 10),
             ],
           ).paddingOnly(bottom: 10),
           Row(
@@ -87,7 +84,7 @@ class MarketWidget extends StatelessWidget {
                           size: 18, color: Color(0xff4A4B4D)),
                       Container(
                         width: 150,
-                        child: Text(_marketAddress,
+                        child: Text(store.address!,
                             softWrap: true,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.ubuntu(
@@ -102,7 +99,7 @@ class MarketWidget extends StatelessWidget {
                       Icon(CupertinoIcons.clock,
                               size: 18, color: Color(0xff4A4B4D))
                           .paddingOnly(right: 3),
-                      Text(_marketTime,
+                      Text(store.hours,
                           style: GoogleFonts.ubuntu(
                               fontSize: 12,
                               fontWeight: FontWeight.w300,
@@ -119,14 +116,14 @@ class MarketWidget extends StatelessWidget {
                 height: 30,
                 width: 80,
                 child: Text(
-                  _isAvailable ? "Available" : "Closed",
+                  store.status! ? "Available" : "Closed",
                   style: GoogleFonts.ubuntu(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
                       color: Colors.white),
                 ).center(),
                 decoration: BoxDecoration(
-                    color: _isAvailable ? Config.color_1 : Config.yellow,
+                    color: store.status! ? Config.color_1 : Config.yellow,
                     borderRadius: BorderRadius.circular(10)),
               ).paddingOnly(right: 15, top: 5)
             ],

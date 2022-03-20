@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/cupertino.dart';
 
 class CategoryWidget extends StatelessWidget {
   const CategoryWidget(this._categoryTitle, this._categoryImageUrl);
@@ -20,8 +19,10 @@ class CategoryWidget extends StatelessWidget {
                 imageUrl: _categoryImageUrl,
                 filterQuality: FilterQuality.high,
                 fit: BoxFit.cover,
+                memCacheHeight: 100,
+                memCacheWidth: 150,
                 colorBlendMode: BlendMode.darken,
-                color: Colors.black.withOpacity(0.3),              
+                color: Colors.black.withOpacity(0.3),
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     CircularProgressIndicator(value: downloadProgress.progress)
                         .center(),

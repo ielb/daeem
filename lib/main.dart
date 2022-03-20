@@ -21,6 +21,7 @@ import 'package:daeem/screens/connection.dart';
 import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/order_details_screen.dart';
 import 'package:daeem/screens/order_screen.dart';
+import 'package:daeem/screens/password/password_reset.dart';
 import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
@@ -28,6 +29,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'services/services.dart';
 import 'screens/setup.dart';
 import 'package:daeem/screens/sub_category.dart';
@@ -35,7 +37,9 @@ import 'package:daeem/screens/sub_category.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   notifyManager.showNotification(
-      5, message.notification?.title??message.data['title'], message.notification?.body ?? message.data['body']);
+      5,
+      message.notification?.title ?? message.data['title'],
+      message.notification?.body ?? message.data['body']);
   notifyManager.setOnNotificationClick(onNotificationClick);
   notifyManager.setOnNotificationReceive(onNotificationReceive);
 }
@@ -48,14 +52,15 @@ onNotificationReceive(notification) {}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   await Firebase.initializeApp(
       options: FirebaseOptions(
-          apiKey: 'AIzaSyD06NHrE7Q0bvZKU4bbb_iCu_JbwuIhp7U',
-          appId: "1:754880333308:android:24877d09b33939c6749e79",
-          messagingSenderId: '754880333308',
-          projectId: 'daeem-10b87'));
+          apiKey: dotenv.env['firebase_api_key']!,
+          appId: dotenv.env['firebase_app_id']!,
+          messagingSenderId: dotenv.env['firebase_messaging_sender_id']!,
+          projectId: dotenv.env['firebase_project_id']!));
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
@@ -102,7 +107,6 @@ Route<dynamic> routes(RouteSettings settings) {
     case Splash.id:
       return CupertinoPageRoute(builder: (_) => Setup(), settings: settings);
 
- 
     case LostConnection.id:
       return CupertinoPageRoute(
           builder: (_) => LostConnection(), settings: settings);
@@ -113,6 +117,9 @@ Route<dynamic> routes(RouteSettings settings) {
     /// Home screen
     case Home.id:
       return CupertinoPageRoute(builder: (_) => Home(), settings: settings);
+    case ResetPasswordPage.id:
+      return CupertinoPageRoute(
+          builder: (_) => ResetPasswordPage(), settings: settings);
 
     case OrdersPage.id:
       return CupertinoPageRoute(
@@ -150,9 +157,12 @@ Route<dynamic> routes(RouteSettings settings) {
     case Setting.id:
       return CupertinoPageRoute(builder: (_) => Setting(), settings: settings);
 
-
     case Category.id:
-      return CupertinoPageRoute(builder: (_) => Category(), settings: settings);
+      return CupertinoPageRoute(
+          builder: (_) => Category(
+                category: settings.arguments as String,
+              ),
+          settings: settings);
     case CheckoutPage.id:
       return CupertinoPageRoute(
           builder: (_) => CheckoutPage(), settings: settings);
@@ -160,9 +170,11 @@ Route<dynamic> routes(RouteSettings settings) {
     case ProductsPage.id:
       return CupertinoPageRoute(
           builder: (_) => ProductsPage(), settings: settings);
-          case ProductDetails.id:
+    case ProductDetails.id:
       return CupertinoPageRoute(
-          builder: (_) => ProductDetails(product : settings.arguments as Product), settings: settings);
+          builder: (_) =>
+              ProductDetails(product: settings.arguments as Product),
+          settings: settings);
     case ChangePassword.id:
       return CupertinoPageRoute(
           builder: (_) => ChangePassword(), settings: settings);
@@ -176,7 +188,8 @@ Route<dynamic> routes(RouteSettings settings) {
       return CupertinoPageRoute(builder: (_) => CartPage(), settings: settings);
     case OrderDetails.id:
       return CupertinoPageRoute(
-          builder: (_) => OrderDetails(order: settings.arguments as Order), settings: settings);
+          builder: (_) => OrderDetails(order: settings.arguments as Order),
+          settings: settings);
     case NotificationScreen.id:
       return CupertinoPageRoute(
           builder: (_) => NotificationScreen(), settings: settings);

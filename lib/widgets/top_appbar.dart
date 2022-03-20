@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/provider/category_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
@@ -9,7 +11,6 @@ import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import 'package:ionicons/ionicons.dart';
-import '/extensions/extensions.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
@@ -33,9 +34,9 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         buildAppBar(shrinkOffset, context),
         Positioned(
           top: top,
-          left: 20,
-          right: 20,
-          child: buildFloating(shrinkOffset),
+          left: 30,
+          right: 30,
+          child: buildFloating(shrinkOffset, context),
         ),
       ],
     );
@@ -218,7 +219,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                 image: new DecorationImage(
                   colorFilter: ColorFilter.mode(
                       Colors.black.withOpacity(0.8), BlendMode.darken),
-                  image: new NetworkImage(market.cover!),
+                  image: new CachedNetworkImageProvider(market.cover!),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.only(
@@ -227,14 +228,6 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             child: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                "Supermarket",
-                style: GoogleFonts.ubuntu(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: Config.white),
-              ),
-              centerTitle: true,
               leading: IconButton(
                   onPressed: () {
                     if (!isMarket) {
@@ -380,11 +373,11 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             )));
   }
 
-  Widget buildFloating(double shrinkOffset) => Opacity(
+  Widget buildFloating(double shrinkOffset, context) => Opacity(
         opacity: disappear(shrinkOffset),
         child: Container(
           padding: EdgeInsets.all(10),
-          height: 100,
+          height: 120,
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
@@ -398,6 +391,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
               ]),
           child: Column(
             children: [
+              Spacer(),
               Text(
                 market.name!,
                 style: GoogleFonts.ubuntu(
@@ -405,9 +399,10 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                     fontSize: 24,
                     fontWeight: FontWeight.w500),
               ),
-              SizedBox(height: 10),
+              Spacer(),
               Row(
                 children: [
+                  Spacer(),
                   Icon(CupertinoIcons.clock, size: 18, color: Color(0xff4A4B4D))
                       .paddingOnly(right: 3, left: 10),
                   Text(market.hours,
@@ -416,9 +411,39 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                           fontWeight: FontWeight.w300,
                           color: Color(0xff4A4B4D))),
                   Spacer(),
-                  Rating((s) {}, 5).paddingOnly(right: 10),
+                  Icon(CupertinoIcons.phone, size: 18, color: Color(0xff4A4B4D))
+                      .paddingOnly(right: 3, left: 10),
+                  Text(market.phone ?? market.address!,
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: Color(0xff4A4B4D))),
+                  Spacer(),
                 ],
               ),
+              Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(Ionicons.location_outline,
+                          size: 18, color: Color(0xff4A4B4D))
+                      .paddingOnly(right: 3, left: 10),
+                  Text(market.address!,
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: Color(0xff4A4B4D))),
+                ],
+              ),
+              Spacer(),
+              Rating((s) {
+                Provider.of<StoreProvider>(context, listen: false).rate(
+                    market.id!,
+                    int.parse(Provider.of<ClientProvider>(context).client!.id!),
+                    s);
+              }, 5),
+              Spacer(),
             ],
           ),
         ),

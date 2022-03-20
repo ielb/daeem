@@ -55,12 +55,10 @@ class LocalNotifyManager {
   Future<void> showNotification(int id, String title, String body) async {
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel', // id
-      'High Importance Notifications', // title
-      'This channel is used for important notifications.', // description
+      'High Importance Notifications', // title/ description
       importance: Importance.max,
     );
-    var androidChannel = AndroidNotificationDetails(
-        'channelId', 'channelName', 'channelDescription',
+    var androidChannel = AndroidNotificationDetails('channelId', 'channelName',
         importance: Importance.max, priority: Priority.max, playSound: true);
     var iosChannel = IOSNotificationDetails();
     var platformChannel =

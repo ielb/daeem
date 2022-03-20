@@ -68,8 +68,6 @@ class CartProvider extends BaseProvider {
 
   Future<bool> checkout(BuildContext context, cl.Client client, String marketId,
       DateTime? deliveryTime) async {
-  
-
     if (_basket.isEmpty) {
       print("empty");
       return false;
@@ -81,7 +79,7 @@ class CartProvider extends BaseProvider {
        "id":element.product.id,
         "price":double.parse(element.product.price??'0'),
         "quantity":element.quantity,
-        "variant":element.product.currentVariant?.id?? -1,
+        "variant":element.product.currentVariant?.id ?? '-1',
      };
      list.add(data);
    });

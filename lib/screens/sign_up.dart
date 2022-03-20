@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
@@ -131,147 +133,150 @@ class _SignUpState extends State<SignUp> {
                   image: AssetImage(Config.auth_background),
                   fit: BoxFit.fitHeight,
                 )),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.signup,
-                      style: GoogleFonts.ubuntu(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600),
-                    ).paddingOnly(left: 35, bottom: 10).align(
-                        alignment: locale.locale?.languageCode == "ar"
-                            ? Alignment.topRight
-                            : Alignment.topLeft),
-                    Container(
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.only(bottom: 30),
-                      height: _isValidate ? 440 : 480,
-                      width: screenSize(context).width * .85,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Column(
-                        children: [
-                          RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: AppLocalizations.of(context)!.join +
-                                        "\n",
-                                    style: GoogleFonts.ubuntu(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 28,
-                                        color: Config.color_1),
-                                  ),
-                                  TextSpan(
-                                      text: AppLocalizations.of(context)!
-                                          .love_join,
+                child: BackdropFilter(
+                    filter: new ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.signup,
+                        style: GoogleFonts.ubuntu(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w600),
+                      ).paddingOnly(left: 35, bottom: 10).align(
+                          alignment: locale.locale?.languageCode == "ar"
+                              ? Alignment.topRight
+                              : Alignment.topLeft),
+                      Container(
+                        padding: EdgeInsets.all(5),
+                        margin: EdgeInsets.only(bottom: 30),
+                        height: _isValidate ? 440 : 480,
+                        width: screenSize(context).width * .85,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Column(
+                          children: [
+                            RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: AppLocalizations.of(context)!.join +
+                                          "\n",
                                       style: GoogleFonts.ubuntu(
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: 14,
-                                          color: Config.color_1))
-                                ],
-                              )),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                    icon: Config.google,
-                                    onPressed: _googleSignUp,
-                                    iconSize: 40),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                IconButton(
-                                  icon: Config.facebook,
-                                  onPressed: _facebookSignUp,
-                                  iconSize: 40,
-                                ),
-                              ]),
-                          Form(
-                              key: _formkey,
-                              child: Column(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 28,
+                                          color: Config.color_1),
+                                    ),
+                                    TextSpan(
+                                        text: AppLocalizations.of(context)!
+                                            .love_join,
+                                        style: GoogleFonts.ubuntu(
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 14,
+                                            color: Config.color_1))
+                                  ],
+                                )),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Input(
-                                    _nameController!,
-                                    AppLocalizations.of(context)!.name,
-                                    CupertinoIcons.person,
-                                    isName: true,
+                                  IconButton(
+                                      icon: Config.google,
+                                      onPressed: _googleSignUp,
+                                      iconSize: 40),
+                                  SizedBox(
+                                    width: 20,
                                   ),
-                                  Input(
-                                      _emailController!,
-                                      AppLocalizations.of(context)!.email,
-                                      Icons.email_outlined),
-                                  Input(
-                                    _passwordController!,
-                                    AppLocalizations.of(context)!.password,
-                                    CupertinoIcons.lock,
-                                    showPassword: _showPassword,
-                                    isPassword: true,
-                                    obscureText: _isVisible,
+                                  IconButton(
+                                    icon: Config.facebook,
+                                    onPressed: _facebookSignUp,
+                                    iconSize: 40,
                                   ),
-                                ],
-                              )),
-                          ElevatedButton(
-                            onPressed: () {
-                              _validate();
-                            },
-                            child: Text(
-                              AppLocalizations.of(context)!.signup,
-                              style: GoogleFonts.ubuntu(fontSize: 22),
+                                ]),
+                            Form(
+                                key: _formkey,
+                                child: Column(
+                                  children: [
+                                    Input(
+                                      _nameController!,
+                                      AppLocalizations.of(context)!.name,
+                                      CupertinoIcons.person,
+                                      isName: true,
+                                    ),
+                                    Input(
+                                        _emailController!,
+                                        AppLocalizations.of(context)!.email,
+                                        Icons.email_outlined),
+                                    Input(
+                                      _passwordController!,
+                                      AppLocalizations.of(context)!.password,
+                                      CupertinoIcons.lock,
+                                      showPassword: _showPassword,
+                                      isPassword: true,
+                                      obscureText: _isVisible,
+                                    ),
+                                  ],
+                                )),
+                            ElevatedButton(
+                              onPressed: () {
+                                _validate();
+                              },
+                              child: Text(
+                                AppLocalizations.of(context)!.signup,
+                                style: GoogleFonts.ubuntu(fontSize: 22),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                  shadowColor: Config.color_1,
+                                  primary: Config.color_1,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: new BorderRadius.circular(5),
+                                  ),
+                                  fixedSize: Size(270, 50)),
+                            ).paddingOnly(top: 5, bottom: 10),
+                            OutlinedButton(
+                              onPressed: () {
+                                if (_clientProvider.client == null ||
+                                    _addressProvider.address == null) {
+                                  Config.bottomSheet(context);
+                                } else {
+                                  Prefs.instance.setAuth(false);
+                                  Navigator.pushReplacementNamed(
+                                      context, Home.id);
+                                }
+                              },
+                              child: Text(AppLocalizations.of(context)!.skip),
+                              style: OutlinedButton.styleFrom(
+                                  primary: Config.color_1,
+                                  side: BorderSide(
+                                      color: Config.color_1, width: 1.5),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: new BorderRadius.circular(6),
+                                  ),
+                                  textStyle: GoogleFonts.ubuntu(fontSize: 22),
+                                  fixedSize: Size(270, 50)),
                             ),
-                            style: ElevatedButton.styleFrom(
-                                shadowColor: Config.color_1,
-                                primary: Config.color_1,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(5),
-                                ),
-                                fixedSize: Size(270, 50)),
-                          ).paddingOnly(top: 5, bottom: 10),
-                          OutlinedButton(
-                            onPressed: () {
-                              if (_clientProvider.client == null ||
-                                  _addressProvider.address == null) {
-                                Config.bottomSheet(context);
-                              } else {
-                                Prefs.instance.setAuth(false);
-                                Navigator.pushReplacementNamed(
-                                    context, Home.id);
-                              }
-                            },
-                            child: Text(AppLocalizations.of(context)!.skip),
-                            style: OutlinedButton.styleFrom(
-                                primary: Config.color_1,
-                                side: BorderSide(
-                                    color: Config.color_1, width: 1.5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(6),
-                                ),
-                                textStyle: GoogleFonts.ubuntu(fontSize: 22),
-                                fixedSize: Size(270, 50)),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text(AppLocalizations.of(context)!.have_acc,
-                          style: GoogleFonts.ubuntu(
-                              color: Colors.black45, fontSize: 18)),
-                      GestureDetector(
-                          onTap: () {
-                            _formkey.currentState!.reset();
-                            Navigator.pop(context);
-                          },
-                          child: Text(AppLocalizations.of(context)!.signIn,
-                              style: GoogleFonts.ubuntu(
-                                  color: Config.color_1,
-                                  fontSize: 18,
-                                  decoration: TextDecoration.underline)))
-                    ])
-                  ],
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text(AppLocalizations.of(context)!.have_acc,
+                            style: GoogleFonts.ubuntu(
+                                color: Colors.black, fontSize: 18)).paddingOnly(right: 10),
+                        GestureDetector(
+                            onTap: () {
+                              _formkey.currentState!.reset();
+                              Navigator.pop(context);
+                            },
+                            child: Text(AppLocalizations.of(context)!.signIn,
+                                style: GoogleFonts.ubuntu(
+                                    color: Config.color_1,
+                                    fontSize: 18,
+                                    decoration: TextDecoration.underline)))
+                      ])
+                    ],
+                  ),
                 ),
               ),
             ),

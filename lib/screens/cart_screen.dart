@@ -3,6 +3,7 @@ import 'package:daeem/models/item.dart';
 import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/auth_provider.dart';
 import 'package:daeem/provider/cart_provider.dart';
+import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/screens/product_details.dart';
@@ -25,6 +26,7 @@ class _CartPageState extends State<CartPage> {
   bool called = false;
   bool couponChecked = false;
   String discout = '';
+  late ClientProvider client ;
   late CartProvider cart;
   late StoreProvider market;
   late AuthProvider auth;
@@ -36,6 +38,7 @@ class _CartPageState extends State<CartPage> {
       cart = Provider.of<CartProvider>(context);
       market = Provider.of<StoreProvider>(context);
       auth = Provider.of<AuthProvider>(context);
+      client =  Provider.of<ClientProvider>(context);
       _controller = TextEditingController();
       WidgetsBinding.instance?.addPostFrameCallback((_) async {
         showDialog(
@@ -107,6 +110,7 @@ class _CartPageState extends State<CartPage> {
 
   checkout() async {
     if (auth.isAuth()) {
+      client.getClientAddress(client.client!);
       Navigator.pushNamed(context, CheckoutPage.id);
     } else {
       showTopSnackBar(

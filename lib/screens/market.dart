@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/market_category.dart';
 import 'package:daeem/provider/auth_provider.dart';
@@ -121,18 +120,27 @@ class _MarketPageState extends State<MarketPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           TextButton(
-                              onPressed: () {
-                                cart.clearCart();
-                                Navigator.of(context).pushReplacementNamed(Home.id);
-                              },
-                              child: Text("Cancel anyway",style: GoogleFonts.ubuntu(fontSize: 14,color: Colors.red.shade500),),
-                             ),
+                            onPressed: () {
+                              cart.clearCart();
+                              Navigator.of(context)
+                                  .pushReplacementNamed(Home.id);
+                            },
+                            child: Text(
+                              "Cancel anyway",
+                              style: GoogleFonts.ubuntu(
+                                  fontSize: 14, color: Colors.red.shade500),
+                            ),
+                          ),
                           Spacer(),
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, CheckoutPage.id);
                             },
-                            child: Text("Go to checkout",style: GoogleFonts.ubuntu(fontSize: 14,color: Config.color_2),),
+                            child: Text(
+                              "Go to checkout",
+                              style: GoogleFonts.ubuntu(
+                                  fontSize: 14, color: Config.color_2),
+                            ),
                           ),
                         ],
                       ).paddingOnly(left: 20, right: 20, bottom: 20)
@@ -259,20 +267,34 @@ class _MarketPageState extends State<MarketPage> {
                 },
               );
             }
-            return snapshot.data?.length != 0
-                ? ListView.builder(
-                    shrinkWrap: true,
-                    primary: false,
-                    itemExtent: 200,
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) {
-                      return CategoryWidget(snapshot.data![index].name!,
-                              snapshot.data![index].image!)
-                          .paddingOnly(left: 20, right: 20, bottom: 20);
-                    })
-                : Text("We didn't find what are you searching about")
-                    .paddingAll(50)
-                    .center();
+
+            if (!market.status!) {
+              return Column(
+                children: [
+                  Image.asset(
+                    "assets/closed_stores.gif",
+                    height: screenSize(context).height * .4,
+                  ),
+                  Text("This store is currently closed",
+                      style: GoogleFonts.ubuntu(
+                          fontSize: 20, fontWeight: FontWeight.w500))
+                ],
+              );
+            } else
+              return snapshot.data?.length != 0
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemExtent: 200,
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (context, index) {
+                        return CategoryWidget(snapshot.data![index].name!,
+                                snapshot.data![index].image!)
+                            .paddingOnly(left: 20, right: 20, bottom: 20);
+                      })
+                  : Text("We didn't find what are you searching about")
+                      .paddingAll(50)
+                      .center();
           }),
     );
   }
@@ -307,26 +329,38 @@ class _MarketPageState extends State<MarketPage> {
                   ],
                 );
               }
-
-              return ListView.builder(
-                shrinkWrap: true,
-                primary: false,
-                itemCount: _categoryProvider.categories.length,
-                itemExtent: 150,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, Category.id,
-                        arguments: [
-                          market,
-                          _categoryProvider.categories[index].id
-                        ]),
-                    child: CategoryWidget(
-                            _categoryProvider.categories[index].name!,
-                            _categoryProvider.categories[index].image!)
-                        .paddingOnly(left: 20, right: 20, bottom: 30),
-                  );
-                },
-              );
+              if (!market.status!) {
+                return Column(
+                  children: [
+                    Image.asset(
+                      "assets/closed_stores.gif",
+                      height: screenSize(context).height * .4,
+                    ),
+                    Text("This store is currently closed",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 20, fontWeight: FontWeight.w500))
+                  ],
+                );
+              } else
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: _categoryProvider.categories.length,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, Category.id,
+                          arguments: [
+                            market,
+                            _categoryProvider.categories[index].id
+                          ]),
+                      child: CategoryWidget(
+                              _categoryProvider.categories[index].name!,
+                              _categoryProvider.categories[index].image!)
+                          .paddingOnly(left: 20, right: 20, bottom: 30),
+                    );
+                  },
+                );
             }),
       );
 }

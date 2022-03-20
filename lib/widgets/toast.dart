@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class Toast {
   static final int lengthShort = 1;
@@ -10,12 +9,12 @@ class Toast {
 
   static void show(String msg, BuildContext context,
       {int? duration = 1,
-        int? gravity = 0,
-        Color backgroundColor = const Color(0xAA000000),
-        textStyle = const TextStyle(fontSize: 15, color: Colors.white),
-        double backgroundRadius = 20,
-        bool? rootNavigator,
-        Border? border}) {
+      int? gravity = 0,
+      Color backgroundColor = const Color(0xAA000000),
+      textStyle = const TextStyle(fontSize: 15, color: Colors.white),
+      double backgroundRadius = 20,
+      bool? rootNavigator,
+      Border? border}) {
     ToastView.dismiss();
     ToastView.createView(msg, context, duration, gravity, backgroundColor,
         textStyle, backgroundRadius, border, rootNavigator);
@@ -45,7 +44,7 @@ class ToastView {
       double backgroundRadius,
       Border? border,
       bool? rootNavigator) async {
-    overlayState = Overlay.of(context, rootOverlay: rootNavigator??false);
+    overlayState = Overlay.of(context, rootOverlay: rootNavigator ?? false);
 
     _overlayEntry = new OverlayEntry(
       builder: (BuildContext context) => ToastWidget(
@@ -97,7 +96,8 @@ class ToastWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Positioned(
         top: gravity == 2 ? MediaQuery.of(context).viewInsets.top + 50 : null,
-        bottom: gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
+        bottom:
+            gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
         child: Material(
           color: Colors.transparent,
           child: widget,

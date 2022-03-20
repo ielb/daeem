@@ -21,22 +21,20 @@ class PushNotificationService {
           sound: true);
    }
 
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
+    _fcm.getInitialMessage().then((message) {
       print("Init");
      
       if (message != null) {
-        _notificationProvider.addNotification(notif.Notification.fromMap(message.data));
+       // _notificationProvider.addNotification(notif.Notification.fromMap(message.data));
         notifyManager.showNotification(
             0, message.data['title'], message.data['body']);
       }
     });
-    await FirebaseMessaging.instance
+    await _fcm
         .setForegroundNotificationPresentationOptions(
             alert: true, badge: true, sound: true);
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print("Opend");
-      _notificationProvider.addNotification(notif.Notification.fromMap(message.data));
       notifyManager.showNotification(
           1, message.data['title'], message.data['body']);
     });

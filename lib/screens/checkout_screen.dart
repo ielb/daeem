@@ -10,7 +10,6 @@ import 'package:daeem/screens/client/change_phone.dart';
 import 'package:daeem/screens/confirmed_screen.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -262,8 +261,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
               ),
             ),
-      bottomNavigationBar: client.client!.address != null &&
-              client.client!.phone != null
+      bottomNavigationBar: client.client?.address != null &&
+              client.client?.phone != null
           ? Container(
               height: 100,
               color: Colors.transparent,

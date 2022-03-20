@@ -1,11 +1,10 @@
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'dart:async';
 
 import 'package:ionicons/ionicons.dart';
+import 'package:pinput/pin_put/pin_put.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -21,10 +20,17 @@ class _VerificationState extends State<Verification> {
   bool _isVerified = false;
   bool _isLoading = false;
   String phoneNumber = '';
+  late TextEditingController _pinPutController;
+  final _pinPutFocusNode = FocusNode();
   bool called = false;
+  String code = '';
   Map<String, dynamic> from = {'phoneNumber': '', "from": 0};
-
-  String _code = '';
+  BoxDecoration get _pinPutDecoration {
+    return BoxDecoration(
+      border: Border.all(color: Config.color_1),
+      borderRadius: BorderRadius.circular(5.0),
+    );
+  }
 
   // ignore: unused_field
   late Timer _timer;
@@ -54,18 +60,30 @@ class _VerificationState extends State<Verification> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!called) {
+      _pinPutController = TextEditingController();
       client = Provider.of<ClientProvider>(context);
       from = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       setState(() {
-       phoneNumber = from['phoneNumber'];
+        phoneNumber = from['phoneNumber'];
         called = !called;
       });
     }
   }
 
+  void _submit(String _code) {
+    setState(() {
+      code = _code;
+    });
+  }
+
   verify() async {
-    showDialog(context: context, builder: (context) => Center(child: CircularProgressIndicator(color: Config.color_2,)));
-    var result = await client.changePhone(smsCode: _code, phone: phoneNumber);
+    showDialog(
+        context: context,
+        builder: (context) => Center(
+                child: CircularProgressIndicator(
+              color: Config.color_2,
+            )));
+    var result = await client.changePhone(smsCode: code, phone: phoneNumber);
     if (result) {
       showTopSnackBar(
           context,
@@ -124,17 +142,26 @@ class _VerificationState extends State<Verification> {
                   SizedBox(
                     height: 20,
                   ),
-                  VerificationCode(
-                      length: 6,
-                      textStyle: TextStyle(fontSize: 20),
-                      underlineColor: Colors.blueAccent,
-                      keyboardType: TextInputType.number,
-                      onCompleted: (value) {
-                        setState(() {
-                          _code = value;
-                        });
-                      },
-                      onEditing: (value) {}),
+                  Container(
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(left: 10.0, right: 10.0),
+                    child: PinPut(
+                      fieldsCount: 6,
+                      onSubmit: (String pin) => _submit(pin),
+                      focusNode: _pinPutFocusNode,
+                      controller: _pinPutController,
+                      submittedFieldDecoration: _pinPutDecoration.copyWith(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      selectedFieldDecoration: _pinPutDecoration,
+                      followingFieldDecoration: _pinPutDecoration.copyWith(
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(
+                          color: Config.color_1.withOpacity(.5),
+                        ),
+                      ),
+                    ).center(),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -161,7 +188,7 @@ class _VerificationState extends State<Verification> {
                   ),
                   MaterialButton(
                     disabledColor: Colors.grey,
-                    onPressed: _code.length < 6
+                    onPressed: code.length < 6
                         ? null
                         : () {
                             verify();

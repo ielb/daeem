@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:daeem/models/market.dart';
 import 'package:daeem/models/sub_category.dart';
 import 'package:daeem/provider/category_provider.dart';
@@ -11,6 +9,8 @@ import 'package:flutter/cupertino.dart';
 
 class Category extends StatefulWidget {
   static const id = "category";
+  Category({required this.category});
+  final String category;
 
   @override
   _CategoryState createState() => _CategoryState();
@@ -70,7 +70,8 @@ class _CategoryState extends State<Category> {
       isSearching = true;
     });
   }
-  Future<bool> _backPressed()async{
+
+  Future<bool> _backPressed() async {
     _categoryProvider.closeSub();
     Navigator.of(context).pop(context);
     return true;
@@ -91,7 +92,7 @@ class _CategoryState extends State<Category> {
                 delegate: CustomSliverAppBarDelegate(market, 200),
                 pinned: true,
               ),
-    
+
               ///Closed sign
               if (_isClosed)
                 SliverToBoxAdapter(
@@ -125,8 +126,8 @@ class _CategoryState extends State<Category> {
                                           fontWeight: FontWeight.w600))
                                 ])),
                             Text("Explore stores near you",
-                                    style:
-                                        GoogleFonts.ubuntu(color: Config.color_1))
+                                    style: GoogleFonts.ubuntu(
+                                        color: Config.color_1))
                                 .align(alignment: Alignment.bottomLeft)
                                 .paddingOnly(right: 105)
                           ])
@@ -144,7 +145,7 @@ class _CategoryState extends State<Category> {
                         )
                       ]),
                 )),
-    
+
               ///SearchField
               SliverToBoxAdapter(
                   child: SearchInput(
@@ -158,9 +159,16 @@ class _CategoryState extends State<Category> {
                 searching: isSearching,
                 isHavingShadow: true,
               ).paddingOnly(left: 20, right: 20, top: _isClosed ? 10 : 80)),
+              SliverToBoxAdapter(
+                child: Text("{}",
+                        style: GoogleFonts.ubuntu(
+                            fontSize: 22,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold))
+                    .paddingOnly(left: 20, top: 20),
+              ),
               isSearching ? _searchedContent() : _content()
             ],
-
           ),
           mcontext: context,
         ),
@@ -175,29 +183,32 @@ class _CategoryState extends State<Category> {
           future: _categoryProvider.searchForSubCategories(query),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-               return  ListView.builder(
-              shrinkWrap: true,
-              primary: false,
-              itemCount:5,
-              itemExtent: 150,
-              itemBuilder: (context, index) {
-                return CategoryLoading().paddingOnly(left: 20, right: 20, bottom: 20);
-              },
-            );
-            }
-
-            return snapshot.data?.length !=0   ? ListView.builder(
+              return ListView.builder(
                 shrinkWrap: true,
                 primary: false,
-                itemExtent:150,
-                itemCount:   snapshot.data?.length,
+                itemCount: 5,
+                itemExtent: 150,
                 itemBuilder: (context, index) {
-                  return  CategoryWidget(snapshot.data![index].name!,
-                          snapshot.data![index].image!)
-                      .paddingOnly(left: 20, right: 20, bottom: 20) ;
-                }): Text("We didn't find what are you searching about")
-                              .paddingAll(50)
-                              .center();
+                  return CategoryLoading()
+                      .paddingOnly(left: 20, right: 20, bottom: 20);
+                },
+              );
+            }
+
+            return snapshot.data?.length != 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    primary: false,
+                    itemExtent: 150,
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      return CategoryWidget(snapshot.data![index].name!,
+                              snapshot.data![index].image!)
+                          .paddingOnly(left: 20, right: 20, bottom: 20);
+                    })
+                : Text("We didn't find what are you searching about")
+                    .paddingAll(50)
+                    .center();
           }),
     );
   }
@@ -208,45 +219,47 @@ class _CategoryState extends State<Category> {
             future: dataResult,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                 return  ListView.builder(
-              shrinkWrap: true,
-              primary: false,
-              itemCount:5,
-              itemExtent: 150,
-              itemBuilder: (context, index) {
-                return CategoryLoading().paddingOnly(left: 20, right: 20, bottom: 20);
-              },
-            );
-              }
-              if(_categoryProvider.subCategories.isEmpty){              
-              return Column(children: [
-                Config.empty,
-                SizedBox(height: screenSize(context).height * 0.1),
-                Text("There are no sub categories ",
-                    style: GoogleFonts.ubuntu(
-                        fontSize: 20,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600)),
-                SizedBox(height: screenSize(context).height * 0.1),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, Home.id);
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: 5,
+                  itemExtent: 150,
+                  itemBuilder: (context, index) {
+                    return CategoryLoading()
+                        .paddingOnly(left: 20, right: 20, bottom: 20);
                   },
-                  child: Text("Continue shopping",
-                     ),
-                  style: ElevatedButton.styleFrom(
-                    textStyle: GoogleFonts.ubuntu(
+                );
+              }
+              if (_categoryProvider.subCategories.isEmpty) {
+                return Column(children: [
+                  Config.empty,
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  Text("There are no sub categories ",
+                      style: GoogleFonts.ubuntu(
                           fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600),
-                      shadowColor: Config.color_2,
-                      primary: Config.color_2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(15),
-                      ),
-                      fixedSize: Size(270, 50)),
-                )
-              ]);
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: screenSize(context).height * 0.1),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, Home.id);
+                    },
+                    child: Text(
+                      "Continue shopping",
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        textStyle: GoogleFonts.ubuntu(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600),
+                        shadowColor: Config.color_2,
+                        primary: Config.color_2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(15),
+                        ),
+                        fixedSize: Size(270, 50)),
+                  )
+                ]);
               }
 
               return ListView.builder(

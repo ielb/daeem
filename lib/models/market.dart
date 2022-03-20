@@ -51,7 +51,20 @@ class Store {
     this.lng = json['lng'];
     this.isFakeRating = json['use_fake_rating'] == "0" ? false : true;
     this.status = json['status'] == "0" ? false : true;
+    if(isFakeRating == false) {
+      getRating(id??json['id']).then((value) { if(value!=null)  rating=value; else rating= 5;});
+    }    
     getHours(id??json['id']).then((value) {  hours=value;});
+  }
+  Future<int?> getRating(int id) async{
+     StoreService service = StoreService();
+    Response? response = await service.getMarketsRating(id);
+    if (response!=null&& response.statusCode == 200) {
+      return jsonDecode(response.body)['rating'];
+    } else {
+      return 5;
+    }
+    
   }
 
  Future<String> getHours(int id) async {

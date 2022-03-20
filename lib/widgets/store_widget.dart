@@ -11,25 +11,30 @@ class StoreWidget extends StatelessWidget {
       child: Column(
         children: [
           CachedNetworkImage(
-            imageUrl: imageUrl,
-            fit: BoxFit.cover,
-            height: 70,
-            progressIndicatorBuilder: (context, url, downloadProgress) =>
-              CircularProgressIndicator(
-                value: downloadProgress.progress).paddingOnly(bottom: 10).center(),
-                errorWidget: (context, url, error) => Image.asset(
-                  "assets/placeholder.png",
-                  fit: BoxFit.cover,
-                )
-          ),
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              height: 70,
+              memCacheHeight: 70,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                    color: Config.color_2,
+                    strokeWidth: 2,
+                  ).paddingOnly(bottom: 10).center(),
+              errorWidget: (context, url, error) => Image.asset(
+                    "assets/placeholder.png",
+                    fit: BoxFit.cover,
+                  )),
           Text(
             title.toString().replaceAll(r' ', '\n'),
             overflow: TextOverflow.ellipsis,
-            textAlign:TextAlign.center,
+            textAlign: TextAlign.center,
             softWrap: true,
             style: GoogleFonts.ubuntu(
                 fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-          ).align(alignment: Alignment.center).paddingOnly(top:4,),
+          ).align(alignment: Alignment.center).paddingOnly(
+                top: 4,
+              ),
         ],
       ),
     );

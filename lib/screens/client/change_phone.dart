@@ -67,7 +67,7 @@ class _ChangePhoneState extends State<ChangePhone> {
       await client
           .verifyClientPhoneNumber(phoneNumber ?? _phoneController.text);
 
-      Navigator.pushNamed(context, Verification.id, arguments: {
+      Navigator.pushReplacementNamed(context, Verification.id, arguments: {
         'phoneNumber':
             "+212${_phoneController.text.length == 9 ? _phoneController.text : _phoneController.text.substring(1)}",
         'from': from
