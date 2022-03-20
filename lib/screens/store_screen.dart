@@ -3,8 +3,6 @@
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:daeem/models/market.dart' as model;
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/loading/market_shimmer.dart';
@@ -254,7 +252,8 @@ class _StoreState extends State<Store> {
                       onRate: (rate) {
                         marketProvider.rate(
                             marketProvider.markets[index].id!,
-                            int.parse(Provider.of<ClientProvider>(context,listen: false)
+                            int.parse(Provider.of<ClientProvider>(context,
+                                    listen: false)
                                 .client!
                                 .id!),
                             rate);

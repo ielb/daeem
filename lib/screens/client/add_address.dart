@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
@@ -7,7 +6,6 @@ import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -100,12 +98,9 @@ class _AddressPageState extends State<AddressPage> {
           infoWindow: InfoWindow(title: "test")));
       Navigator.pop(context);
     }
-    Timer(Duration(milliseconds:2500), () {
-     if(mounted)
-       expand();
+    Timer(Duration(milliseconds: 2500), () {
+      if (mounted) expand();
     });
-    
-
   }
 
   @override
@@ -196,9 +191,9 @@ class _AddressPageState extends State<AddressPage> {
 
         expand();
       } else {
-        if(mounted) {
+        if (mounted) {
           showTopSnackBar(context,
-            CustomSnackBar.info(message: "Please select a valid address"));
+              CustomSnackBar.info(message: "Please select a valid address"));
         }
       }
     }
@@ -211,7 +206,7 @@ class _AddressPageState extends State<AddressPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:  ExpandableBottomSheet(
+        body: ExpandableBottomSheet(
             key: key,
             enableToggle: true,
             background: Stack(
@@ -222,7 +217,6 @@ class _AddressPageState extends State<AddressPage> {
                       isVisible = false;
                     });
                   },
-
                   onPointerUp: (event) {
                     setState(() {
                       isVisible = true;

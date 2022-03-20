@@ -37,7 +37,9 @@ import 'package:daeem/screens/sub_category.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   notifyManager.showNotification(
-      5, message.notification?.title??message.data['title'], message.notification?.body ?? message.data['body']);
+      5,
+      message.notification?.title ?? message.data['title'],
+      message.notification?.body ?? message.data['body']);
   notifyManager.setOnNotificationClick(onNotificationClick);
   notifyManager.setOnNotificationReceive(onNotificationReceive);
 }
@@ -58,7 +60,7 @@ void main() async {
           apiKey: dotenv.env['firebase_api_key']!,
           appId: dotenv.env['firebase_app_id']!,
           messagingSenderId: dotenv.env['firebase_messaging_sender_id']!,
-          projectId:dotenv.env['firebase_project_id']!));
+          projectId: dotenv.env['firebase_project_id']!));
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AuthProvider()),
@@ -105,7 +107,6 @@ Route<dynamic> routes(RouteSettings settings) {
     case Splash.id:
       return CupertinoPageRoute(builder: (_) => Setup(), settings: settings);
 
- 
     case LostConnection.id:
       return CupertinoPageRoute(
           builder: (_) => LostConnection(), settings: settings);
@@ -123,6 +124,7 @@ Route<dynamic> routes(RouteSettings settings) {
     case OrdersPage.id:
       return CupertinoPageRoute(
           builder: (_) => OrdersPage(), settings: settings);
+
     /// On boarding
     case OnBoardering.id:
       return CupertinoPageRoute(
@@ -155,9 +157,12 @@ Route<dynamic> routes(RouteSettings settings) {
     case Setting.id:
       return CupertinoPageRoute(builder: (_) => Setting(), settings: settings);
 
-
     case Category.id:
-      return CupertinoPageRoute(builder: (_) => Category(category: settings.arguments as String,), settings: settings);
+      return CupertinoPageRoute(
+          builder: (_) => Category(
+                category: settings.arguments as String,
+              ),
+          settings: settings);
     case CheckoutPage.id:
       return CupertinoPageRoute(
           builder: (_) => CheckoutPage(), settings: settings);
@@ -165,9 +170,11 @@ Route<dynamic> routes(RouteSettings settings) {
     case ProductsPage.id:
       return CupertinoPageRoute(
           builder: (_) => ProductsPage(), settings: settings);
-          case ProductDetails.id:
+    case ProductDetails.id:
       return CupertinoPageRoute(
-          builder: (_) => ProductDetails(product : settings.arguments as Product), settings: settings);
+          builder: (_) =>
+              ProductDetails(product: settings.arguments as Product),
+          settings: settings);
     case ChangePassword.id:
       return CupertinoPageRoute(
           builder: (_) => ChangePassword(), settings: settings);
@@ -181,7 +188,8 @@ Route<dynamic> routes(RouteSettings settings) {
       return CupertinoPageRoute(builder: (_) => CartPage(), settings: settings);
     case OrderDetails.id:
       return CupertinoPageRoute(
-          builder: (_) => OrderDetails(order: settings.arguments as Order), settings: settings);
+          builder: (_) => OrderDetails(order: settings.arguments as Order),
+          settings: settings);
     case NotificationScreen.id:
       return CupertinoPageRoute(
           builder: (_) => NotificationScreen(), settings: settings);

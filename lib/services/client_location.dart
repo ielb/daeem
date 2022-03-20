@@ -9,9 +9,9 @@ class LocationService {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     // Test if location services are enabled.
     if (!serviceEnabled) {
-     await loc.Location.instance.requestService();
-     // await Geolocator.openLocationSettings();
-     
+      await loc.Location.instance.requestService();
+      // await Geolocator.openLocationSettings();
+
     }
 
     permission = await Geolocator.checkPermission();
@@ -35,8 +35,8 @@ class LocationService {
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    return await GeolocatorPlatform.instance
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return await GeolocatorPlatform.instance.getCurrentPosition(
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.high));
   }
 
   Future<List<Placemark>> getAddress(double lat, double lang) async {

@@ -10,9 +10,7 @@ import 'package:daeem/provider/notifiation_provider.dart';
 import 'package:daeem/screens/connection.dart';
 import 'package:daeem/services/notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
-import "package:provider/provider.dart";
 import "package:simple_connection_checker/simple_connection_checker.dart";
 
 class Splash extends StatefulWidget {
@@ -73,14 +71,15 @@ class _SplashState extends State<Splash> {
 
   void _getAuthClient() async {
     String? id = await Prefs.instance.getClient();
-   
+
     if (id != null && id != "") {
       bool result = await auth.getAuthenticatedClient(
         id,
       );
 
       if (result) {
-        Provider.of<NotificationProvider>(context, listen: false).getNotifications();
+        Provider.of<NotificationProvider>(context, listen: false)
+            .getNotifications();
         client.setClient(auth.client!);
         addressProvider.setAddress(client.client?.address);
         if (client.client!.address != null) {

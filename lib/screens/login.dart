@@ -7,7 +7,6 @@ import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/screens/password/password_reset.dart';
 import 'package:daeem/widgets/inputField.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -298,9 +297,9 @@ class _LoginState extends State<Login> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(AppLocalizations.of(context)!.don_have_acc,
-                                  style: GoogleFonts.ubuntu(
-                                      color: Colors.black, fontSize: 18)).paddingOnly(right: 10),
-                                      
+                                      style: GoogleFonts.ubuntu(
+                                          color: Colors.black, fontSize: 18))
+                                  .paddingOnly(right: 10),
                               GestureDetector(
                                   onTap: () {
                                     _formkey.currentState!.reset();

@@ -11,6 +11,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> updatePhone(id, phone) async {
@@ -20,6 +21,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> updateAddress(Address address) async {
@@ -39,6 +41,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> getAddress(id) async {
@@ -47,6 +50,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> resetPassword(id, password) async {
@@ -56,6 +60,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> changePassword(id, oldP, newP) async {
@@ -68,6 +73,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> order(data) async {
@@ -78,6 +84,7 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> token(id, token) async {
@@ -89,12 +96,13 @@ class ClientService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
-    Future<http.Response?> refund(String id,int orderId,String reason) async {
+  Future<http.Response?> refund(String id, int orderId, String reason) async {
     try {
       print(id);
-      print(orderId); 
+      print(orderId);
       print(reason);
       return await api.httpPost('order/refund', {
         'client_id': id.toString(),
@@ -102,7 +110,8 @@ class ClientService extends BaseApi {
         'reason': reason.toString(),
       });
     } catch (e) {
-     print(e);
+      print(e);
     }
+    return null;
   }
 }

@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:daeem/configs/config.dart';
-import 'package:flutter/material.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/services.dart';
 
 class Input extends StatelessWidget {
   Input(this._controller, this._hint, this._icon,
@@ -44,6 +41,7 @@ class Input extends StatelessWidget {
               }
             }
           }
+          return null;
         },
         controller: _controller,
         obscureText: obscureText,

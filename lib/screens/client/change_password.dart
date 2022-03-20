@@ -1,7 +1,6 @@
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class ChangePassword extends StatefulWidget {
   static const id = "password";
@@ -166,6 +165,7 @@ class _ChangePasswordState extends State<ChangePassword> {
     if (text != null && text.isEmpty) return 'this field is required';
     if (text != null && text.length < 8)
       return 'the password should be 8 chars long';
+    return null;
   }
 
   @override

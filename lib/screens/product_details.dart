@@ -4,7 +4,6 @@ import 'package:daeem/models/product.dart';
 import 'package:daeem/provider/cart_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ProductDetails extends StatefulWidget {

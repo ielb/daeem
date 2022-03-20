@@ -1,6 +1,5 @@
 import 'package:daeem/screens/client/add_address.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/cupertino.dart';
 
 class Config {
   static const background = "assets/background.png";

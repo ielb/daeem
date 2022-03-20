@@ -9,6 +9,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> socialLogin(
@@ -22,8 +23,10 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
-   Future<http.Response?> resetPassword(String email) async {
+
+  Future<http.Response?> resetPassword(String email) async {
     try {
       return await api.httpPost('reset_password_request', {
         'email': email.trim().toLowerCase(),
@@ -31,6 +34,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> checkEmail(String email) async {
@@ -41,6 +45,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> socialRegister(
@@ -55,6 +60,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> register(
@@ -68,6 +74,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> getClient(String id) async {
@@ -76,6 +83,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<http.Response?> sentVerification() async {
@@ -84,6 +92,7 @@ class AuthService extends BaseApi {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   // Future<http.Response?> logout(){

@@ -11,7 +11,6 @@ import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:daeem/services/services.dart';
 import 'package:ionicons/ionicons.dart';
-import '/extensions/extensions.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
@@ -427,7 +426,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Ionicons.location_outline, size: 18, color: Color(0xff4A4B4D))
+                  Icon(Ionicons.location_outline,
+                          size: 18, color: Color(0xff4A4B4D))
                       .paddingOnly(right: 3, left: 10),
                   Text(market.address!,
                       style: GoogleFonts.ubuntu(

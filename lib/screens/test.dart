@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daeem/services/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class Test extends StatefulWidget {
   const Test({Key? key}) : super(key: key);
@@ -48,7 +47,8 @@ class _TestState extends State<Test> {
                 filterQuality: FilterQuality.high,
                 fit: BoxFit.cover,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    CircularProgressIndicator(value: downloadProgress.progress).center(),
+                    CircularProgressIndicator(value: downloadProgress.progress)
+                        .center(),
                 errorWidget: (context, url, error) => Image.asset(
                       "assets/placeholder.png",
                       filterQuality: FilterQuality.high,

@@ -9,14 +9,10 @@ import 'package:daeem/screens/notification_screen.dart';
 import 'package:daeem/screens/store/home_store_shimmer.dart';
 import 'package:daeem/screens/store_screen.dart';
 import 'package:daeem/services/services.dart';
-import 'package:daeem/widgets/drawer.dart';
 import 'package:daeem/widgets/home_category_widget.dart';
 import 'package:daeem/widgets/store_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:ionicons/ionicons.dart';
 
 class Home extends StatefulWidget {
@@ -103,7 +99,7 @@ class _HomeState extends State<Home> {
               Navigator.pushNamed(context, AddressPage.id);
             },
             child: SizedBox(
-              width: screenSize(context).width*.5,
+              width: screenSize(context).width * .5,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -117,10 +113,9 @@ class _HomeState extends State<Home> {
                   Row(
                     children: [
                       SizedBox(
-                        width: screenSize(context).width*.35,
+                        width: screenSize(context).width * .35,
                         child: Consumer<ClientProvider>(
                             builder: (context, _provider, child) {
-                              
                           return Text(
                             "${_provider.client?.address?.address ?? 'current Location'}",
                             maxLines: 1,

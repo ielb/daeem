@@ -1,7 +1,6 @@
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/screens/checkout_screen.dart';
 import 'package:daeem/services/services.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:ionicons/ionicons.dart';
@@ -24,7 +23,7 @@ class _VerificationState extends State<Verification> {
   late TextEditingController _pinPutController;
   final _pinPutFocusNode = FocusNode();
   bool called = false;
-  String code  = ''; 
+  String code = '';
   Map<String, dynamic> from = {'phoneNumber': '', "from": 0};
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
@@ -32,7 +31,8 @@ class _VerificationState extends State<Verification> {
       borderRadius: BorderRadius.circular(5.0),
     );
   }
-    // ignore: unused_field
+
+  // ignore: unused_field
   late Timer _timer;
   late ClientProvider client;
   int _start = 60;
@@ -72,7 +72,7 @@ class _VerificationState extends State<Verification> {
 
   void _submit(String _code) {
     setState(() {
-      code  = _code;
+      code = _code;
     });
   }
 
@@ -196,7 +196,6 @@ class _VerificationState extends State<Verification> {
                     color: Config.color_2,
                     minWidth: double.infinity,
                     height: 50,
-                    
                     child: _isLoading
                         ? Container(
                             width: 20,
