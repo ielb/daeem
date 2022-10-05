@@ -13,7 +13,7 @@ class _SetupState extends State<Setup> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         Timer(
         Duration(microseconds: 50),
         () => Navigator.pushReplacement(

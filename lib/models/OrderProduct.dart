@@ -47,7 +47,7 @@ class OrderdProduct {
     return OrderdProduct(
       name: map['name'],
       isHadVariant: map['has_variants']=='0' ? false : true,
-      image:"https://app.daeem.ma/images/products/" + map['image'],
+      image:"https://app.serveni.ma/images/products/" + map['image'],
       price: map['price'],
       variant: map['variant']  ,
       quantity: map['qty'],

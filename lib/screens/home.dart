@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
       _clientProvider = Provider.of<ClientProvider>(context);
       _addressProvider = Provider.of<AddressProvider>(context);
 
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         if (_clientProvider.client?.address == null &&
             _addressProvider.address == null) {
           Config.bottomSheet(context);

@@ -13,7 +13,6 @@ class StoreType {
     required this.image,
   });
 
-
   StoreType copyWith({
     String? id,
     String? name,
@@ -33,18 +32,17 @@ class StoreType {
       'image': image,
     };
   }
-   
-
 
   factory StoreType.fromMap(Map<String, dynamic> map) => StoreType(
-      id: map['id'].toString(),
-      name: map['name'],
-      image:  "https://app.daeem.ma/images/type-store/"+map['image'],
-    );
+        id: map['id'].toString(),
+        name: map['name'],
+        image: "https://app.serveni.ma/images/type-store/" + map['image'],
+      );
 
   String toJson() => json.encode(toMap());
 
-  factory StoreType.fromJson(String source) => StoreType.fromMap(json.decode(source));
+  factory StoreType.fromJson(String source) =>
+      StoreType.fromMap(json.decode(source));
 
   @override
   String toString() => 'StoreType(id: $id, name: $name, image: $image)';
@@ -52,11 +50,11 @@ class StoreType {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is StoreType &&
-      other.id == id &&
-      other.name == name &&
-      other.image == image;
+        other.id == id &&
+        other.name == name &&
+        other.image == image;
   }
 
   @override

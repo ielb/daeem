@@ -134,7 +134,7 @@ class _SignUpState extends State<SignUp> {
                   fit: BoxFit.fitHeight,
                 )),
                 child: BackdropFilter(
-                    filter: new ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  filter: new ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -229,7 +229,7 @@ class _SignUpState extends State<SignUp> {
                               ),
                               style: ElevatedButton.styleFrom(
                                   shadowColor: Config.color_1,
-                                  primary: Config.color_1,
+                                  backgroundColor: Config.color_1,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: new BorderRadius.circular(5),
                                   ),
@@ -248,7 +248,7 @@ class _SignUpState extends State<SignUp> {
                               },
                               child: Text(AppLocalizations.of(context)!.skip),
                               style: OutlinedButton.styleFrom(
-                                  primary: Config.color_1,
+                                  backgroundColor: Config.color_1,
                                   side: BorderSide(
                                       color: Config.color_1, width: 1.5),
                                   shape: RoundedRectangleBorder(
@@ -260,21 +260,25 @@ class _SignUpState extends State<SignUp> {
                           ],
                         ),
                       ),
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text(AppLocalizations.of(context)!.have_acc,
-                            style: GoogleFonts.ubuntu(
-                                color: Colors.black, fontSize: 18)).paddingOnly(right: 10),
-                        GestureDetector(
-                            onTap: () {
-                              _formkey.currentState!.reset();
-                              Navigator.pop(context);
-                            },
-                            child: Text(AppLocalizations.of(context)!.signIn,
-                                style: GoogleFonts.ubuntu(
-                                    color: Config.color_1,
-                                    fontSize: 18,
-                                    decoration: TextDecoration.underline)))
-                      ])
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(AppLocalizations.of(context)!.have_acc,
+                                    style: GoogleFonts.ubuntu(
+                                        color: Colors.black, fontSize: 18))
+                                .paddingOnly(right: 10),
+                            GestureDetector(
+                                onTap: () {
+                                  _formkey.currentState!.reset();
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                    AppLocalizations.of(context)!.signIn,
+                                    style: GoogleFonts.ubuntu(
+                                        color: Config.color_1,
+                                        fontSize: 18,
+                                        decoration: TextDecoration.underline)))
+                          ])
                     ],
                   ),
                 ),

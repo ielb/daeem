@@ -23,7 +23,7 @@ class _OrderDetailsState extends State<OrderDetails> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       client = Provider.of<ClientProvider>(context, listen: false);
     });
     super.initState();

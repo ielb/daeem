@@ -348,7 +348,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 ),
                 style: ElevatedButton.styleFrom(
                     shadowColor: Colors.transparent,
-                    primary: Config.color_2,
+                    backgroundColor: Config.color_2,
                     shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15),
                     ),

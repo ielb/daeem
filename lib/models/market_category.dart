@@ -1,4 +1,3 @@
-
 class MarketCategory {
   int? id;
   String? marketId;
@@ -39,17 +38,12 @@ class MarketCategory {
     };
   }
 
-
-
-   MarketCategory.fromJson(Map<String,dynamic> map){
-    
-      this.id= map['id'];
-      this.marketId= map['supermarket_id'];
-      this.name=  map['name'];
-      this.image="https://app.daeem.ma/public/images/categories/"+ map['image'];
-      this.status= map['status'];
-    
-  } 
-
-
+  MarketCategory.fromJson(Map<String, dynamic> map) {
+    this.id = map['id'];
+    this.marketId = map['supermarket_id'];
+    this.name = map['name'];
+    this.image =
+        "https://app.serveni.ma/public/images/categories/" + map['image'];
+    this.status = map['status'];
+  }
 }

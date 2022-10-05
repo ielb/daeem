@@ -7,9 +7,9 @@ import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
 import 'package:daeem/screens/cart_screen.dart';
 import 'package:daeem/screens/checkout_screen.dart';
+import 'package:daeem/services/services.dart';
 import 'package:daeem/widgets/rating.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:daeem/services/services.dart';
 import 'package:ionicons/ionicons.dart';
 
 class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
@@ -287,7 +287,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                                           Colors.red.shade500),
                                                 ),
                                                 style: OutlinedButton.styleFrom(
-                                                  primary: Colors.red.shade400,
+                                                  backgroundColor:
+                                                      Colors.red.shade400,
                                                   side: BorderSide(
                                                       color:
                                                           Colors.red.shade400,

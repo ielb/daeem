@@ -6,7 +6,7 @@ class SubCategory {
   String? name;
   String? image;
   String? status;
-  List<Product> products =List.empty(growable: true );
+  List<Product> products = List.empty(growable: true);
   SubCategory({
     this.id,
     this.categoryId,
@@ -25,12 +25,12 @@ class SubCategory {
     };
   }
 
-   SubCategory.fromJson(Map<String, dynamic> map) {
-      this.id= map['id'];
-      this.categoryId= map['categoryId'];
-      this.name= map['name'];
-      this.image="https://app.daeem.ma/public/images/subcategories/"+ map['image'];
-      this.status= map['status'];
+  SubCategory.fromJson(Map<String, dynamic> map) {
+    this.id = map['id'];
+    this.categoryId = map['categoryId'];
+    this.name = map['name'];
+    this.image =
+        "https://app.serveni.ma/public/images/subcategories/" + map['image'];
+    this.status = map['status'];
   }
-
 }

@@ -21,7 +21,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     _nameController = TextEditingController();
     _emailController = TextEditingController();
-    WidgetsBinding.instance!.scheduleFrameCallback((timeStamp) {
+    WidgetsBinding.instance.scheduleFrameCallback((timeStamp) {
       _clientProvider = Provider.of<ClientProvider>(context, listen: false);
       _nameController.text = _clientProvider.client!.name!;
       _emailController.text = _clientProvider.client!.email!;

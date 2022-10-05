@@ -22,7 +22,7 @@ class _OrdersPageState extends State<OrdersPage> {
     if (!called) {
       _ordersProvider = Provider.of<OrdersProvider>(context);
       _clientProvider = Provider.of<ClientProvider>(context);
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         _getOrders();
       });
 
@@ -97,15 +97,16 @@ class _OrdersPageState extends State<OrdersPage> {
                   onPressed: () {
                     Navigator.pushNamed(context, Home.id);
                   },
-                  child: Text("Continue shopping",
-                     ),
+                  child: Text(
+                    "Continue shopping",
+                  ),
                   style: ElevatedButton.styleFrom(
-                    textStyle: GoogleFonts.ubuntu(
+                      textStyle: GoogleFonts.ubuntu(
                           fontSize: 20,
                           color: Colors.white,
                           fontWeight: FontWeight.w600),
                       shadowColor: Config.color_2,
-                      primary: Config.color_2,
+                      backgroundColor: Config.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(15),
                       ),

@@ -31,7 +31,7 @@ class _SplashState extends State<Splash> {
   late StoreProvider _storeProvider;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       auth = Provider.of<AuthProvider>(context, listen: false);
       client = Provider.of<ClientProvider>(context, listen: false);
       addressProvider = Provider.of<AddressProvider>(context, listen: false);

@@ -39,10 +39,8 @@ class Store {
   Store.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
     this.name = json['name'];
-    this.logo =
-        "https://app.daeem.ma/images/stores/logos/" + json['logo'];
-    this.cover =
-        "https://app.daeem.ma/images/stores/covers/" + json['cover'];
+    this.logo = "https://app.serveni.ma/images/stores/logos/" + json['logo'];
+    this.cover = "https://app.serveni.ma/images/stores/covers/" + json['cover'];
     this.phone = json['phone'];
     this.address = json['address'];
     this.cityId = json['city_id'];
@@ -51,29 +49,35 @@ class Store {
     this.lng = json['lng'];
     this.isFakeRating = json['use_fake_rating'] == "0" ? false : true;
     this.status = json['status'] == "0" ? false : true;
-    if(isFakeRating == false) {
-      getRating(id??json['id']).then((value) { if(value!=null)  rating=value; else rating= 5;});
-    }    
-    getHours(id??json['id']).then((value) {  hours=value;});
+    if (isFakeRating == false) {
+      getRating(id ?? json['id']).then((value) {
+        if (value != null)
+          rating = value;
+        else
+          rating = 5;
+      });
+    }
+    getHours(id ?? json['id']).then((value) {
+      hours = value;
+    });
   }
-  Future<int?> getRating(int id) async{
-     StoreService service = StoreService();
+  Future<int?> getRating(int id) async {
+    StoreService service = StoreService();
     Response? response = await service.getMarketsRating(id);
-    if (response!=null&& response.statusCode == 200) {
+    if (response != null && response.statusCode == 200) {
       return jsonDecode(response.body)['rating'];
     } else {
       return 5;
     }
-    
   }
 
- Future<String> getHours(int id) async {
+  Future<String> getHours(int id) async {
     StoreService service = StoreService();
     Response? response = await service.getMarketsHours(id);
     if (response != null && response.statusCode == 200) {
       var data = jsonDecode(response.body);
       if (data['status'] != "error") {
-         data = data['data'];
+        data = data['data'];
         switch (DateFormat('EEEE').format(DateTime.now())) {
           case "Monday":
             return "${data['0_from']} - ${data['0_to']}";
@@ -90,7 +94,7 @@ class Store {
           case "Sunday":
             return "${data['6_from']} - ${data['6_to']}";
           default:
-             return "07:00 - 22:00";
+            return "07:00 - 22:00";
         }
       } else {
         return "07:00 - 22:00";

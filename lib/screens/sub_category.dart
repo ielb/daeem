@@ -10,7 +10,7 @@ import 'package:flutter/cupertino.dart';
 class Category extends StatefulWidget {
   static const id = "category";
   Category({required this.category});
-  final String category;
+  final List<Object?> category;
 
   @override
   _CategoryState createState() => _CategoryState();
@@ -253,7 +253,7 @@ class _CategoryState extends State<Category> {
                             color: Colors.white,
                             fontWeight: FontWeight.w600),
                         shadowColor: Config.color_2,
-                        primary: Config.color_2,
+                        backgroundColor: Config.color_2,
                         shape: RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(15),
                         ),

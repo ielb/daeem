@@ -40,7 +40,7 @@ class _CartPageState extends State<CartPage> {
       auth = Provider.of<AuthProvider>(context);
       client =  Provider.of<ClientProvider>(context);
       _controller = TextEditingController();
-      WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         showDialog(
             context: context,
             barrierDismissible: false,
@@ -376,7 +376,7 @@ class _CartPageState extends State<CartPage> {
                                           child: Text("Check"),
                                           style: ElevatedButton.styleFrom(
                                               shadowColor: Config.color_1,
-                                              primary: Config.color_1,
+                                              backgroundColor: Config.color_1,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     new BorderRadius.circular(

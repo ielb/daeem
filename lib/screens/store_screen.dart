@@ -226,7 +226,7 @@ class _StoreState extends State<Store> {
                           color: Colors.white,
                           fontWeight: FontWeight.w600),
                       shadowColor: Config.color_2,
-                      primary: Config.color_2,
+                      backgroundColor: Config.color_2,
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(15),
                       ),

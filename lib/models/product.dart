@@ -17,7 +17,6 @@ class Product {
   int? hasVariant;
   Variant? currentVariant;
   List<Variant> variants = [];
- 
 
   Product({
     this.id,
@@ -32,8 +31,7 @@ class Product {
     this.available,
     this.status,
     this.hasVariant,
-     this.variants = const [],
-
+    this.variants = const [],
   });
 
   Product copyWith({
@@ -49,7 +47,6 @@ class Product {
     bool? available,
     bool? status,
     int? hasVariant,
-
   }) {
     return Product(
       id: id ?? this.id,
@@ -83,30 +80,31 @@ class Product {
       'hasVariant': hasVariant,
     };
   }
-     
-  
 
   factory Product.fromMap(Map<String, dynamic> json) {
     return Product(
-      id : json['id'],
-      supermarketId :json['supermarket_id'],
-      sku : json['sku'],
-      name : json['name'],
-      description : json['description'],
-      image : "https://app.daeem.ma/images/products/"+json['image'],
-      price : json['price'],
-      weight : json['weight'],
-      subCategoryId : json[''],
-      available : json['available'] == 0 ? false: true,
-      status : json['status'] == 0 ? false :true,
-      hasVariant : int.parse(json['has_variants'].toString()),
-      variants : json['variants'].length!=0  ? List<Variant>.from(json['variants'].map((x) => Variant.fromMap(x))) : List<Variant>.empty(growable: true),
+      id: json['id'],
+      supermarketId: json['supermarket_id'],
+      sku: json['sku'],
+      name: json['name'],
+      description: json['description'],
+      image: "https://app.serveni.ma/images/products/" + json['image'],
+      price: json['price'],
+      weight: json['weight'],
+      subCategoryId: json[''],
+      available: json['available'] == 0 ? false : true,
+      status: json['status'] == 0 ? false : true,
+      hasVariant: int.parse(json['has_variants'].toString()),
+      variants: json['variants'].length != 0
+          ? List<Variant>.from(json['variants'].map((x) => Variant.fromMap(x)))
+          : List<Variant>.empty(growable: true),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Product.fromJson(String source) => Product.fromMap(json.decode(source));
+  factory Product.fromJson(String source) =>
+      Product.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -116,35 +114,35 @@ class Product {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Product &&
-      other.id == id &&
-      other.supermarketId == supermarketId &&
-      other.sku == sku &&
-      other.name == name &&
-      other.description == description &&
-      other.image == image &&
-      other.price == price &&
-      other.weight == weight &&
-      other.subCategoryId == subCategoryId &&
-      other.available == available &&
-      other.status == status &&
-      other.hasVariant == hasVariant;
+        other.id == id &&
+        other.supermarketId == supermarketId &&
+        other.sku == sku &&
+        other.name == name &&
+        other.description == description &&
+        other.image == image &&
+        other.price == price &&
+        other.weight == weight &&
+        other.subCategoryId == subCategoryId &&
+        other.available == available &&
+        other.status == status &&
+        other.hasVariant == hasVariant;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      supermarketId.hashCode ^
-      sku.hashCode ^
-      name.hashCode ^
-      description.hashCode ^
-      image.hashCode ^
-      price.hashCode ^
-      weight.hashCode ^
-      subCategoryId.hashCode ^
-      available.hashCode ^
-      status.hashCode ^
-      hasVariant.hashCode;
+        supermarketId.hashCode ^
+        sku.hashCode ^
+        name.hashCode ^
+        description.hashCode ^
+        image.hashCode ^
+        price.hashCode ^
+        weight.hashCode ^
+        subCategoryId.hashCode ^
+        available.hashCode ^
+        status.hashCode ^
+        hasVariant.hashCode;
   }
 }

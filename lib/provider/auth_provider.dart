@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names, unused_local_variable
 
 import 'dart:convert';
+import 'dart:developer';
+
 import 'package:daeem/provider/base_provider.dart';
 import 'package:daeem/services/auth_service.dart';
 import 'package:daeem/services/services.dart';
@@ -42,15 +44,14 @@ class AuthProvider extends BaseProvider {
   }
 
   Future<dynamic> resetPassword(String email) async {
-    http.Response? response =  await _authService.resetPassword(email);
-    if(response != null&&response.statusCode == 200) {
-      var data= json.decode(response.body);
-      if(data['status'] == 'success') {
-         
+    http.Response? response = await _authService.resetPassword(email);
+    if (response != null && response.statusCode == 200) {
+      var data = json.decode(response.body);
+      if (data['status'] == 'success') {
         return data['data'];
-      }else
-      return null;
-    }else {
+      } else
+        return null;
+    } else {
       return null;
     }
   }
@@ -93,7 +94,8 @@ class AuthProvider extends BaseProvider {
               }
             }
           } else
-            return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
+            return await socialMediaSignUp(email, clientCredential.user!.uid,
+                clientCredential.user!.displayName!, provider);
         }
       } else {
         notifyListeners();
@@ -142,7 +144,8 @@ class AuthProvider extends BaseProvider {
                 }
               }
             } else {
-              return await socialMediaSignUp(email,clientCredential.user!.uid,clientCredential.user!.displayName!, provider);
+              return await socialMediaSignUp(email, clientCredential.user!.uid,
+                  clientCredential.user!.displayName!, provider);
             }
           }
         }
@@ -156,13 +159,11 @@ class AuthProvider extends BaseProvider {
     }
   }
 
-  Future<bool> socialMediaSignUp(String email,String uid,String displayName ,String provider) async {
+  Future<bool> socialMediaSignUp(
+      String email, String uid, String displayName, String provider) async {
     if (provider == "facebook") {
-      var response = await _authService.socialRegister(
-          1,
-          email,
-          uid,
-          displayName);
+      var response =
+          await _authService.socialRegister(1, email, uid, displayName);
       if (response != null) {
         var data = jsonDecode(response.body);
         if (data['status'] == "success") {
@@ -178,11 +179,8 @@ class AuthProvider extends BaseProvider {
       }
       return false;
     } else {
-      var response = await _authService.socialRegister(
-          0,
-          email,
-          uid,
-          displayName);
+      var response =
+          await _authService.socialRegister(0, email, uid, displayName);
       if (response != null) {
         var data = jsonDecode(response.body);
         if (data['status'] == "success") {
@@ -212,7 +210,11 @@ class AuthProvider extends BaseProvider {
               await FirebaseAuth.instance.signInWithCredential(credential);
           var emailResult = await checkEmail(clientCredential.user!.email!);
           if (emailResult == false) {
-            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'facebook');
+            return await socialMediaSignUp(
+                clientCredential.user!.email!,
+                clientCredential.user!.uid,
+                clientCredential.user!.displayName!,
+                'facebook');
           }
         }
         return false;
@@ -231,7 +233,11 @@ class AuthProvider extends BaseProvider {
 
           var emailResult = await checkEmail(clientCredential.user!.email!);
           if (emailResult == false) {
-            return await socialMediaSignUp(clientCredential.user!.email!,clientCredential.user!.uid,clientCredential.user!.displayName!, 'google');
+            return await socialMediaSignUp(
+                clientCredential.user!.email!,
+                clientCredential.user!.uid,
+                clientCredential.user!.displayName!,
+                'google');
           }
         }
       }
@@ -246,8 +252,10 @@ class AuthProvider extends BaseProvider {
     setBusy(true);
     http.Response? response = await _authService.register(
         name.trim(), email.toLowerCase().trim(), password.trim());
+    log("${response?.body.toString()}");
     if (response != null) {
       var data = jsonDecode(response.body);
+
       if (data['status'] == "success") {
         notifyListeners();
         return true;

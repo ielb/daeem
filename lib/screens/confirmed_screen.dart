@@ -48,7 +48,7 @@ class _ConfirmedPageState extends State<ConfirmedPage> {
               ),
               style: ElevatedButton.styleFrom(
                   shadowColor: Config.color_1,
-                  primary: Config.color_1,
+                  backgroundColor: Config.color_1,
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(15),
                   ),
@@ -60,7 +60,7 @@ class _ConfirmedPageState extends State<ConfirmedPage> {
               },
               child: Text("Back home"),
               style: OutlinedButton.styleFrom(
-                  primary: Config.color_1,
+                  backgroundColor: Config.color_1,
                   side: BorderSide(color: Config.color_1, width: 1.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(15),

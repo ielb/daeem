@@ -277,7 +277,7 @@ class _ProductsPageState extends State<ProductsPage> {
                               color: Colors.white,
                               fontWeight: FontWeight.w600),
                           shadowColor: Config.color_2,
-                          primary: Config.color_2,
+                          backgroundColor: Config.color_2,
                           shape: RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(15),
                           ),

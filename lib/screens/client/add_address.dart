@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
+
 import 'package:daeem/models/address.dart';
 import 'package:daeem/provider/address_provider.dart';
 import 'package:daeem/provider/client_provider.dart';
 import 'package:daeem/provider/market_provider.dart';
+import 'package:daeem/services/client_location.dart';
 import 'package:daeem/services/services.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +13,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:daeem/services/client_location.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -49,7 +51,7 @@ class _AddressPageState extends State<AddressPage> {
     _business = TextEditingController();
     _floor = TextEditingController();
     _post = TextEditingController();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       icon = await BitmapDescriptor.fromAssetImage(
           ImageConfiguration(
               devicePixelRatio: screenSize(context).aspectRatio,
@@ -87,8 +89,9 @@ class _AddressPageState extends State<AddressPage> {
           18));
       address = await LocationService()
           .getAddress(_currentPosition!.latitude, _currentPosition!.longitude);
-      _street.text = "${address.first.street ?? ''}";
-      _post.text = "${address.first.postalCode ?? ''}";
+      log("address: $address");
+      _street.text = "${address[0].toJson()['street'] ?? ''}";
+      _post.text = "${address[0].toJson()['postalCode'] ?? ''}";
       _markers.add(Marker(
           markerId: MarkerId('marker_2'),
           position:

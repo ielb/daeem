@@ -26,7 +26,7 @@ class _ChangePasswordState extends State<ChangePassword> {
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
 
-    WidgetsBinding.instance!.scheduleFrameCallback((timeStamp) {
+    WidgetsBinding.instance.scheduleFrameCallback((timeStamp) {
       _clientProvider = Provider.of<ClientProvider>(context, listen: false);
     });
     super.initState();
@@ -80,7 +80,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       ),
                       style: ElevatedButton.styleFrom(
                           shadowColor: Config.color_1,
-                          primary: Config.color_1,
+                          backgroundColor: Config.color_1,
                           shape: RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(15),
                           ),
@@ -138,7 +138,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       ),
                       style: ElevatedButton.styleFrom(
                           shadowColor: Config.color_1,
-                          primary: Config.color_1,
+                          backgroundColor: Config.color_1,
                           shape: RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(15),
                           ),

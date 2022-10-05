@@ -4,9 +4,9 @@ import 'package:pinput/pin_put/pin_put.dart';
 
 class CodeVerificationPage extends StatefulWidget {
   static const id = "password/verification";
-  CodeVerificationPage({required this.client,required this.passCode});
+  CodeVerificationPage({required this.client, required this.passCode});
   final int passCode;
-  final Client client ;
+  final Client client;
   @override
   _CodeVerificationPageState createState() => _CodeVerificationPageState();
 }
@@ -14,10 +14,10 @@ class CodeVerificationPage extends StatefulWidget {
 class _CodeVerificationPageState extends State<CodeVerificationPage> {
   late TextEditingController _pinPutController;
   final _pinPutFocusNode = FocusNode();
-  bool called=false;
+  bool called = false;
   BoxDecoration get _pinPutDecoration {
     return BoxDecoration(
-      border: Border.all(color:  Config.color_1),
+      border: Border.all(color: Config.color_1),
       borderRadius: BorderRadius.circular(5.0),
     );
   }
@@ -34,13 +34,16 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
     super.dispose();
   }
 
-  void _submit(String _code){
+  void _submit(String _code) {
     print(widget.client.id);
-    if(int.parse(_code) == widget.passCode){
-      
-       Navigator.push(context, MaterialPageRoute(builder: (context)=>ChangePassword(client: widget.client,)));
-    }
-    else{
+    if (int.parse(_code) == widget.passCode) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ChangePassword(
+                    client: widget.client,
+                  )));
+    } else {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -99,8 +102,8 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
               ).paddingOnly(top: 20, bottom: 30),
               Container(
                 color: Colors.white,
-                margin: const EdgeInsets.only(left:20.0,right: 20.0),
-                padding: const EdgeInsets.only(left:20.0,right: 20.0),
+                margin: const EdgeInsets.only(left: 20.0, right: 20.0),
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                 child: PinPut(
                   fieldsCount: 5,
                   onSubmit: (String pin) => _submit(pin),
@@ -127,7 +130,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
                 ),
                 style: ElevatedButton.styleFrom(
                     shadowColor: Config.color_1,
-                    primary: Config.color_1,
+                    backgroundColor: Config.color_1,
                     shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15),
                     ),

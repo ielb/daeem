@@ -17,7 +17,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   void initState() {
     _emailController = TextEditingController();
-    WidgetsBinding.instance?.addPostFrameCallback(
+    WidgetsBinding.instance.addPostFrameCallback(
         (_) => _auth = Provider.of<AuthProvider>(context, listen: false));
     super.initState();
   }
@@ -129,7 +129,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
                 style: ElevatedButton.styleFrom(
                     shadowColor: Config.color_1,
-                    primary: Config.color_1,
+                    backgroundColor: Config.color_1,
                     shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15),
                     ),

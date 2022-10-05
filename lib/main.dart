@@ -25,14 +25,15 @@ import 'package:daeem/screens/password/password_reset.dart';
 import 'package:daeem/screens/product_details.dart';
 import 'package:daeem/screens/products_screen.dart';
 import 'package:daeem/screens/store_screen.dart';
+import 'package:daeem/screens/sub_category.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'services/services.dart';
+
 import 'screens/setup.dart';
-import 'package:daeem/screens/sub_category.dart';
+import 'services/services.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -160,7 +161,7 @@ Route<dynamic> routes(RouteSettings settings) {
     case Category.id:
       return CupertinoPageRoute(
           builder: (_) => Category(
-                category: settings.arguments as String,
+                category: settings.arguments as List<Object?>,
               ),
           settings: settings);
     case CheckoutPage.id:
